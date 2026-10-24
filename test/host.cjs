@@ -287,7 +287,7 @@ async function run() {
   const customIds = path.join(root, 'BP/scripts/component-ids.ts'), customScript = path.join(root, 'BP/scripts/custom-components.ts');
   await fs.mkdir(path.dirname(customIds), { recursive: true });
   await fs.writeFile(customIds, "export const BLOCK_ID = 'test:host_block' as const;");
-  await fs.writeFile(customScript, "import {system} from '@minecraft/server'; import {BLOCK_ID} from './component-ids.js'; system.beforeEvents.startup.subscribe(({blockComponentRegistry: blocks, itemComponentRegistry}) => { blocks.registerCustomComponent(BLOCK_ID, {onTick() {}}); itemComponentRegistry.registerCustomComponent('test:host_item', {}); });");
+  await fs.writeFile(customScript, "import {system} from '@minecraft/server'; import {BLOCK_ID} from './component-ids.js'; system.beforeEvents.startup.subscribe(({blockComponentRegistry: blocks, itemComponentRegistry}) => { blocks.registerCustomComponent(BLOCK_ID, {onTick(event, {params}) { if (typeof params.golden === 'boolean') {} if(typeof params.nested.label === 'string') {} }}); itemComponentRegistry.registerCustomComponent('test:host_item', {}); });");
   const customUri = vscode.Uri.file(path.join(root, 'BP/blocks/custom-components.json'));
   await core.writeJson(customUri.fsPath, { format_version: '1.21.90', 'minecraft:block': { description: { identifier: 'test:host_custom' }, components: { '': {} } } });
   const customDoc = await vscode.workspace.openTextDocument(customUri); await vscode.window.showTextDocument(customDoc);
@@ -308,6 +308,32 @@ async function run() {
   assert.ok(componentHover.some(h => h.contents.some(c => c.value?.includes('onTick'))), 'Custom component registration hover missing');
   const componentDefinitions = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', customUri, registeredPosition);
   assert.ok(componentDefinitions.some(definition => definition.uri?.fsPath.toLowerCase() === customScript.toLowerCase()), 'Custom component registration navigation missing');
+  await setCustomBlock({ 'test:host_block': { '': 0 } });
+  const parameterCompletions = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, customDoc.positionAt(customDoc.getText().indexOf('"":') + 1));
+  assert.ok(parameterCompletions.items.some(item => item.label === 'golden'), 'Script parameter completion missing');
+  assert.ok(parameterCompletions.items.some(item => item.label === 'nested'), 'Nested parameter container completion missing');
+  await setCustomBlock({ 'test:host_block': { golden: false, nested: { '': '' } } });
+  const parameterHover = await vscode.commands.executeCommand('vscode.executeHoverProvider', customUri, customDoc.positionAt(customDoc.getText().indexOf('golden') + 2));
+  assert.ok(parameterHover.some(h => h.contents.some(c => c.value?.includes('boolean') && c.value?.includes('Script:'))), 'Script parameter hover missing');
+  const nestedHints = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, customDoc.positionAt(customDoc.getText().indexOf('"":') + 1));
+  assert.ok(nestedHints.items.some(item => item.label === 'label'), 'Nested script parameter completion missing');
+  const boolHints = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, customDoc.positionAt(customDoc.getText().indexOf('false') + 2));
+  assert.ok(boolHints.items.some(item => item.label === 'true') && boolHints.items.some(item => item.label === 'false'), 'Boolean custom parameter values missing');
+  const geometryFile = path.join(root,'RP/models/blocks/host.geo.json'), terrainFile = path.join(root,'RP/textures/terrain_texture.json');
+  await core.writeJson(geometryFile, {format_version:'1.12.0', 'minecraft:geometry': [{description:{identifier:'geometry.host_test'}}]});
+  await core.writeJson(terrainFile, {texture_data:{host_texture:{textures:'textures/blocks/host'}}});
+  await setCustomBlock({'minecraft:geometry':'', 'minecraft:material_instances': {'*': {texture:''}}});
+  await until(async () => {
+    const hints = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, customDoc.positionAt(customDoc.getText().indexOf('"minecraft:geometry":"') + '"minecraft:geometry":"'.length));
+    return hints.items.some(item => item.label === 'geometry.host_test') && hints.items.some(item => item.label === 'minecraft:geometry.cross');
+  }, 'Pack and vanilla block geometries missing');
+  await until(async () => {
+    const hints = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, customDoc.positionAt(customDoc.getText().indexOf('"texture":"') + '"texture":"'.length));
+    return hints.items.some(item => item.label === 'host_texture');
+  }, 'Terrain atlas material texture completion missing');
+  await setCustomBlock({'minecraft:material_instances': {'*': {texture:'host_texture'}}});
+  const textureDefs = await vscode.commands.executeCommand('vscode.executeDefinitionProvider',customUri,customDoc.positionAt(customDoc.getText().indexOf('host_texture')+3));
+  assert.ok(textureDefs.some(d => d.uri?.fsPath.toLowerCase() === terrainFile.toLowerCase() && d.range.start.line > 0), 'Atlas entry navigation missing');
   await setCustomBlock({}, [{ condition: '1', components: { '': {} } }]);
   await until(async () => {
     const position = customDoc.positionAt(customDoc.getText().indexOf('"":') + 1);

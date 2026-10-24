@@ -12,7 +12,7 @@ function chooseRelease(list, target) {
 function buildIndex(bytes, tag) {
   let expanded = 0;
   const files = unzipSync(bytes, { filter: entry => {
-    if (!/^metadata\/(doc_modules|json_schemas|command_modules|vanilladata_modules)\/.*\.json$/.test(entry.name)) return false;
+    if (!/^metadata\/(doc_modules|json_schemas|command_modules|vanilladata_modules)\/.*\.json$/.test(entry.name) && !/^resource_pack\/textures\/(terrain_texture|item_texture)\.json$/.test(entry.name)) return false;
     expanded += entry.originalSize;
     if (entry.originalSize > 8 * 1024 * 1024 || expanded > 96 * 1024 * 1024) throw new Error('Mojang reference archive exceeds expanded size limit');
     return true;
@@ -20,12 +20,16 @@ function buildIndex(bytes, tag) {
   const read = name => files[name] && JSON.parse(Buffer.from(files[name]).toString('utf8'));
   const result = { tag, engine: engine(tag), source: `https://github.com/Mojang/bedrock-samples/tree/${tag}`, components: { block: {}, entity: {}, item: {} } };
   const text = value => Array.isArray(value) ? value.join('\n\n') : value || '';
-  result.intelligenceVersion = 1;
+  result.intelligenceVersion = 2;
   result.vanilla = {};
   for (const [file, kind] of Object.entries({ items: 'item', blocks: 'block', entities: 'entity', effects: 'effect', enchantments: 'enchantment', biomes: 'biome', dimensions: 'dimension' })) {
     result.vanilla[kind] = [...new Set((read(`metadata/vanilladata_modules/mojang-${file}.json`)?.data_items || []).map(value => value.command_name || value.name).filter(value => typeof value === 'string'))];
   }
   result.commands = read('metadata/command_modules/mojang-commands.json') || { commands: [], command_enums: [] };
+  for (const kind of ['terrain_texture', 'item_texture']) {
+    const bytes = files[`resource_pack/textures/${kind}.json`];
+    result.vanilla[kind] = bytes ? Object.keys(require('jsonc-parser').parse(Buffer.from(bytes).toString('utf8'))?.texture_data || {}) : [];
+  }
   function documented(node) {
     return { description: text(node.description), type: node.type, default: node.default,
       fields: Object.fromEntries((node.nodes || []).filter(n => n.name && !n.name.includes(' ')).map(n => [n.name, { description: text(n.description), type: n.type, default: n.default }])) };
@@ -61,7 +65,7 @@ function buildIndex(bytes, tag) {
 async function loadReference(root, target, { force = false, fetchImpl = globalThis.fetch } = {}) {
   const file = await core.local(root, '.bedrock/reference/components.json');
   const cached = await fs.readFile(file, 'utf8').then(JSON.parse).catch(() => null);
-  if (!force && cached?.intelligenceVersion === 1 && cached?.target === target && cached.tag && Date.now() - cached.updated < 86400000) return cached;
+  if (!force && cached?.intelligenceVersion === 2 && cached?.target === target && cached.tag && Date.now() - cached.updated < 86400000) return cached;
   const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
   async function get(url, limit) {
     const response = await fetchImpl(url, { signal: controller.signal, headers: { 'User-Agent': 'Bedrock-Workbench', Accept: 'application/vnd.github+json' } });
@@ -75,7 +79,7 @@ async function loadReference(root, target, { force = false, fetchImpl = globalTh
     const list = JSON.parse((await get(API, 4 * 1024 * 1024)).toString());
     const release = chooseRelease(list, target);
     if (!release) throw new Error(`No released Mojang samples found at or below engine ${target}`);
-    if (!force && cached?.intelligenceVersion === 1 && cached?.tag === release.tag_name) { cached.target = target; cached.updated = Date.now(); await core.writeJson(file, cached); return cached; }
+    if (!force && cached?.intelligenceVersion === 2 && cached?.tag === release.tag_name) { cached.target = target; cached.updated = Date.now(); await core.writeJson(file, cached); return cached; }
     const asset = release.assets?.find(a => a.name === `bedrock-samples-${release.tag_name}-min.zip`);
     const expected = `https://github.com/Mojang/bedrock-samples/releases/download/${release.tag_name}/${asset?.name}`;
     if (!asset || asset.browser_download_url !== expected) throw new Error('Mojang release is missing its text reference archive');

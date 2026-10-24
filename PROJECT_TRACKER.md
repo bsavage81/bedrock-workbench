@@ -188,3 +188,12 @@ Primary references, exact audited scope, and regeneration instructions are recor
 - [ ] Dynamic/helper-generated registration IDs and optional explicit custom parameter schemas; unsaved script overlays.
 
 Exact supported patterns, exclusions and sources are documented in schemas/AUTHORING.md.
+
+## Completed in 0.11.0
+
+- [x] Pack and compatible vanilla block geometry suggestions, including permutations and identifier objects.
+- [x] Context-aware terrain/item atlas suggestions and precise project source navigation.
+- [x] Custom block/item parameter completions, nested fields, advisory type/example hovers, and source navigation from saved scripts/types and project definitions.
+- [x] Unit and native VS Code host verification for custom parameter keys, nested keys, boolean values, hovers, geometry, and material textures.
+
+Remaining: general function argument flow, external package types, unsaved script inference, and additional texture field contexts.

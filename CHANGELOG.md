@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.11.0 — October 24, 2026
+
+- Complete custom block/item parameter keys, nested fields, and example values from saved script usage, TypeScript types, and existing project definitions; add type/source hovers and Go to Definition. Hints do not impose validation requirements.
+- Complete block geometry fields with pack models and compatible vanilla block geometries, including permutation and object forms.
+- Resolve material instances, destruction particles, item icons, blocks.json, and flipbook atlas tiles against the appropriate project and compatible vanilla texture atlases. Keep image-path fields separate.
+- Navigate directly to project atlas entries and geometry identifiers; refresh the reference cache to include vanilla atlas names.
+
 ## 0.10.0 — October 24, 2026
 
 - Add original block document/state/trait/permutation schemas and 23 common component definitions, with audited nested structural checks and legacy unions.

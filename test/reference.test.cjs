@@ -5,6 +5,8 @@ const { buildIndex, chooseRelease, closest, componentSchema } = require('../src/
 function archive() {
   const json = value => strToU8(JSON.stringify(value));
   return zipSync({
+    'resource_pack/textures/terrain_texture.json': strToU8('{// atlas\n"texture_data":{"stone":{"textures":"textures/blocks/stone"}}}'),
+    'resource_pack/textures/item_texture.json': json({texture_data: {apple: {textures: 'textures/items/apple'}}}),
     'metadata/doc_modules/blocks.json': json({ name: 'Blocks', nodes: [{ name: 'Block Components', nodes: [{ name: 'minecraft:friction', type: 'number', description: ['Controls friction.'], nodes: [] }] }] }),
     'metadata/doc_modules/entities.json': json({ name: 'Entities', nodes: [{ name: 'Server Entity Documentation', nodes: [{ name: 'Components', nodes: [{ name: 'minecraft:health', description: ['Entity health.'], nodes: [{ name: 'value', type: 'Integer', description: ['Starting health.'] }] }] }] }] }),
     'metadata/json_schemas/server/item/1.26.30/Item Components.json': json({ properties: { 'minecraft:food': { $ref: '../1.20.50/food.json', description: 'Food behavior.' } } }),
@@ -14,6 +16,9 @@ function archive() {
 }
 test('Mojang documentation and schema references supply component and field descriptions without beta content', () => {
   const index = buildIndex(archive(), 'v1.26.50.4');
+  assert.equal(index.intelligenceVersion, 2);
+  assert.deepEqual(index.vanilla.terrain_texture, ['stone']);
+  assert.deepEqual(index.vanilla.item_texture, ['apple']);
   assert.equal(index.components.block['minecraft:friction'].description, 'Controls friction.');
   assert.equal(index.components.entity['minecraft:health'].fields.value.description, 'Starting health.');
   assert.equal(index.components.item['minecraft:food'].fields.nutrition.default, 4);

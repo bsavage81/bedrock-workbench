@@ -33,7 +33,12 @@ async function scan(project) {
     batch.push(() => indexFile(index, side, relative).catch(error => { if (error.code !== 'ENOENT') throw error; }));
     if (batch.length === 8) { await Promise.all(batch.map(run => run())); batch = []; }
   }
-  await Promise.all(batch.map(run => run())); refreshScripts(index); return index;
+  await Promise.all(batch.map(run => run())); refreshScripts(index);
+  if (project.config?.targetVersion) try {
+    const cached = await core.readJson(await core.local(project.root, '.bedrock/reference/components.json'));
+    if (cached.engine && require('./releases.cjs').compareVersions(cached.engine, project.config.targetVersion) <= 0) index.reference = cached;
+  } catch { /* Reference data is optional when offline or not yet cached. */ }
+  return index;
 }
 function refreshScripts(index) {
   if (!index.scriptsDirty) return;
@@ -75,7 +80,7 @@ async function indexFile(index, side, relative) {
       for (const id of Object.keys(data?.sound_definitions || {})) index.add('sound', id, file);
       for (const geometry of Array.isArray(data?.['minecraft:geometry']) ? data['minecraft:geometry'] : []) index.add('geometry', geometry?.description?.identifier, file);
       for (const id of Object.keys(data || {})) if (id.startsWith('geometry.')) index.add('geometry', id, file);
-      for (const id of Object.keys(data?.texture_data || {})) index.add(rel.endsWith('terrain_texture.json') ? 'terrain_texture' : 'item_texture', id, file);
+      if (/^(?:subpacks\/[^/]+\/)?textures\/(?:terrain_texture|item_texture)\.json$/.test(rel)) for (const id of Object.keys(data?.texture_data || {})) index.add(rel.endsWith('terrain_texture.json') ? 'terrain_texture' : 'item_texture', id, file);
     }
     for (const id of Object.keys(data?.animations || {})) index.add('animation', id, file);
     for (const id of Object.keys(data?.animation_controllers || {})) index.add('animation_controller', id, file);
@@ -98,10 +103,56 @@ function referenceKind(keys, value, document) {
     if (keys[2] === 'animations' && keys.length === 4) return value?.startsWith('controller.animation.') ? 'animation_controller' : 'animation';
     if (keys[2] === 'render_controllers' && keys.length === 4) return 'render_controller';
   }
-  if (root === 'minecraft:block' && keys.includes('material_instances') && key === 'texture') return 'terrain_texture';
+  const depth = keys[1] === 'components' ? 2 : keys[1] === 'permutations' && typeof keys[2] === 'number' && keys[3] === 'components' ? 4 : 0;
+  const component = depth ? keys[depth] : undefined, tail = keys.slice(depth + 1);
+  if (root === 'minecraft:block' && depth) {
+    if (component === 'minecraft:geometry' && (!tail.length || (tail.length === 1 && key === 'identifier'))) return 'geometry';
+    if (component === 'minecraft:material_instances' && tail.length === 2 && key === 'texture') return 'terrain_texture';
+    if (component === 'minecraft:destruction_particles' && tail.length === 1 && key === 'texture') return 'terrain_texture';
+    if (component === 'minecraft:loot' && !tail.length) return 'loot_table';
+  }
+  if (root === 'minecraft:item' && component === 'minecraft:icon' && (!tail.length || (tail.length === 1 && key === 'texture') || (tail.length === 2 && tail[0] === 'textures'))) return 'item_texture';
+  if (document.side === 'resource') {
+    if (document.relative === 'blocks.json' && ((keys.length === 2 && key === 'textures') || (keys.length === 3 && parent === 'textures'))) return 'terrain_texture';
+    if (document.relative === 'textures/flipbook_textures.json' && keys.length === 2) {
+      if (key === 'atlas_tile') return 'terrain_texture'; if (key === 'flipbook_texture') return 'texture';
+    }
+    if (root === 'particle_effect' && keys.join('/') === 'particle_effect/description/basic_render_parameters/texture') return 'texture';
+    if (['textures/item_texture.json', 'textures/terrain_texture.json'].includes(document.relative) && keys[0] === 'texture_data' && keys[2] === 'textures' && (keys.length === 3 || (keys.length === 4 && (typeof key === 'number' || key === 'path')) || (keys.length === 5 && typeof keys[3] === 'number' && key === 'path'))) return 'texture';
+  }
   if (String(root).startsWith('minecraft:recipe_') && ['item', 'result', 'input', 'output', 'reagent', 'base', 'addition', 'template'].includes(key)) return 'item';
   if (root === 'minecraft:entity' && ['entity_type', 'spawn_entity', 'into'].includes(key)) return 'entity';
   if (root === 'minecraft:entity' && keys.includes('minecraft:loot') && key === 'table') return 'loot_table';
+}
+function builtinGeometries(document, project) {
+  const data = document.data || (document.tree && json.getNodeValue(document.tree));
+  if (!data?.['minecraft:block']) return [];
+  const values = ['minecraft:geometry.full_block', 'minecraft:geometry.cross'];
+  const version = value => { const parts = typeof value === 'string' && /^\d+\.\d+(?:\.\d+)?$/.test(value) ? value.split('.').map(Number) : []; return parts.length ? [...parts, 0].slice(0, 3) : [0, 0, 0]; };
+  const compare = require('./releases.cjs').compareVersions;
+  if (compare(version(data.format_version), [1, 26, 0]) >= 0 && compare(version(project.config?.targetVersion), [1, 26, 0]) >= 0) values.push('minecraft:geometry.full_block_v1');
+  return values;
+}
+function referenceValues(index, kind, document, reference = index.reference) {
+  const values = new Map(index.values(kind));
+  if (kind === 'item') for (const entry of index.values('block')) if (!values.has(entry[0])) values.set(...entry);
+  if (kind === 'animation') for (const entry of index.values('animation_controller')) if (!values.has(entry[0])) values.set(...entry);
+  const vanilla = reference?.vanilla?.[kind];
+  for (const id of Array.isArray(vanilla) ? vanilla : []) if (typeof id === 'string' && !values.has(id)) values.set(id, []);
+  if (kind === 'geometry') for (const id of builtinGeometries(document, index.project)) if (!values.has(id)) values.set(id, []);
+  return values;
+}
+function referenceDefinitions(index, kind, id) {
+  return (index.values(kind).get(id) || []).map(file => {
+    const document = index.documents.get(file); let node;
+    if (document && ['terrain_texture', 'item_texture'].includes(kind)) node = json.findNodeAtLocation(document.tree, ['texture_data', id])?.parent?.children[0];
+    if (document && kind === 'geometry') {
+      const geometries = json.findNodeAtLocation(document.tree, ['minecraft:geometry']);
+      node = geometries?.children?.map(g => json.findNodeAtLocation(g, ['description', 'identifier'])).find(n => n?.value === id) || json.findNodeAtLocation(document.tree, [id])?.parent?.children[0];
+    }
+    const before = document?.text.slice(0, node?.offset || 0) || '', lines = before.split('\n');
+    return { file, line: lines.length - 1, column: lines.at(-1).length };
+  });
 }
 function componentContext(document, offset) {
   if (document.side !== 'behavior') return;
@@ -144,7 +195,7 @@ function references(document) {
   if (document.tree) walk(document.tree); return result;
 }
 function referenceIssues(index, document) {
-  return references(document).filter(ref => ref.value && !index.values(ref.type).has(ref.value) && !(ref.type === 'item' && index.values('block').has(ref.value)) && !ref.value.startsWith('minecraft:') && !/[?()[\]{}]/.test(ref.value)).map(ref => ({ file: document.file, offset: ref.node.offset + 1, length: Math.max(1, ref.node.length - 2), severity: 'information', message: `${ref.type.replaceAll('_', ' ')} '${ref.value}' was not found in this project. It may be supplied by Minecraft or another pack.` }));
+  return references(document).filter(ref => ref.value && !referenceValues(index, ref.type, document).has(ref.value) && !ref.value.startsWith('minecraft:') && !/[?()[\]{}]/.test(ref.value)).map(ref => ({ file: document.file, offset: ref.node.offset + 1, length: Math.max(1, ref.node.length - 2), severity: 'information', message: `${ref.type.replaceAll('_', ' ')} '${ref.value}' was not found in this project. It may be supplied by Minecraft or another pack.` }));
 }
 function molangNodes(document) {
   if (!/^(?:animations|animation_controllers|particles|entity|attachables)\//.test(document.relative)) return [];
@@ -166,4 +217,4 @@ function molangIssues(document) {
     return molangParser.parse(node.value).errors.map(error => ({ file: document.file, offset: offsets[error.start] || node.offset + 1, length: Math.max(1, (offsets[error.end] || offsets[error.start] || node.offset + 1) - (offsets[error.start] || node.offset + 1)), severity: 'warning', message: `Molang: ${error.message}` }));
   });
 }
-module.exports = { ContentIndex, scan, update, fileKind, referenceKind, references, referenceIssues, componentContext, customComponentIssues, molangNodes, molangIssues, rawOffsets, MOLANG_QUERIES, MOLANG_MATH, molangParser };
+module.exports = { ContentIndex, scan, update, fileKind, referenceKind, referenceValues, referenceDefinitions, builtinGeometries, references, referenceIssues, componentContext, customComponentIssues, molangNodes, molangIssues, rawOffsets, MOLANG_QUERIES, MOLANG_MATH, molangParser };

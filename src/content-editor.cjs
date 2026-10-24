@@ -3,6 +3,7 @@ const json = require('jsonc-parser');
 const content = require('./content.cjs');
 const reference = require('./reference.cjs');
 const commands = require('./commands.cjs');
+const parameters = require('./component-parameters.cjs');
 function attach(vscode, context, getProject, output) {
   if (!vscode.languages.registerCompletionItemProvider) return;
   const diagnostics = vscode.languages.createDiagnosticCollection('bedrock-content');
@@ -58,6 +59,68 @@ function attach(vscode, context, getProject, output) {
     diagnostics.set(document.uri, issues.map(issue => diagnostic(document, issue)));
   }
   const selector = [{ language: 'json', scheme: 'file' }, { language: 'jsonc', scheme: 'file' }];
+  function parameterAt(document, position) {
+    const data = documentData(document); if (!data) return;
+    const state = parameters.context(data, document.offsetAt(position)); if (state) return { ...state, data };
+  }
+  function parameterMarkdown(id, value, index) {
+    const md = new vscode.MarkdownString();
+    md.appendText(`${id}${value.path.length ? ' · ' + value.path.join('.') : ''}\n\n`);
+    if (value.description) md.appendText(value.description + '\n\n');
+    md.appendText(`Parameter hint: ${value.types.join(' | ') || 'unknown type'}. Inferred from script usage and existing project definitions; not a validation requirement.`);
+    if (value.samples.length) md.appendText('\nExamples: ' + value.samples.map(sample => JSON.stringify(sample)).join(', '));
+    for (const source of value.sources) md.appendText(`\n${source.origin === 'script' ? 'Script' : 'Example'}: ${path.relative(index.project.root, source.file)}:${source.line + 1}`);
+    return md;
+  }
+  context.subscriptions.push(
+    vscode.languages.registerCompletionItemProvider(selector, {
+      async provideCompletionItems(document, position) {
+        const state = parameterAt(document, position); if (!state) return;
+        const index = await ensure(); if (!index) return;
+        const values = parameters.hints(index, state.kind, state.id), same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+        if (state.mode === 'key') {
+          const parent = json.findNodeAtLocation(state.data.tree, state.location.path.slice(0, -1));
+          const existing = new Set(parent?.children?.filter(n => n.type === 'property').map(n => n.children[0].value));
+          return values.filter(value => value.path.length === state.path.length + 1 && same(value.path.slice(0, -1), state.path) && value.path.at(-1) !== '*' && (!existing.has(value.path.at(-1)) || value.path.at(-1) === state.field)).map(value => {
+            const key = value.path.at(-1), item = new vscode.CompletionItem(key, vscode.CompletionItemKind.Property);
+            item.detail = `Custom parameter · ${value.types.join(' | ') || 'inferred'}`; item.documentation = parameterMarkdown(state.id, value, index);
+            if (state.node?.type === 'string') { item.range = new vscode.Range(document.positionAt(state.node.offset + 1), document.positionAt(state.node.offset + state.node.length - 1)); item.insertText = key; }
+            else {
+              const example = value.samples.length ? JSON.stringify(value.samples[0]) : value.types.includes('boolean') ? 'false' : value.types.some(type => ['number', 'integer'].includes(type)) ? '0' : value.types.includes('string') ? '""' : value.types.includes('array') ? '[]' : '{}';
+              item.insertText = new vscode.SnippetString(JSON.stringify(key) + ': ${1:' + example.replace(/[\\$}]/g, '\\$&') + '}');
+            }
+            return item;
+          });
+        }
+        const value = values.find(value => same(value.path, state.path)); if (!value) return;
+        const samples = new Set(value.samples); if (value.types.includes('boolean')) { samples.add(true); samples.add(false); }
+        return [...samples].map(sample => {
+          const item = new vscode.CompletionItem(JSON.stringify(sample), vscode.CompletionItemKind.Value); item.documentation = parameterMarkdown(state.id, value, index); item.detail = 'Custom parameter example';
+          const quoted = state.node?.type === 'string', string = typeof sample === 'string';
+          if (quoted) item.range = new vscode.Range(document.positionAt(state.node.offset + (string ? 1 : 0)), document.positionAt(state.node.offset + state.node.length - (string ? 1 : 0)));
+          item.insertText = quoted && string ? JSON.stringify(sample).slice(1, -1) : JSON.stringify(sample); return item;
+        });
+      }
+    }, '"', ':'),
+    vscode.languages.registerHoverProvider(selector, {
+      async provideHover(document, position) {
+        const state = parameterAt(document, position); if (!state) return;
+        const index = await ensure(); if (!index) return;
+        const path = state.mode === 'key' ? [...state.path, state.field] : state.path;
+        const value = parameters.hints(index, state.kind, state.id).find(value => JSON.stringify(value.path) === JSON.stringify(path));
+        if (value) return new vscode.Hover(parameterMarkdown(state.id, value, index));
+      }
+    }),
+    vscode.languages.registerDefinitionProvider(selector, {
+      async provideDefinition(document, position) {
+        const state = parameterAt(document, position); if (!state) return;
+        const index = await ensure(); if (!index) return;
+        const path = state.mode === 'key' ? [...state.path, state.field] : state.path;
+        const value = parameters.hints(index, state.kind, state.id).find(value => JSON.stringify(value.path) === JSON.stringify(path));
+        return value?.sources.map(source => new vscode.Location(vscode.Uri.file(source.file), new vscode.Position(source.line, source.column)));
+      }
+    })
+  );
   function customAt(document, position) {
     const data = documentData(document); if (!data) return;
     const state = content.componentContext(data, document.offsetAt(position));
@@ -114,14 +177,13 @@ function attach(vscode, context, getProject, output) {
         });
         const kind = content.referenceKind(location.path, node.value, data); if (!kind) return;
         const index = await ensure(); if (!index) return;
-        const values = new Map(index.values(kind));
-        const refs = await referenceData();
-        for (const id of refs?.vanilla?.[kind] || []) if (!values.has(id)) values.set(id, []);
-        if (kind === 'item') for (const entry of index.values('block')) values.set(...entry);
-        if (kind === 'animation') for (const entry of index.values('animation_controller')) values.set(...entry);
+        const refs = /^(item|block|entity|terrain_texture|item_texture)$/.test(kind) ? await referenceData() : index.reference;
+        if (refs) index.reference = refs;
+        const values = content.referenceValues(index, kind, data, refs);
         return [...values].map(([id, files]) => {
           const item = new vscode.CompletionItem(id, vscode.CompletionItemKind.Reference); item.range = range; item.insertText = id;
-          item.detail = files.length ? `Project ${kind.replaceAll('_', ' ')}` : `Minecraft ${refs.tag}`; item.documentation = files.length ? files.map(file => path.relative(index.project.root, file)).join('\n') : refs.source; return item;
+          item.detail = files.length ? `Project ${kind.replaceAll('_', ' ')}` : kind === 'geometry' ? 'Vanilla block geometry' : `Minecraft ${refs?.tag || 'reference'}`;
+          item.documentation = files.length ? files.map(file => path.relative(index.project.root, file)).join('\n') : kind === 'geometry' ? 'Built-in block geometry. Availability depends on the block format and target engine.' : refs?.source; return item;
         });
       }
     }, '"', '.', ':'),
@@ -145,7 +207,7 @@ function attach(vscode, context, getProject, output) {
       async provideDefinition(document, position) {
         const state = at(document, position); if (!state) return;
         const kind = content.referenceKind(state.location.path, state.node.value, state.data); if (!kind) return;
-        const index = await ensure(); return index?.values(kind).get(state.node.value)?.map(file => new vscode.Location(vscode.Uri.file(file), new vscode.Position(0, 0)));
+        const index = await ensure(); return index && content.referenceDefinitions(index, kind, state.node.value).map(value => new vscode.Location(vscode.Uri.file(value.file), new vscode.Position(value.line, value.column)));
       }
     }),
     vscode.workspace.onDidOpenTextDocument(document => { validate(document); void ensure().then(() => validate(document)); }),
