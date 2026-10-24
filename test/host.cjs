@@ -117,7 +117,13 @@ async function run() {
   const molangPosition = animationDoc.positionAt(animationDoc.getText().indexOf('query.anim_time') + 'query.anim_'.length);
   const molangCompletions = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', animationUri, molangPosition);
   assert.ok(molangCompletions.items.some(item => item.label === 'query.anim_time' && item.detail === 'Mojang Molang reference'), 'Molang completion missing');
+  assert.ok(commands.includes('bedrock.vanillaSource'),'Vanilla reference source command missing');
+  await core.writeJson(path.join(root,'BP/recipes/vanilla-validation.json'),{format_version:'1.26.50','minecraft:recipe_shapeless':{description:{identifier:'test:vanilla_validation'},tags:['crafting_table'],ingredients:[{item:'minecraft:diamnod'}],result:'minecraft:diamond'}});
   await vscode.commands.executeCommand('bedrock.validate');
+  const vanillaReport=await core.readJson(path.join(root,'.bedrock/validation-report.json'));
+  assert.ok(vanillaReport.vanillaSources.some(source=>source.type==='samples'),'Validation report omitted the vanilla source');
+  assert.ok(vanillaReport.issues.some(issue=>issue.message.includes("'minecraft:diamnod'")&&issue.severity==='information'),'Unknown vanilla item was not identified');
+  assert.ok(!vanillaReport.issues.some(issue=>issue.message.includes("'minecraft:diamond' was not found")),'Valid vanilla item was marked missing');
   const functionUri = vscode.Uri.file(path.join(root, 'BP/functions/editor.mcfunction'));
   await fs.mkdir(path.dirname(functionUri.fsPath), { recursive: true });
   await fs.writeFile(functionUri.fsPath, 'give @s minecraft:di');
@@ -302,6 +308,19 @@ async function run() {
     edit.replace(customUri, new vscode.Range(customDoc.positionAt(0), customDoc.positionAt(customDoc.getText().length)), JSON.stringify({ format_version: '1.21.90', 'minecraft:block': { description: { identifier: 'test:host_custom' }, components, ...(permutations ? { permutations } : {}) } }));
     assert.ok(await vscode.workspace.applyEdit(edit));
   }
+  await setCustomBlock({'minecraft:collision_box':null});
+  const collisionPosition=customDoc.positionAt(customDoc.getText().indexOf('null'));
+  const collisionHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',customUri,collisionPosition);
+  const collisionArray=collisionHints.items.find(item=>item.label==='Collision box array');
+  assert.ok(collisionArray,'Collision-box array starter missing');
+  assert.ok(collisionArray.insertText.value.includes('[')&&collisionArray.insertText.value.includes('origin'),'Collision-array suggestion does not insert boxes');
+  assert.ok(collisionHints.items.some(item=>item.label==='Single collision box'),'Single collision-box starter missing');
+  assert.ok(collisionHints.items.some(item=>item.label==='true')&&collisionHints.items.some(item=>item.label==='false'),'Boolean collision values missing');
+  await setCustomBlock({'minecraft:collision_box':[]});
+  const collisionItemHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',customUri,customDoc.positionAt(customDoc.getText().indexOf('[]')+1));
+  assert.ok(collisionItemHints.items.some(item=>item.label==='Single collision box'),'Collision array entry starter missing');
+  const collisionHover=await vscode.commands.executeCommand('vscode.executeHoverProvider',customUri,customDoc.positionAt(customDoc.getText().indexOf('minecraft:collision_box')+5));
+  assert.ok(collisionHover.some(h=>h.contents.some(c=>c.value?.includes('array defines multiple boxes')&&c.value.includes('learn.microsoft.com'))),'Collision array hover missing');
   await setCustomBlock({'minecraft:random_offset':{x:{range:{min:-4,max:4},steps:0}},'minecraft:flower_pottable':{}});
   for(const [needle,expected] of [['minecraft:random_offset','Position-seeded'],['minecraft:flower_pottable','flower pot'],['steps','Zero permits'],['min','Minimum displacement']]) {
     const position=customDoc.positionAt(customDoc.getText().indexOf('"'+needle+'"')+2);
@@ -347,6 +366,25 @@ async function run() {
   assert.ok(nestedHints.items.some(item => item.label === 'label'), 'Nested script parameter completion missing');
   const boolHints = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, customDoc.positionAt(customDoc.getText().indexOf('false') + 2));
   assert.ok(boolHints.items.some(item => item.label === 'true') && boolHints.items.some(item => item.label === 'false'), 'Boolean custom parameter values missing');
+  async function rawBlock(source) {
+    const edit=new vscode.WorkspaceEdit();
+    edit.replace(customUri,new vscode.Range(customDoc.positionAt(0),customDoc.positionAt(customDoc.getText().length)),source.replace('|',''));
+    assert.ok(await vscode.workspace.applyEdit(edit));
+    return customDoc.positionAt(source.indexOf('|'));
+  }
+  const commaCases=[
+    ['{"minecraft:block":{"components":{"test:host_block":{"golden":fa|lse "other":0}}}}','true','true,'],
+    ['{"minecraft:block":{"components":{"minecraft:placement_filter":{"conditions":[{"block_filter":["|" "minecraft:dirt"]}]}}}}','minecraft:stone','"minecraft:stone",'],
+    ['{"minecraft:block":{"components":{"minecraft:placement_filter":{"conditions":[{"block_filter":["|", "minecraft:dirt"]}]}}}}','minecraft:stone','"minecraft:stone"']
+  ];
+  for(const [source,label,expected]of commaCases) {
+    const position=await rawBlock(source);
+    const hints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',customUri,position);
+    const item=hints.items.find(item=>item.label===label);assert.ok(item,'Comma case completion missing: '+label);
+    assert.equal(item.insertText,expected);
+    const edit=new vscode.WorkspaceEdit();edit.replace(customUri,item.range,item.insertText);assert.ok(await vscode.workspace.applyEdit(edit));
+    const errors=[];require('jsonc-parser').parse(customDoc.getText(),errors);assert.deepEqual(errors,[],'Accepting a value left invalid JSON');
+  }
   const geometryFile = path.join(root,'RP/models/blocks/host.geo.json'), terrainFile = path.join(root,'RP/textures/terrain_texture.json');
   await core.writeJson(geometryFile, {format_version:'1.12.0', 'minecraft:geometry': [{description:{identifier:'geometry.host_test'}}]});
   await core.writeJson(terrainFile, {texture_data:{host_texture:{textures:'textures/blocks/host'}}});

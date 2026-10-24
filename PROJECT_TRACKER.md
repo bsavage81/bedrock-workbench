@@ -1,5 +1,11 @@
 # Bedrock VS Code Extension — project tracker
 
+Included in 0.13.0: collision_box array/object starter completions and a clearer multi-box hover are fixed locally and verified in VS Code. Publication authorized October 24, 2026.
+
+Also included in 0.13.0: custom parameter/reference value completions and new-key snippets supply missing commas before following object properties or array entries, preserving existing commas and skipping JSONC comments. String values are inserted with complete escaped quotes. Unit and native VS Code acceptance checks pass; release verification completed before distribution.
+
+Vanilla validation in 0.13.0: released samples now index full supported vanilla resource identifiers, namespaced unknowns are informational rather than silently skipped, and validation reports list sources. Added an opt-in read-only installed-pack selector with machine-local Release/Preview persistence, declared-version filtering, size limits, and disconnect support. User game directories have not been scanned; tests use isolated fixtures. Included in the authorized 0.13.0 release.
+
 Updated: October 23, 2026
 
 ## Goal

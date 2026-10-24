@@ -67,8 +67,9 @@ async function harness(t, autoDeploy = false, releaseScenario = {}) {
   };
   const extensionFile = path.resolve('src/extension.cjs'), actualRequire = createRequire(extensionFile), module = { exports: {} };
   const factory = vm.runInNewContext(`(function(require, module, exports) { ${await fs.readFile(extensionFile, 'utf8')}\n})`, { console, process, setTimeout, clearTimeout }, { filename: extensionFile });
-  factory(name => name === 'vscode' ? vscode : name === './releases.cjs' ? releaseApi : name === './scripts.cjs' ? scriptApi : name === './experiment-updates.cjs' ? updates : actualRequire(name), module, module.exports);
-  module.exports.activate({ subscriptions: disposables, extensionUri: uri(path.dirname(path.dirname(extensionFile))) });
+  factory(name => name === 'vscode' ? vscode : name === './releases.cjs' ? releaseApi : name === './scripts.cjs' ? scriptApi : name === './reference.cjs' ? {...actualRequire(name),loadReference:async()=>undefined} : name === './experiment-updates.cjs' ? updates : actualRequire(name), module, module.exports);
+  const state=new Map();
+  module.exports.activate({ subscriptions: disposables, extensionUri: uri(path.dirname(path.dirname(extensionFile))),globalState:{get:(key,fallback)=>state.has(key)?state.get(key):fallback,update:async(key,value)=>state.set(key,value)} });
   t.after(() => disposables.forEach(d => d.dispose()));
   await commands.get('bedrock.refresh')();
   async function sidebar(node) {
@@ -79,8 +80,24 @@ async function harness(t, autoDeploy = false, releaseScenario = {}) {
     }
     return result;
   }
-  return { root, config, destination, inputs, prompts, errors, vscode, commands, fileSelections, iconPrompts, information, finishRelease, releaseCalls: () => releaseCalls, setQuickPick: choice => { quickPick = choice; }, sidebar, checkbox: (node, state) => checkboxHandler({ items: [[node, state]] }) };
+  return { root, config, destination, inputs, prompts, errors, vscode, commands, fileSelections, iconPrompts, information, finishRelease,state, releaseCalls: () => releaseCalls, setQuickPick: choice => { quickPick = choice; }, sidebar, checkbox: (node, state) => checkboxHandler({ items: [[node, state]] }) };
 }
+test('installed vanilla references require folder selection and can be disconnected without changing pack settings',async t=>{
+  const h=await harness(t),folder=path.join(h.root,'selected-game');
+  await core.writeJson(path.join(folder,'resource_pack/textures/terrain_texture.json'),{texture_data:{test:{textures:'textures/test'}}});
+  const before=await fs.readFile(path.join(h.root,'bedrock-project.json'),'utf8');
+  h.setQuickPick('Select installed vanilla packs…');
+  await h.commands.get('bedrock.vanillaSource')();
+  assert.equal(h.state.has('bedrock.vanillaSources'),false,'Canceling folder consent must not select a source');
+  h.fileSelections.push([{fsPath:folder}]);h.inputs.push(h.config.targetVersion);
+  await h.commands.get('bedrock.vanillaSource')();
+  assert.deepEqual(h.errors,[]);
+  assert.equal(h.state.get('bedrock.vanillaSources').release.folder,folder);
+  assert.match(h.iconPrompts.at(-1).openLabel,/read-only/);
+  assert.equal(await fs.readFile(path.join(h.root,'bedrock-project.json'),'utf8'),before);
+  h.setQuickPick('Mojang samples only');await h.commands.get('bedrock.vanillaSource')();
+  assert.equal(h.state.get('bedrock.vanillaSources').release,undefined);
+});
 async function assertVersion(root, version) {
   assert.deepEqual((await core.loadProject(root)).config.version, version);
   for (const folder of ['BP', 'RP']) {

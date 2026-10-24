@@ -15,7 +15,11 @@ const componentProperties = {
   'minecraft:light_dampening': { type: 'integer', minimum: 0, maximum: 15, description: 'Amount of light blocked by the block.' },
   'minecraft:destructible_by_mining': { ...boolOr(object({ seconds_to_destroy: { type: 'number', minimum: 0 }, item_specific_speeds: array(object({ item: { anyOf: [string(), object({ tags: string(), name: string() })] }, destroy_speed: { type: 'number' } }, ['item', 'destroy_speed'])) })), description: 'Mining behavior, with optional per-item speeds.' },
   'minecraft:destructible_by_explosion': { ...boolOr(object({ explosion_resistance: { type: 'number', minimum: 0 } })), description: 'Explosion resistance, or a boolean switch.' },
-  'minecraft:collision_box': { anyOf: [{ type: 'boolean' }, ref('box'), array(ref('box'))], description: 'Collision shape; box arrays require a supporting format and engine.' },
+  'minecraft:collision_box': {
+    anyOf: [{ type: 'boolean' }, ref('box'), array(ref('box'))],
+    description: 'Collision bounds: true uses a full cube, false disables collision, an object defines one box, and an array defines multiple boxes. Box arrays and heights up to 24 model units are stable from format 1.26.0; earlier formats used experimental support.',
+    defaultSnippets: [{ label: 'Collision box array', description: 'Create a list of collision boxes for a multi-part shape.', body: [{ origin: [-8, 0, -8], size: [16, 16, 16] }] }]
+  },
   'minecraft:selection_box': { ...boolOr(ref('box')), description: 'Outline used when targeting the block.' },
   'minecraft:geometry': { anyOf: [object({ identifier: string('Geometry identifier from a resource pack.'), bone_visibility: { type: 'object', additionalProperties: { type: ['boolean', 'string'] } }, culling: string(), culling_layer: string(), culling_shape: string(), uv_lock: { anyOf: [{ type: 'boolean' }, array(string())] } }, ['identifier']), string('Geometry identifier from a resource pack.')], description: 'Geometry and optional bone visibility/culling settings.' },
   'minecraft:material_instances': { type: 'object', additionalProperties: { anyOf: [ref('material'), string('Reference another named material instance.')] }, description: 'Maps geometry material slots or faces to textures and rendering settings.' },

@@ -1,0 +1,45 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs/promises');
+const path=require('node:path');
+const json=require('jsonc-parser');
+const vanilla=require('../src/vanilla.cjs');
+const content=require('../src/content.cjs');
+test('vanilla identifiers are checked when cataloged, with unknowns informational and aliases accepted',()=>{
+  const text=JSON.stringify({'minecraft:recipe_shapeless':{ingredients:[{item:'minecraft:diamond'},{item:'diamond'},{item:'minecraft:diamnod'},{item:'other:external'}]}});
+  const document={side:'behavior',relative:'recipes/test.json',file:'test.json',text,tree:json.parseTree(text)};
+  const index=new content.ContentIndex({config:{targetVersion:'1.26.50'}});
+  index.reference={vanilla:{item:['minecraft:diamond']}};
+  const issues=content.referenceIssues(index,document);
+  assert.equal(issues.length,2);assert.ok(issues.every(i=>i.severity==='information'));
+  assert.ok(issues.some(i=>i.message.includes('minecraft:diamnod')));
+  assert.ok(issues.every(i=>i.message.includes('indexed vanilla references')));
+  index.reference=undefined;
+  assert.equal(content.referenceIssues(index,document).some(i=>i.message.includes('minecraft:diamnod')),false,'Missing catalogs cannot establish an unknown vanilla name');
+});
+test('selected vanilla folders are indexed read-only and matched to channel, version, and selection',async t=>{
+  await fs.mkdir('.test-temp',{recursive:true});
+  const root=await fs.mkdtemp(path.resolve('.test-temp/vanilla-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+  const folder=path.join(root,'game');
+  async function write(relative,data){const file=path.join(folder,relative);await fs.mkdir(path.dirname(file),{recursive:true});await fs.writeFile(file,JSON.stringify(data));return file;}
+  const packFile=await write('Content/data/resource_packs/vanilla/models/entity/test.geo.json',{'minecraft:geometry':[{description:{identifier:'geometry.installed'}}]});
+  await write('Content/data/resource_packs/vanilla/textures/terrain_texture.json',{texture_data:{installed:{textures:'textures/blocks/installed'}}});
+  await write('Content/data/behavior_packs/vanilla/blocks/test.json',{'minecraft:block':{description:{identifier:'minecraft:installed'}}});
+  await write('Content/data/resource_packs/unrelated/models/entity/test.json',{'geometry.not_vanilla':{}});
+  const before=await fs.readFile(packFile);
+  const project={root,config:{target:'release',targetVersion:'1.26.50'},vanillaSource:{folder,version:'1.26.50'}};
+  const result=await vanilla.local(project);
+  assert.equal(result.packs,2);assert.deepEqual(result.vanilla.geometry,['geometry.installed']);
+  assert.deepEqual(result.vanilla.block,['minecraft:installed']);
+  assert.deepEqual(result.vanilla.texture,['textures/blocks/installed']);
+  assert.deepEqual(await fs.readFile(packFile),before);
+  const merged=vanilla.merge({vanilla:{block:['minecraft:stone']}},result);
+  assert.deepEqual(merged.vanilla.block,['minecraft:stone','minecraft:installed']);
+  assert.equal((await vanilla.local(project)).updated,result.updated,'Same source uses cache');
+  assert.equal(await vanilla.local({...project,vanillaSource:undefined}),undefined,'Unselected sources must not be read');
+  await assert.rejects(vanilla.local({...project,vanillaSource:{folder,version:'1.26.60'}}),/newer than target/);
+  const preview=await vanilla.local({...project,config:{...project.config,target:'preview'}});
+  assert.equal(preview.source.channel,'preview');
+  const empty=path.join(root,'empty');await fs.mkdir(empty);
+  await assert.rejects(vanilla.local({...project,vanillaSource:{folder:empty,version:'1.26.50'}}),/No readable vanilla packs/);
+});

@@ -4,7 +4,7 @@ const content = require('./content.cjs');
 const reference = require('./reference.cjs');
 const commands = require('./commands.cjs');
 const parameters = require('./component-parameters.cjs');
-const {keyEdit} = require('./completion-key.cjs');
+const {keyEdit,valueEdit} = require('./completion-key.cjs');
 const documentation = require('./documentation.cjs');
 function attach(vscode, context, getProject, output) {
   if (!vscode.languages.registerCompletionItemProvider) return;
@@ -23,7 +23,7 @@ function attach(vscode, context, getProject, output) {
   }
   async function ensure() {
     const project = getProject(); if (!project || disposed) return;
-    const next = JSON.stringify([project.root, project.packs]);
+    const next = JSON.stringify([project.root, project.packs,project.vanillaSource,project.config.target,project.config.targetVersion]);
     if (next !== key) { key = next; dirty = true; cached = undefined; pendingFiles.clear(); }
     if (running) { await running; return ensure(); }
     if (!dirty && cached) return cached;
@@ -61,11 +61,15 @@ function attach(vscode, context, getProject, output) {
     diagnostics.set(document.uri, issues.map(issue => diagnostic(document, issue)));
   }
   const selector = [{ language: 'json', scheme: 'file' }, { language: 'jsonc', scheme: 'file' }];
-  function completeKey(item, document, state, key, valueSnippet) {
-    const edit = keyEdit(state.data.text, state.node, key, valueSnippet);
+  function completeKey(item, document, state, key, valueSnippet, position) {
+    const edit = keyEdit(state.data.text, state.node, key, valueSnippet,document.offsetAt(position));
     if (edit.start !== undefined) item.range = new vscode.Range(document.positionAt(edit.start), document.positionAt(edit.end));
     item.insertText = edit.snippet ? new vscode.SnippetString(edit.text) : edit.text;
     if (edit.snippet) item.command = { command: 'editor.action.triggerSuggest', title: 'Suggest parameter values' };
+  }
+  function completeValue(item,document,state,position,value) {
+    const edit=valueEdit(state.data.text,state.node,document.offsetAt(position),value);
+    item.range=new vscode.Range(document.positionAt(edit.start),document.positionAt(edit.end)); item.insertText=edit.text; item.filterText=JSON.stringify(value);
   }
   function parameterAt(document, position) {
     const data = documentData(document); if (!data) return;
@@ -95,7 +99,7 @@ function attach(vscode, context, getProject, output) {
             item.detail = `Custom parameter · ${value.types.join(' | ') || 'inferred'}`; item.documentation = parameterMarkdown(state.id, value, index);
             const example = value.samples.length ? JSON.stringify(value.samples[0]) : value.types.includes('boolean') ? 'false' : value.types.some(type => ['number', 'integer'].includes(type)) ? '0' : value.types.includes('array') ? '[]' : value.types.includes('object') ? '{}' : '""';
             const quoted = example.startsWith('"'), placeholder = (quoted ? example.slice(1,-1) : example).replace(/[\\$}]/g, '\\$&');
-            completeKey(item, document, state, key, (quoted ? '"' : '') + '${1:' + placeholder + '}' + (quoted ? '"' : ''));
+            completeKey(item, document, state, key, (quoted ? '"' : '') + '${1:' + placeholder + '}' + (quoted ? '"' : ''), position);
             return item;
           });
         }
@@ -103,9 +107,7 @@ function attach(vscode, context, getProject, output) {
         const samples = new Set(value.samples); if (value.types.includes('boolean')) { samples.add(true); samples.add(false); }
         return [...samples].map(sample => {
           const item = new vscode.CompletionItem(JSON.stringify(sample), vscode.CompletionItemKind.Value); item.documentation = parameterMarkdown(state.id, value, index); item.detail = 'Custom parameter example';
-          const quoted = state.node?.type === 'string', string = typeof sample === 'string';
-          if (quoted) item.range = new vscode.Range(document.positionAt(state.node.offset + (string ? 1 : 0)), document.positionAt(state.node.offset + state.node.length - (string ? 1 : 0)));
-          item.insertText = quoted && string ? JSON.stringify(sample).slice(1, -1) : JSON.stringify(sample); return item;
+          completeValue(item,document,state,position,sample); return item;
         });
       }
     }, '"', ':'),
@@ -145,10 +147,8 @@ function attach(vscode, context, getProject, output) {
           item.detail = `Project ${state.kind} custom component`;
           item.documentation = files.map(file => path.relative(index.project.root, file)).join('\n');
           if (state.mode === 'key') {
-            completeKey(item, document, state, id, '{\n\t$0\n}');
-          } else if (state.node?.type === 'string') {
-            item.range = new vscode.Range(document.positionAt(state.node.offset + 1), document.positionAt(state.node.offset + state.node.length - 1)); item.insertText = id;
-          } else item.insertText = JSON.stringify(id);
+            completeKey(item, document, state, id, '{\n\t$0\n}',position);
+          } else completeValue(item,document,state,position,id);
           return item;
         });
       }
@@ -188,12 +188,13 @@ function attach(vscode, context, getProject, output) {
         const kind = content.referenceKind(location.path, node.value, data); if (!kind) return;
         const index = await ensure(); if (!index) return;
         const refs = /^(item|block|entity|terrain_texture|item_texture)$/.test(kind) ? await referenceData() : index.reference;
-        if (refs) index.reference = refs;
-        const values = content.referenceValues(index, kind, data, refs);
+        if (refs) index.reference = require('./vanilla.cjs').merge(refs,index.localReference);
+        const values = content.referenceValues(index, kind, data, index.reference);
         return [...values].map(([id, files]) => {
-          const item = new vscode.CompletionItem(id, vscode.CompletionItemKind.Reference); item.range = range; item.insertText = id;
-          item.detail = files.length ? `Project ${kind.replaceAll('_', ' ')}` : kind === 'geometry' ? 'Vanilla block geometry' : `Minecraft ${refs?.tag || 'reference'}`;
-          item.documentation = files.length ? files.map(file => path.relative(index.project.root, file)).join('\n') : kind === 'geometry' ? 'Built-in block geometry. Availability depends on the block format and target engine.' : refs?.source; return item;
+          const item = new vscode.CompletionItem(id, vscode.CompletionItemKind.Reference); completeValue(item,document,state,position,id);
+          const local=index.localReference?.vanilla?.[kind]?.includes(id),builtin=kind==='geometry' && content.builtinGeometries(data,index.project).includes(id);
+          item.detail = files.length ? `Project ${kind.replaceAll('_', ' ')}` : local ? `Installed vanilla ${index.localReference.source.version}` : builtin ? 'Vanilla block geometry' : `Minecraft ${index.reference?.tag || 'reference'}`;
+          item.documentation = files.length ? files.map(file => path.relative(index.project.root, file)).join('\n') : local ? index.localReference.source.folder : builtin ? 'Built-in block geometry. Availability depends on the block format and target engine.' : index.reference?.source; return item;
         });
       }
     }, '"', '.', ':'),
@@ -260,7 +261,7 @@ function attach(vscode, context, getProject, output) {
     // Config rediscovery briefly clears the active project. Keep using the
     // indexed project during that gap so saved-file events are not dropped.
     const project = getProject() || cached?.project;
-    if (project && path.resolve(uri.fsPath).toLowerCase() === path.join(project.root, '.bedrock/reference/components.json').toLowerCase()) { vanillaKey = undefined; return; }
+    if (project && path.resolve(uri.fsPath).toLowerCase() === path.join(project.root, '.bedrock/reference/components.json').toLowerCase()) { vanillaKey = undefined; dirty=true; void ensure().then(()=>{for(const document of vscode.workspace.textDocuments)validate(document);}); return; }
     if (!project || !content.fileKind(project, uri.fsPath)) return;
     dirty = true; pendingFiles.add(uri.fsPath); clearTimeout(timer);
     timer = setTimeout(() => { void ensure().then(() => { for (const document of vscode.workspace.textDocuments) validate(document); }); }, 500);

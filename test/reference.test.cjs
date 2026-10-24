@@ -5,6 +5,11 @@ const { buildIndex, chooseRelease, closest, componentSchema } = require('../src/
 function archive() {
   const json = value => strToU8(JSON.stringify(value));
   return zipSync({
+    'behavior_pack/items/apple.json':json({'minecraft:item':{description:{identifier:'minecraft:apple'}}}),
+    'behavior_pack/blocks/stone.json':json({'minecraft:block':{description:{identifier:'minecraft:stone'}}}),
+    'behavior_pack/loot_tables/blocks/stone.json':json({pools:[]}),
+    'resource_pack/models/entity/test.geo.json':json({'minecraft:geometry':[{description:{identifier:'geometry.vanilla_test'}}]}),
+    'resource_pack/animations/test.json':json({animations:{'animation.vanilla_test':{}}}),
     'resource_pack/textures/terrain_texture.json': strToU8('{// atlas\n"texture_data":{"stone":{"textures":"textures/blocks/stone"}}}'),
     'resource_pack/textures/item_texture.json': json({texture_data: {apple: {textures: 'textures/items/apple'}}}),
     'metadata/doc_modules/blocks.json': json({ name: 'Blocks', nodes: [{ name: 'Block Components', nodes: [{ name: 'minecraft:friction', type: 'number', description: ['Controls friction.'], nodes: [] }] }] }),
@@ -16,9 +21,14 @@ function archive() {
 }
 test('Mojang documentation and schema references supply component and field descriptions without beta content', () => {
   const index = buildIndex(archive(), 'v1.26.50.4');
-  assert.equal(index.intelligenceVersion, 2);
+  assert.equal(index.intelligenceVersion, 3);
   assert.deepEqual(index.vanilla.terrain_texture, ['stone']);
   assert.deepEqual(index.vanilla.item_texture, ['apple']);
+  assert.ok(index.vanilla.item.includes('minecraft:apple'));
+  assert.ok(index.vanilla.block.includes('minecraft:stone'));
+  assert.deepEqual(index.vanilla.geometry,['geometry.vanilla_test']);
+  assert.ok(index.vanilla.texture.includes('textures/blocks/stone'));
+  assert.deepEqual(index.vanilla.loot_table,['loot_tables/blocks/stone.json']);
   assert.equal(index.components.block['minecraft:friction'].description, 'Controls friction.');
   assert.equal(index.components.entity['minecraft:health'].fields.value.description, 'Starting health.');
   assert.equal(index.components.item['minecraft:food'].fields.nutrition.default, 4);

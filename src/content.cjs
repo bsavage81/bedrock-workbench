@@ -38,6 +38,8 @@ async function scan(project) {
     const cached = await core.readJson(await core.local(project.root, '.bedrock/reference/components.json'));
     if (cached.engine && require('./releases.cjs').compareVersions(cached.engine, project.config.targetVersion) <= 0) index.reference = cached;
   } catch { /* Reference data is optional when offline or not yet cached. */ }
+  try { index.localReference=await require('./vanilla.cjs').local(project);index.reference=require('./vanilla.cjs').merge(index.reference,index.localReference); }
+  catch(error) { index.referenceWarning=error.message; }
   return index;
 }
 function refreshScripts(index) {
@@ -97,6 +99,11 @@ async function update(index, file) {
 }
 function referenceKind(keys, value, document) {
   const key = keys.at(-1), parent = keys.at(-2), root = keys[0];
+  if(document.relative?.startsWith('loot_tables/') && key==='name') {
+    const type=json.findNodeAtLocation(document.tree,[...keys.slice(0,-1),'type'])?.value;
+    if(type==='item'||type==='minecraft:item')return 'item';
+    if(type==='loot_table'||type==='minecraft:loot_table')return 'loot_table';
+  }
   if (document.side === 'resource' && ['minecraft:client_entity', 'minecraft:attachable'].includes(root) && keys[1] === 'description') {
     if (keys[2] === 'textures' && keys.length === 4) return 'texture';
     if (keys[2] === 'geometry' && keys.length === 4) return 'geometry';
@@ -201,7 +208,13 @@ function references(document) {
   if (document.tree) walk(document.tree); return result;
 }
 function referenceIssues(index, document) {
-  return references(document).filter(ref => ref.value && !referenceValues(index, ref.type, document).has(ref.value) && !ref.value.startsWith('minecraft:') && !/[?()[\]{}]/.test(ref.value)).map(ref => ({ file: document.file, offset: ref.node.offset + 1, length: Math.max(1, ref.node.length - 2), severity: 'information', message: `${ref.type.replaceAll('_', ' ')} '${ref.value}' was not found in this project. It may be supplied by Minecraft or another pack.` }));
+  return references(document).filter(ref => {
+    if(!ref.value||/[?()[\]{}]/.test(ref.value))return false;
+    const values=referenceValues(index,ref.type,document);
+    if(values.has(ref.value)||(['item','block','entity'].includes(ref.type)&&!ref.value.includes(':')&&values.has('minecraft:'+ref.value)))return false;
+    if(ref.value.startsWith('minecraft:')&&!index.reference?.vanilla?.[ref.type]?.length)return false;
+    return true;
+  }).map(ref => ({ file: document.file, offset: ref.node.offset + 1, length: Math.max(1, ref.node.length - 2), severity: 'information', message: `${ref.type.replaceAll('_', ' ')} '${ref.value}' was not found in this project${index.reference?.vanilla?.[ref.type]?.length?' or the indexed vanilla references':''}. It may be supplied by Minecraft or another pack.` }));
 }
 function molangNodes(document) {
   if (!/^(?:animations|animation_controllers|particles|entity|attachables)\//.test(document.relative)) return [];

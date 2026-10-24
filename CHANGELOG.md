@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.0 — October 24, 2026
+
+- Offer collision-box array and single-box starters, including box entries within arrays; clarify supported forms in the Learn-linked hover.
+- Add missing commas when accepting Workbench value suggestions or new custom key/value snippets before a following sibling. Preserve existing separators and JSONC comments.
+- Expand the vanilla samples catalog to geometry, animation/controllers, loot tables, particles, sounds, and texture paths. Check unknown minecraft-prefixed names when catalog data is available, while keeping unresolved references informational.
+- Add optional read-only indexing of explicitly selected installed vanilla packs, with machine-local Release/Preview selections, version checks, caching, and disconnect support. Validation reports record reference sources.
+- Add vanilla item/table name completion and checks for loot entries.
+
 ## 0.12.0 — October 24, 2026
 
 - Expand authored block rules to 46 current/legacy components, including random offsets, flower pots, visuals, redstone, connections, containers, and particle settings. Add nested field descriptions and value choices.

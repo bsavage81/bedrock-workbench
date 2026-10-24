@@ -199,7 +199,26 @@
           "description": "Maximum corner in the newer box representation.",
           "markdownDescription": "Maximum corner in the newer box representation.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
         }
-      }
+      },
+      "defaultSnippets": [
+        {
+          "label": "Single collision box",
+          "description": "One box; add more objects when used inside a collision-box array.",
+          "body": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              16,
+              16
+            ]
+          },
+          "markdownDescription": "One box; add more objects when used inside a collision-box array.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
+        }
+      ]
     },
     "components": {
       "type": "object",
@@ -323,8 +342,29 @@
               }
             }
           ],
-          "description": "Collision shape; box arrays require a supporting format and engine.",
-          "markdownDescription": "Collision shape; box arrays require a supporting format and engine.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
+          "description": "Collision bounds: true uses a full cube, false disables collision, an object defines one box, and an array defines multiple boxes. Box arrays and heights up to 24 model units are stable from format 1.26.0; earlier formats used experimental support.",
+          "defaultSnippets": [
+            {
+              "label": "Collision box array",
+              "description": "Create a list of collision boxes for a multi-part shape.",
+              "body": [
+                {
+                  "origin": [
+                    -8,
+                    0,
+                    -8
+                  ],
+                  "size": [
+                    16,
+                    16,
+                    16
+                  ]
+                }
+              ],
+              "markdownDescription": "Create a list of collision boxes for a multi-part shape.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
+            }
+          ],
+          "markdownDescription": "Collision bounds: true uses a full cube, false disables collision, an object defines one box, and an array defines multiple boxes. Box arrays and heights up to 24 model units are stable from format 1.26.0; earlier formats used experimental support.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
         },
         "minecraft:selection_box": {
           "anyOf": [

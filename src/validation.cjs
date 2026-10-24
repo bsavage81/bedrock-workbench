@@ -11,8 +11,8 @@ function at(document, keys, message, severity = 'error') {
   return { file: document.file, offset: node?.offset || 0, length: Math.max(1, node?.length || 1), message, severity };
 }
 function pointerKeys(pointer) { return pointer.split('/').slice(1).map(k => k.replaceAll('~1', '/').replaceAll('~0', '~')); }
-async function validateProject(root) {
-  const project = await core.loadProject(root), index = await content.scan(project);
+async function validateProject(root, {vanillaSource}={}) {
+  const project = {...await core.loadProject(root),vanillaSource}, index = await content.scan(project);
   const issues = [...index.issues];
   const prepared = await schemas.prepare(project), validateSchema = prepared.directory ? await schemas.validator(prepared) : undefined;
   const unavailable = new Set(); const uuids = new Map();
@@ -56,6 +56,6 @@ async function validateProject(root) {
     }
     for (const duplicates of groups.values()) if (duplicates.length > 1) for (const file of duplicates) issues.push({ file, offset: 0, length: 1, severity: 'warning', message: `Duplicate ${type.replaceAll('_', ' ')} identifier '${id}' in this pack.` });
   }
-  return { files: index.documents.size, schemaVersion: prepared.directory ? schemas.VERSION : null, issues };
+  return { files: index.documents.size, schemaVersion: prepared.directory ? schemas.VERSION : null, vanillaSources:[...(index.reference?.tag?[{type:'samples',tag:index.reference.tag,engine:index.reference.engine}]:[]),...(index.localReference?[{type:'installed',...index.localReference.source}]:[])],referenceWarning:index.referenceWarning, issues };
 }
 module.exports = { validateProject };

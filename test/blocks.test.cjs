@@ -44,6 +44,17 @@ test('expanded block rules cover offset, potted/embedded/item visuals, redstone 
   assert.match(rules['minecraft:flower_pottable'].description,/No parameters/);
   assert.match(rules['minecraft:random_offset'].properties.x.properties.steps.description,/Zero/);
 });
+
+test('collision starter array validates as a multi-box shape and rejects malformed entries',()=>{
+  const schema=require('../schemas/block.schema.json');
+  const component=schema.definitions.components.properties['minecraft:collision_box'];
+  const starter=component.defaultSnippets.find(s=>s.label==='Collision box array').body;
+  assert.ok(Array.isArray(starter));
+  assert.ok(validate(block({'minecraft:collision_box':[...starter,{origin:[-4,16,-4],size:[8,8,8]}]})),JSON.stringify(validate.errors));
+  assert.equal(validate(block({'minecraft:collision_box':[...starter,{size:[8,8]}]})),false);
+  assert.match(component.markdownDescription,/array defines multiple boxes/);
+  assert.match(component.markdownDescription,/learn.microsoft.com/);
+});
 test('script discovery handles TypeScript, imported/reexported constants, registry aliases and block/item separation', () => {
   const base = path.resolve('fixtures/BP/scripts');
   const sources = new Map([
