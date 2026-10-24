@@ -18,6 +18,9 @@ test('component documentation uses published Learn pages, including irregular na
 test('authored and adapted component/field hovers link to Microsoft Learn without replacing descriptions',()=>{
   const block=require('../schemas/block.schema.json').definitions.components.properties;
   for(const component of Object.values(block)) assert.match(component.markdownDescription,/\[Microsoft Learn documentation\]\(https:\/\/learn.microsoft.com/);
+  const definitions=require('../schemas/block.schema.json').definitions;
+  assert.match(definitions.material.properties.face_dimming.markdownDescription,/minecraftblock_material_instances/);
+  assert.match(definitions.box.properties.origin.markdownDescription,/minecraftblock_collision_box/);
   const input={description:'Starting health.',properties:{value:{type:'integer',description:'Initial health points.'}}};
   const schema=adapt(input,'bp/entities/entity_minecraft_health.schema.json');
   assert.match(schema.markdownDescription,/Starting health\..*\n\n.*minecraftcomponent_health/);

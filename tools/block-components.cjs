@@ -84,6 +84,8 @@ module.exports = function extend(schema) {
       for(const value of Object.values(node)) if(Array.isArray(value)) value.forEach(linkFields); else if(value && typeof value==='object') linkFields(value);
     }
     linkFields(component);
+    if(id==='minecraft:material_instances') linkFields(d.material);
+    if(id==='minecraft:collision_box') linkFields(d.box);
   }
   for(const name of ['breathability','bone_visibility','unit_cube','queued_ticking','random_ticking','block_light_absorption','block_light_emission','destroy_time','explosion_resistance']) c['minecraft:'+name].doNotSuggest=true;
   d.components.description='Built-in and script-registered block components. Custom parameter hints are advisory.';

@@ -181,19 +181,23 @@
       "properties": {
         "origin": {
           "$ref": "#/definitions/vector",
-          "description": "Lower corner of the box in model coordinates."
+          "description": "Lower corner of the box in model coordinates.",
+          "markdownDescription": "Lower corner of the box in model coordinates.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
         },
         "size": {
           "$ref": "#/definitions/vector",
-          "description": "Box dimensions in model units."
+          "description": "Box dimensions in model units.",
+          "markdownDescription": "Box dimensions in model units.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
         },
         "min": {
           "$ref": "#/definitions/vector",
-          "description": "Minimum corner in the newer box representation."
+          "description": "Minimum corner in the newer box representation.",
+          "markdownDescription": "Minimum corner in the newer box representation.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
         },
         "max": {
           "$ref": "#/definitions/vector",
-          "description": "Maximum corner in the newer box representation."
+          "description": "Maximum corner in the newer box representation.",
+          "markdownDescription": "Maximum corner in the newer box representation.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
         }
       }
     },
@@ -1447,7 +1451,8 @@
       "properties": {
         "texture": {
           "type": "string",
-          "description": "Texture-atlas identifier."
+          "description": "Texture-atlas identifier.",
+          "markdownDescription": "Texture-atlas identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
         },
         "render_method": {
           "anyOf": [
@@ -1459,29 +1464,34 @@
                 "alpha_test",
                 "blend",
                 "double_sided"
-              ]
+              ],
+              "markdownDescription": "Texture transparency/culling mode.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
             },
             {
               "type": "string",
               "pattern": "^alpha_test_single_sided$"
             }
           ],
-          "description": "How the material handles transparency and backface culling."
+          "description": "How the material handles transparency and backface culling.",
+          "markdownDescription": "How the material handles transparency and backface culling.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
         },
         "ambient_occlusion": {
           "type": [
             "boolean",
             "number"
           ],
-          "description": "Ambient shading strength. Older formats accept booleans; modern formats use a numeric exponent."
+          "description": "Ambient shading strength. Older formats accept booleans; modern formats use a numeric exponent.",
+          "markdownDescription": "Ambient shading strength. Older formats accept booleans; modern formats use a numeric exponent.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
         },
         "face_dimming": {
           "type": "boolean",
-          "description": "Shade the surface according to its facing direction."
+          "description": "Shade the surface according to its facing direction.",
+          "markdownDescription": "Shade the surface according to its facing direction.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
         },
         "isotropic": {
           "type": "boolean",
-          "description": "Randomize the material UV orientation."
+          "description": "Randomize the material UV orientation.",
+          "markdownDescription": "Randomize the material UV orientation.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
         },
         "tint_method": {
           "type": "string",
@@ -1494,11 +1504,13 @@
             "dry_foliage",
             "grass",
             "water"
-          ]
+          ],
+          "markdownDescription": "Biome tint applied to the rendered color.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
         },
         "alpha_masked_tint": {
           "type": "boolean",
-          "description": "Multiply biome tint by the texture alpha channel. Requires format 1.21.120, opaque rendering, and an enabled tint method."
+          "description": "Multiply biome tint by the texture alpha channel. Requires format 1.21.120, opaque rendering, and an enabled tint method.",
+          "markdownDescription": "Multiply biome tint by the texture alpha channel. Requires format 1.21.120, opaque rendering, and an enabled tint method.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
         }
       }
     },
