@@ -69,4 +69,43 @@ const sounds = { ...header('sound definitions'), ...object({
   format_version: string('Sound-definition format version.'),
   sound_definitions: { type: 'object', description: 'Maps sound event identifiers to audio definitions.', additionalProperties: ref('soundEvent') }
 }, ['sound_definitions']), definitions: { soundFile, soundEvent } };
-for (const [name, schema] of Object.entries({ recipe, 'texture-atlas': atlas, 'sound-definitions': sounds })) fs.writeFileSync(path.join(__dirname, '../schemas', name + '.schema.json'), JSON.stringify(schema, null, 2) + '\n');
+// Function names/parameter shapes are checked against Mojang's documentation
+// and sample loot tables; descriptions and starter objects are authored here.
+const functions = {
+  set_count: ['Choose the stack size.', { count: ref('range'), add: { type: 'boolean' } }, { count: 1 }],
+  set_damage: ['Choose remaining item durability.', { damage: ref('range'), add: { type: 'boolean' } }, { damage: { min: 0.5, max: 1 } }],
+  set_data: ['Choose legacy item data.', { data: ref('range') }, { data: 0 }],
+  enchant_randomly: ['Choose a compatible random enchantment.', { treasure: { type: 'boolean' } }, { treasure: false }],
+  enchant_with_levels: ['Enchant using an experience level.', { levels: ref('range'), treasure: { type: 'boolean' } }, { levels: 30, treasure: false }],
+  enchant_random_gear: ['Apply mob-equipment enchantment rules.', { chance: { type: 'number' } }, { chance: 0.25 }],
+  specific_enchants: ['Choose explicit enchantments.', { enchants: array({ anyOf: [string(), object({ id: { type: ['string', 'integer'] }, level: { anyOf: [ref('range'), array({ type: 'number' })] } })] }) }, { enchants: [{ id: 'sharpness', level: 1 }] }],
+  looting_enchant: ['Adjust drops for Looting.', { count: ref('range'), limit: { type: 'number' } }, { count: { min: 0, max: 1 } }],
+  furnace_smelt: ['Use the cooked item variant.', { conditions: array({ type: 'object' }) }, {}],
+  explosion_decay: ['Reduce drops after an explosion.', {}, {}],
+  set_actor_id: ['Choose a spawn-egg entity.', { id: string() }, { id: 'minecraft:pig' }],
+  set_data_from_color_index: ['Inherit the source entity color.', {}, {}],
+  set_name: ['Set the item display name.', { name: string() }, { name: 'Custom item' }],
+  set_lore: ['Set item description lines.', { lore: array(string()) }, { lore: ['Custom lore'] }],
+  set_potion: ['Choose a potion type.', { id: string() }, { id: 'healing' }],
+  set_book_contents: ['Set written-book content.', { author: string(), title: string(), pages: array({ anyOf: [string(), { type: 'object' }] }) }, { author: 'Author', title: 'Title', pages: ['Page text'] }],
+  set_banner_details: ['Set banner appearance.', { type: { type: ['integer', 'string'] }, base_color: { type: ['integer', 'string'] }, patterns: array({ type: 'object' }) }, { type: 0 }],
+  set_armor_trim: ['Choose an armor trim.', { material: string(), pattern: string() }, { material: 'copper', pattern: 'flow' }],
+  set_stew_effect: ['Choose suspicious-stew effects.', { effects: array(object({ id: { type: ['integer', 'string'] } })) }, { effects: [{ id: 0 }] }],
+  set_ominous_bottle_amplifier: ['Choose the Bad Omen amplifier.', { amplifier: ref('range') }, { amplifier: { min: 0, max: 3 } }],
+  random_aux_value: ['Randomize legacy item data.', { values: ref('range') }, { values: { min: 0, max: 6 } }],
+  random_block_state: ['Randomize an item block state.', {}, {}],
+  exploration_map: ['Create a destination map.', { destination: string() }, { destination: 'buriedtreasure' }],
+  fill_container: ['Fill a placed container from loot.', { loot_table: string() }, { loot_table: 'loot_tables/chests/custom.json' }]
+};
+const aliases = ['set_count', 'set_damage', 'enchant_randomly', 'set_stew_effect', 'set_potion', 'set_data_from_color_index'].map(name => 'minecraft:' + name);
+const lootFunction = {
+  ...object({ function: { anyOf: [{ type: 'string', enum: [...Object.keys(functions), ...aliases] }, string('Function identifier; additional engine functions remain allowed.')], description: 'Loot modifier to apply to this item.' }, conditions: array({ type: 'object' }) }, ['function']),
+  defaultSnippets: Object.entries(functions).map(([name, [description, , body]]) => ({ label: name, description, body: { function: name === 'set_stew_effect' ? 'minecraft:set_stew_effect' : name, ...body } })),
+  allOf: Object.entries(functions).map(([name, [description, properties]]) => ({ if: { properties: { function: { enum: [name, 'minecraft:' + name] } }, required: ['function'] }, then: { description, properties } }))
+};
+const lootFunctions = { type: 'array', description: 'Item modifiers. Add a function object or choose a starter.', items: ref('lootFunction') };
+const lootEntry = object({ type: string('Entry kind, such as item, loot_table, or empty.'), name: string(), weight: { type: 'number' }, quality: { type: 'number' }, functions: lootFunctions, conditions: array({ type: 'object' }) });
+const loot = { ...header('loot table'), ...object({ pools: array(object({ rolls: ref('range'), bonus_rolls: ref('range'), conditions: array({ type: 'object' }), entries: array(lootEntry), functions: lootFunctions })) }),
+  definitions: { range: { anyOf: [{ type: 'number' }, object({ min: { type: 'number' }, max: { type: 'number' } })] }, lootFunction }
+};
+for (const [name, schema] of Object.entries({ recipe, 'texture-atlas': atlas, 'sound-definitions': sounds, 'loot-table': loot })) fs.writeFileSync(path.join(__dirname, '../schemas', name + '.schema.json'), JSON.stringify(schema, null, 2) + '\n');

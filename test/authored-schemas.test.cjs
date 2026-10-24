@@ -5,6 +5,14 @@ const ajv = new Ajv({ strict: false, allErrors: true });
 const recipe = ajv.compile(require('../schemas/recipe.schema.json'));
 const atlas = ajv.compile(require('../schemas/texture-atlas.schema.json'));
 const sounds = ajv.compile(require('../schemas/sound-definitions.schema.json'));
+const loot = ajv.compile(require('../schemas/loot-table.schema.json'));
+const lootDoc = functions => ({ pools: [{ entries: [{ type: 'item', name: 'minecraft:iron_sword', functions }] }] });
+test('loot functions preserve aliases/extensions and validate documented parameter shapes', () => {
+  assert.ok(loot(lootDoc([{ function: 'set_count', count: { min: 1, max: 3 } }, { function: 'minecraft:set_damage', damage: 0.7 }, { function: 'specific_enchants', enchants: [{ id: 'sharpness', level: [1, 3] }] }, { function: 'custom:modifier', custom_payload: true }])));
+  assert.ok(!loot(lootDoc([{ function: 'set_count', count: 'wrong' }])));
+  assert.ok(!loot(lootDoc([{ function: 'enchant_with_levels', levels: 30, treasure: 'wrong' }])));
+  assert.ok(!loot(lootDoc([{}])));
+});
 const doc = (kind, payload, version = '1.20.10') => ({ format_version: version, ['minecraft:recipe_' + kind]: { description: { identifier: 'example:recipe' }, ...payload } });
 const validRecipes = [
   doc('shaped', { pattern: ['A ', ' A'], key: { A: { tag: 'minecraft:planks' } }, result: { item: 'example:tool', count: 2 }, unlock: { context: 'PlayerHasManyItems' } }, '1.16'),

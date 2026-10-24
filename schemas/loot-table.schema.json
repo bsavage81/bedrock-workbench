@@ -1,30 +1,64 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Bedrock Workbench loot table",
-  "description": "Independently authored structural checks. Unknown fields and function/condition extensions remain allowed.",
   "type": "object",
   "properties": {
     "pools": {
       "type": "array",
-      "description": "Loot selection pools.",
       "items": {
         "type": "object",
         "properties": {
-          "rolls": { "$ref": "#/definitions/range" },
-          "bonus_rolls": { "$ref": "#/definitions/range" },
-          "conditions": { "type": "array", "items": { "type": "object" } },
+          "rolls": {
+            "$ref": "#/definitions/range"
+          },
+          "bonus_rolls": {
+            "$ref": "#/definitions/range"
+          },
+          "conditions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
           "entries": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "type": { "type": "string", "description": "Entry kind, such as item, loot_table, or empty." },
-                "name": { "type": "string" },
-                "weight": { "type": "number" },
-                "quality": { "type": "number" },
-                "functions": { "type": "array", "items": { "type": "object" } },
-                "conditions": { "type": "array", "items": { "type": "object" } }
+                "type": {
+                  "type": "string",
+                  "description": "Entry kind, such as item, loot_table, or empty."
+                },
+                "name": {
+                  "type": "string"
+                },
+                "weight": {
+                  "type": "number"
+                },
+                "quality": {
+                  "type": "number"
+                },
+                "functions": {
+                  "type": "array",
+                  "description": "Item modifiers. Add a function object or choose a starter.",
+                  "items": {
+                    "$ref": "#/definitions/lootFunction"
+                  }
+                },
+                "conditions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
               }
+            }
+          },
+          "functions": {
+            "type": "array",
+            "description": "Item modifiers. Add a function object or choose a starter.",
+            "items": {
+              "$ref": "#/definitions/lootFunction"
             }
           }
         }
@@ -34,8 +68,933 @@
   "definitions": {
     "range": {
       "anyOf": [
-        { "type": "number" },
-        { "type": "object", "properties": { "min": { "type": "number" }, "max": { "type": "number" } } }
+        {
+          "type": "number"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            }
+          }
+        }
+      ]
+    },
+    "lootFunction": {
+      "type": "object",
+      "properties": {
+        "function": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "set_count",
+                "set_damage",
+                "set_data",
+                "enchant_randomly",
+                "enchant_with_levels",
+                "enchant_random_gear",
+                "specific_enchants",
+                "looting_enchant",
+                "furnace_smelt",
+                "explosion_decay",
+                "set_actor_id",
+                "set_data_from_color_index",
+                "set_name",
+                "set_lore",
+                "set_potion",
+                "set_book_contents",
+                "set_banner_details",
+                "set_armor_trim",
+                "set_stew_effect",
+                "set_ominous_bottle_amplifier",
+                "random_aux_value",
+                "random_block_state",
+                "exploration_map",
+                "fill_container",
+                "minecraft:set_count",
+                "minecraft:set_damage",
+                "minecraft:enchant_randomly",
+                "minecraft:set_stew_effect",
+                "minecraft:set_potion",
+                "minecraft:set_data_from_color_index"
+              ]
+            },
+            {
+              "type": "string",
+              "description": "Function identifier; additional engine functions remain allowed."
+            }
+          ],
+          "description": "Loot modifier to apply to this item."
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "required": [
+        "function"
+      ],
+      "defaultSnippets": [
+        {
+          "label": "set_count",
+          "description": "Choose the stack size.",
+          "body": {
+            "function": "set_count",
+            "count": 1
+          }
+        },
+        {
+          "label": "set_damage",
+          "description": "Choose remaining item durability.",
+          "body": {
+            "function": "set_damage",
+            "damage": {
+              "min": 0.5,
+              "max": 1
+            }
+          }
+        },
+        {
+          "label": "set_data",
+          "description": "Choose legacy item data.",
+          "body": {
+            "function": "set_data",
+            "data": 0
+          }
+        },
+        {
+          "label": "enchant_randomly",
+          "description": "Choose a compatible random enchantment.",
+          "body": {
+            "function": "enchant_randomly",
+            "treasure": false
+          }
+        },
+        {
+          "label": "enchant_with_levels",
+          "description": "Enchant using an experience level.",
+          "body": {
+            "function": "enchant_with_levels",
+            "levels": 30,
+            "treasure": false
+          }
+        },
+        {
+          "label": "enchant_random_gear",
+          "description": "Apply mob-equipment enchantment rules.",
+          "body": {
+            "function": "enchant_random_gear",
+            "chance": 0.25
+          }
+        },
+        {
+          "label": "specific_enchants",
+          "description": "Choose explicit enchantments.",
+          "body": {
+            "function": "specific_enchants",
+            "enchants": [
+              {
+                "id": "sharpness",
+                "level": 1
+              }
+            ]
+          }
+        },
+        {
+          "label": "looting_enchant",
+          "description": "Adjust drops for Looting.",
+          "body": {
+            "function": "looting_enchant",
+            "count": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        },
+        {
+          "label": "furnace_smelt",
+          "description": "Use the cooked item variant.",
+          "body": {
+            "function": "furnace_smelt"
+          }
+        },
+        {
+          "label": "explosion_decay",
+          "description": "Reduce drops after an explosion.",
+          "body": {
+            "function": "explosion_decay"
+          }
+        },
+        {
+          "label": "set_actor_id",
+          "description": "Choose a spawn-egg entity.",
+          "body": {
+            "function": "set_actor_id",
+            "id": "minecraft:pig"
+          }
+        },
+        {
+          "label": "set_data_from_color_index",
+          "description": "Inherit the source entity color.",
+          "body": {
+            "function": "set_data_from_color_index"
+          }
+        },
+        {
+          "label": "set_name",
+          "description": "Set the item display name.",
+          "body": {
+            "function": "set_name",
+            "name": "Custom item"
+          }
+        },
+        {
+          "label": "set_lore",
+          "description": "Set item description lines.",
+          "body": {
+            "function": "set_lore",
+            "lore": [
+              "Custom lore"
+            ]
+          }
+        },
+        {
+          "label": "set_potion",
+          "description": "Choose a potion type.",
+          "body": {
+            "function": "set_potion",
+            "id": "healing"
+          }
+        },
+        {
+          "label": "set_book_contents",
+          "description": "Set written-book content.",
+          "body": {
+            "function": "set_book_contents",
+            "author": "Author",
+            "title": "Title",
+            "pages": [
+              "Page text"
+            ]
+          }
+        },
+        {
+          "label": "set_banner_details",
+          "description": "Set banner appearance.",
+          "body": {
+            "function": "set_banner_details",
+            "type": 0
+          }
+        },
+        {
+          "label": "set_armor_trim",
+          "description": "Choose an armor trim.",
+          "body": {
+            "function": "set_armor_trim",
+            "material": "copper",
+            "pattern": "flow"
+          }
+        },
+        {
+          "label": "set_stew_effect",
+          "description": "Choose suspicious-stew effects.",
+          "body": {
+            "function": "minecraft:set_stew_effect",
+            "effects": [
+              {
+                "id": 0
+              }
+            ]
+          }
+        },
+        {
+          "label": "set_ominous_bottle_amplifier",
+          "description": "Choose the Bad Omen amplifier.",
+          "body": {
+            "function": "set_ominous_bottle_amplifier",
+            "amplifier": {
+              "min": 0,
+              "max": 3
+            }
+          }
+        },
+        {
+          "label": "random_aux_value",
+          "description": "Randomize legacy item data.",
+          "body": {
+            "function": "random_aux_value",
+            "values": {
+              "min": 0,
+              "max": 6
+            }
+          }
+        },
+        {
+          "label": "random_block_state",
+          "description": "Randomize an item block state.",
+          "body": {
+            "function": "random_block_state"
+          }
+        },
+        {
+          "label": "exploration_map",
+          "description": "Create a destination map.",
+          "body": {
+            "function": "exploration_map",
+            "destination": "buriedtreasure"
+          }
+        },
+        {
+          "label": "fill_container",
+          "description": "Fill a placed container from loot.",
+          "body": {
+            "function": "fill_container",
+            "loot_table": "loot_tables/chests/custom.json"
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_count",
+                  "minecraft:set_count"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Choose the stack size.",
+            "properties": {
+              "count": {
+                "$ref": "#/definitions/range"
+              },
+              "add": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_damage",
+                  "minecraft:set_damage"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Choose remaining item durability.",
+            "properties": {
+              "damage": {
+                "$ref": "#/definitions/range"
+              },
+              "add": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_data",
+                  "minecraft:set_data"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Choose legacy item data.",
+            "properties": {
+              "data": {
+                "$ref": "#/definitions/range"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "enchant_randomly",
+                  "minecraft:enchant_randomly"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Choose a compatible random enchantment.",
+            "properties": {
+              "treasure": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "enchant_with_levels",
+                  "minecraft:enchant_with_levels"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Enchant using an experience level.",
+            "properties": {
+              "levels": {
+                "$ref": "#/definitions/range"
+              },
+              "treasure": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "enchant_random_gear",
+                  "minecraft:enchant_random_gear"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Apply mob-equipment enchantment rules.",
+            "properties": {
+              "chance": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "specific_enchants",
+                  "minecraft:specific_enchants"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Choose explicit enchantments.",
+            "properties": {
+              "enchants": {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": [
+                            "string",
+                            "integer"
+                          ]
+                        },
+                        "level": {
+                          "anyOf": [
+                            {
+                              "$ref": "#/definitions/range"
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "looting_enchant",
+                  "minecraft:looting_enchant"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Adjust drops for Looting.",
+            "properties": {
+              "count": {
+                "$ref": "#/definitions/range"
+              },
+              "limit": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "furnace_smelt",
+                  "minecraft:furnace_smelt"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Use the cooked item variant.",
+            "properties": {
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "explosion_decay",
+                  "minecraft:explosion_decay"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Reduce drops after an explosion.",
+            "properties": {}
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_actor_id",
+                  "minecraft:set_actor_id"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Choose a spawn-egg entity.",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_data_from_color_index",
+                  "minecraft:set_data_from_color_index"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Inherit the source entity color.",
+            "properties": {}
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_name",
+                  "minecraft:set_name"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Set the item display name.",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_lore",
+                  "minecraft:set_lore"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Set item description lines.",
+            "properties": {
+              "lore": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_potion",
+                  "minecraft:set_potion"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Choose a potion type.",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_book_contents",
+                  "minecraft:set_book_contents"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Set written-book content.",
+            "properties": {
+              "author": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "pages": {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_banner_details",
+                  "minecraft:set_banner_details"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Set banner appearance.",
+            "properties": {
+              "type": {
+                "type": [
+                  "integer",
+                  "string"
+                ]
+              },
+              "base_color": {
+                "type": [
+                  "integer",
+                  "string"
+                ]
+              },
+              "patterns": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_armor_trim",
+                  "minecraft:set_armor_trim"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Choose an armor trim.",
+            "properties": {
+              "material": {
+                "type": "string"
+              },
+              "pattern": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_stew_effect",
+                  "minecraft:set_stew_effect"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Choose suspicious-stew effects.",
+            "properties": {
+              "effects": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "set_ominous_bottle_amplifier",
+                  "minecraft:set_ominous_bottle_amplifier"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Choose the Bad Omen amplifier.",
+            "properties": {
+              "amplifier": {
+                "$ref": "#/definitions/range"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "random_aux_value",
+                  "minecraft:random_aux_value"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Randomize legacy item data.",
+            "properties": {
+              "values": {
+                "$ref": "#/definitions/range"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "random_block_state",
+                  "minecraft:random_block_state"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Randomize an item block state.",
+            "properties": {}
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "exploration_map",
+                  "minecraft:exploration_map"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Create a destination map.",
+            "properties": {
+              "destination": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "function": {
+                "enum": [
+                  "fill_container",
+                  "minecraft:fill_container"
+                ]
+              }
+            },
+            "required": [
+              "function"
+            ]
+          },
+          "then": {
+            "description": "Fill a placed container from loot.",
+            "properties": {
+              "loot_table": {
+                "type": "string"
+              }
+            }
+          }
+        }
       ]
     }
   }

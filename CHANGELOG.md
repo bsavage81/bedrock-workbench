@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.2 — October 24, 2026
+
+- Add loot function starter snippets inside empty arrays, function-name suggestions, and parameter completion based on the selected function.
+- Include documented function parameters, namespaced aliases, and conservative nested validation while keeping unknown engine functions open.
+
 ## 0.9.1 — October 23, 2026
 
 - Suggest built-in station tags inside recipe tag strings, scoped to the recipe type, while continuing to allow custom tags.

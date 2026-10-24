@@ -159,6 +159,31 @@ async function run() {
     const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', tagUri, tagPosition);
     return ['furnace', 'blast_furnace', 'smoker', 'campfire', 'soul_campfire'].every(tag => completion?.items.some(item => String(item.label).replaceAll('"', '') === tag));
   }, 'Recipe station tags were not suggested inside an empty quoted string');
+  const functionLootUri = vscode.Uri.file(path.join(root, 'BP/loot_tables/function-completion.json'));
+  const lootStart = '{"pools":[{"entries":[{"type":"item","name":"minecraft:iron_sword","weight":6,"functions":[] }]}]}';
+  await fs.writeFile(functionLootUri.fsPath, lootStart);
+  let functionLootDoc = await vscode.workspace.openTextDocument(functionLootUri); await vscode.window.showTextDocument(functionLootDoc);
+  await until(async () => {
+    const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', functionLootUri, functionLootDoc.positionAt(functionLootDoc.getText().indexOf('[]') + 1));
+    return completion?.items.some(item => item.label === 'set_count' && String(item.insertText?.value || item.insertText).includes('function'));
+  }, 'Loot function starter objects missing inside the empty functions array');
+  async function setLootFunctions(value) {
+    const edit = new vscode.WorkspaceEdit();
+    edit.replace(functionLootUri, new vscode.Range(functionLootDoc.positionAt(0), functionLootDoc.positionAt(functionLootDoc.getText().length)), lootStart.replace('[]', JSON.stringify(value)));
+    assert.ok(await vscode.workspace.applyEdit(edit));
+  }
+  await setLootFunctions([{ function: '' }]);
+  await until(async () => {
+    const position = functionLootDoc.positionAt(functionLootDoc.getText().indexOf('"function":""') + '"function":"'.length);
+    const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', functionLootUri, position);
+    return completion?.items.some(item => String(item.label).replaceAll('"', '') === 'enchant_with_levels');
+  }, 'Loot function names missing inside a quoted function value');
+  await setLootFunctions([{ function: 'enchant_with_levels', '': 0 }]);
+  await until(async () => {
+    const position = functionLootDoc.positionAt(functionLootDoc.getText().indexOf('"":0') + 1);
+    const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', functionLootUri, position);
+    return ['levels', 'treasure'].every(key => completion?.items.some(item => String(item.label).replaceAll('"', '') === key));
+  }, 'Loot function parameters did not follow the selected function');
   const validationReport = await core.readJson(path.join(root, '.bedrock/validation-report.json'));
   assert.ok(validationReport.files >= 6); assert.equal(validationReport.schemaVersion, '1.26.50');
   state = await core.readJson(stateFile);
