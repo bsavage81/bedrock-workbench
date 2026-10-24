@@ -24,6 +24,7 @@ test('Mojang documentation and schema references supply component and field desc
   assert.match(components.properties['minecraft:food'].markdownDescription, /Mojang documentation \(v1.26.50.4\)/);
   assert.match(components.properties['minecraft:food'].properties.nutrition.markdownDescription, /Type: integer/);
   assert.equal(components.additionalProperties, true);
+  assert.equal(componentSchema(index, 'item', { omit: ['minecraft:food'] }).properties['minecraft:item'].properties.components.properties['minecraft:food'], undefined);
 });
 test('reference selection respects project target and excludes preview releases', () => {
   const releases = [{ tag_name: 'v1.26.50.4' }, { tag_name: 'v1.26.60.1', prerelease: true }, { tag_name: 'v1.26.40.5' }];

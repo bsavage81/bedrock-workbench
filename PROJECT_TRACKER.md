@@ -174,3 +174,17 @@ Preview currently uses compatible released reference data. Command assistance is
 - [ ] Expand original schemas into entity/block/item components and support original routes independently of the current 1.26.50 reference-package floor.
 
 Primary references, exact audited scope, and regeneration instructions are recorded in schemas/AUTHORING.md. Unknown extensions remain allowed; validation does not guarantee runtime behavior.
+
+## October 24: original blocks and script-registered components (0.10.0)
+
+- [x] Original block document/state/trait/permutation schema and 23 common components.
+- [x] Preserve custom parameters, legacy unions and unknown native/custom extensions.
+- [x] Parse JS/TS component registrations without executing project scripts; resolve registry aliases and local/imported constants.
+- [x] Separate block/item registries, complete IDs in normal/permutation/legacy contexts, and provide source hover/navigation.
+- [x] Refresh registry data after saved source/import changes, renames and deletions.
+- [x] Prevent overlapping generated component rules from weakening authored block validation or duplicating assistance.
+- [x] Verify 98 Mojang block examples, five SavageCraft blocks, all five SavageCraft block registrations and full 721-document saved-project validation.
+- [ ] Broader block component coverage, format-specific availability and cross-permutation semantic checks.
+- [ ] Dynamic/helper-generated registration IDs and optional explicit custom parameter schemas; unsaved script overlays.
+
+Exact supported patterns, exclusions and sources are documented in schemas/AUTHORING.md.

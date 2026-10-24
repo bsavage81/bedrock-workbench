@@ -2,9 +2,10 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const json = require('jsonc-parser');
 const core = require('./core.cjs');
+const scripts = require('./script-components.cjs');
 const { molangParser, MOLANG_QUERIES, MOLANG_MATH } = require('./vendor/molang.cjs');
 class ContentIndex {
-  constructor(project) { this.project = project; this.types = new Map(); this.documents = new Map(); this.issues = []; }
+  constructor(project) { this.project = project; this.types = new Map(); this.documents = new Map(); this.issues = []; this.scriptSources = new Map(); this.customComponents = []; this.scriptsDirty = false; }
   add(type, id, file) {
     if (typeof id !== 'string' || !id) return;
     if (!this.types.has(type)) this.types.set(type, new Map());
@@ -15,6 +16,7 @@ class ContentIndex {
     const normalize = value => process.platform === 'win32' ? path.resolve(value).toLowerCase() : path.resolve(value);
     const matches = candidate => normalize(candidate) === normalize(file) || core.inside(file, candidate);
     for (const candidate of this.documents.keys()) if (matches(candidate)) this.documents.delete(candidate);
+    for (const candidate of this.scriptSources.keys()) if (matches(candidate)) { this.scriptSources.delete(candidate); this.scriptsDirty = true; }
     this.issues = this.issues.filter(issue => !matches(issue.file));
     for (const values of this.types.values()) for (const [id, files] of values) {
       const kept = files.filter(candidate => !matches(candidate)); if (kept.length) values.set(id, kept); else values.delete(id);
@@ -31,12 +33,21 @@ async function scan(project) {
     batch.push(() => indexFile(index, side, relative).catch(error => { if (error.code !== 'ENOENT') throw error; }));
     if (batch.length === 8) { await Promise.all(batch.map(run => run())); batch = []; }
   }
-  await Promise.all(batch.map(run => run())); return index;
+  await Promise.all(batch.map(run => run())); refreshScripts(index); return index;
+}
+function refreshScripts(index) {
+  if (!index.scriptsDirty) return;
+  index.customComponents = scripts.analyze(index.scriptSources); index.scriptsDirty = false;
+  for (const type of ['block_component', 'item_component']) index.types.delete(type);
+  for (const value of index.customComponents) index.add(value.kind + '_component', value.id, value.file);
 }
 async function indexFile(index, side, relative) {
     const project = index.project;
     const file = await core.local(project.root, path.relative(project.root, path.join(project.packs[side], relative)));
     const rel = relative.replaceAll(path.sep, '/');
+    if (side === 'behavior' && scripts.scriptFile(rel) && (await fs.stat(file)).size <= 2 * 1024 * 1024) {
+      index.scriptSources.set(file, await fs.readFile(file, 'utf8')); index.scriptsDirty = true;
+    }
     if (side === 'behavior' && /^functions\/.*\.mcfunction$/i.test(rel)) {
       index.add('function', rel.slice(10, -11), file);
       if ((await fs.stat(file)).size <= 2 * 1024 * 1024) {
@@ -75,9 +86,9 @@ async function update(index, file) {
   await core.local(index.project.root, path.relative(index.project.root, file));
   const stat = await fs.stat(file).catch(error => { if (error.code !== 'ENOENT') throw error; });
   index.remove(file);
-  if (!stat) return true;
+  if (!stat) { refreshScripts(index); return true; }
   if (stat.isDirectory()) return false;
-  await indexFile(index, kind.side, kind.relative); return true;
+  await indexFile(index, kind.side, kind.relative); refreshScripts(index); return true;
 }
 function referenceKind(keys, value, document) {
   const key = keys.at(-1), parent = keys.at(-2), root = keys[0];
@@ -91,6 +102,35 @@ function referenceKind(keys, value, document) {
   if (String(root).startsWith('minecraft:recipe_') && ['item', 'result', 'input', 'output', 'reagent', 'base', 'addition', 'template'].includes(key)) return 'item';
   if (root === 'minecraft:entity' && ['entity_type', 'spawn_entity', 'into'].includes(key)) return 'entity';
   if (root === 'minecraft:entity' && keys.includes('minecraft:loot') && key === 'table') return 'loot_table';
+}
+function componentContext(document, offset) {
+  if (document.side !== 'behavior') return;
+  const location = json.getLocation(document.text, offset), keys = location.path;
+  const kind = keys[0] === 'minecraft:block' ? 'block' : keys[0] === 'minecraft:item' ? 'item' : undefined;
+  if (!kind) return;
+  const depth = keys[1] === 'components' ? 2 : keys[1] === 'permutations' && typeof keys[2] === 'number' && keys[3] === 'components' ? 4 : 0;
+  if (!depth) return;
+  const node = json.findNodeAtOffset(document.tree, offset, true);
+  if (keys.length === depth + 1 && location.isAtPropertyKey) return { kind, mode: 'key', id: keys.at(-1), node, location };
+  if (keys.length === depth + 2 && keys[depth] === 'minecraft:custom_components' && !location.isAtPropertyKey) return { kind, mode: 'legacy', id: node?.type === 'string' ? node.value : '', node, location };
+}
+function customComponentIssues(index, document) {
+  const issues = [];
+  function check(node) {
+    if (node.type === 'string') {
+      const state = componentContext(document, node.offset + 1);
+      if (state?.id && !state.id.startsWith('minecraft:') && !index.values(state.kind + '_component').has(state.id) && index.values((state.kind === 'block' ? 'item' : 'block') + '_component').has(state.id)) issues.push({ file: document.file, offset: node.offset + 1, length: Math.max(1, node.length - 2), severity: 'information', message: `'${state.id}' is registered for ${state.kind === 'block' ? 'items' : 'blocks'}, but is used in a ${state.kind} definition. A separate registration may be provided elsewhere.` });
+    }
+  }
+  for (const root of ['minecraft:block', 'minecraft:item']) {
+    const body = json.findNodeAtLocation(document.tree, [root]); if (!body) continue;
+    const containers = [json.findNodeAtLocation(body, ['components']), ...(json.findNodeAtLocation(body, ['permutations'])?.children || []).map(node => json.findNodeAtLocation(node, ['components']))];
+    for (const container of containers) for (const property of container?.children || []) {
+      check(property.children[0]);
+      if (property.children[0].value === 'minecraft:custom_components') for (const child of property.children[1]?.children || []) check(child);
+    }
+  }
+  return issues;
 }
 function references(document) {
   const result = [];
@@ -126,4 +166,4 @@ function molangIssues(document) {
     return molangParser.parse(node.value).errors.map(error => ({ file: document.file, offset: offsets[error.start] || node.offset + 1, length: Math.max(1, (offsets[error.end] || offsets[error.start] || node.offset + 1) - (offsets[error.start] || node.offset + 1)), severity: 'warning', message: `Molang: ${error.message}` }));
   });
 }
-module.exports = { ContentIndex, scan, update, fileKind, referenceKind, references, referenceIssues, molangNodes, molangIssues, rawOffsets, MOLANG_QUERIES, MOLANG_MATH, molangParser };
+module.exports = { ContentIndex, scan, update, fileKind, referenceKind, references, referenceIssues, componentContext, customComponentIssues, molangNodes, molangIssues, rawOffsets, MOLANG_QUERIES, MOLANG_MATH, molangParser };

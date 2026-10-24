@@ -47,11 +47,14 @@ const { unzipSync } = require('fflate');
     if (prepared.directory) {
       const validate = await official.validator(prepared);
       assert.ok((await validate('behavior', 'loot_tables/check.json', { pools: 'invalid' })).length);
+      assert.ok((await validate('behavior', 'blocks/check.json', { format_version: '1.21.90', 'minecraft:block': { description: { identifier: 'test:block' }, components: { 'minecraft:friction': 2 } } })).length);
       assert.ok((await validate('behavior', 'recipes/check.json', { format_version: '1.20.10', 'minecraft:recipe_shapeless': { description: { identifier: 'test:recipe' }, ingredients: [{ item: 'test:item', count: 0 }], result: 'test:result' } })).length);
       assert.ok((await validate('resource', 'textures/item_texture.json', { texture_data: { invalid: { textures: false } } })).length);
       assert.ok((await validate('resource', 'sounds/sound_definitions.json', { sound_definitions: { invalid: { sounds: [{ name: 42 }] } } })).length);
     }
     const molang = require(path.join(unpacked, 'extension/src/vendor/molang.cjs'));
+    const components = require(path.join(unpacked, 'extension/src/script-components.cjs'));
+    assert.equal(components.analyze(new Map([[path.join(isolatedSample, 'BP/scripts/test.ts'), "event.blockComponentRegistry.registerCustomComponent('test:packaged', {});"]]))[0]?.id, 'test:packaged');
     assert.ok(molang.molangParser.parse('math.sin(query.anim_time').errors.length);
     assert.ok(archive['extension/third_party/mojang/LICENSE.md']);
     assert.ok(!Object.keys(archive).some(file => file.startsWith('extension/node_modules/@minecraft/bedrock-schemas/forms/')));

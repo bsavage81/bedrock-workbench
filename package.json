@@ -2,7 +2,7 @@
   "name": "bedrock-workbench",
   "displayName": "Bedrock Workbench",
   "description": "Build, deploy and export Minecraft Bedrock add-ons with separate beta and stable profiles.",
-  "version": "0.9.5",
+  "version": "0.10.0",
   "publisher": "bsavage81",
   "license": "UNLICENSED",
   "engines": {
@@ -23,8 +23,8 @@
     "virtualWorkspaces": false
   },
   "scripts": {
-    "check": "node --check src/core.cjs && node --check src/extension.cjs && node --check src/releases.cjs && node --check src/reference.cjs && node --check src/editor.cjs && node --check src/scripts.cjs && node --check src/experiments.cjs && node --check src/experiment-updates.cjs && node --check src/official-schemas.cjs && node --check src/content.cjs && node --check src/content-editor.cjs && node --check src/validation.cjs && node --check src/commands.cjs && node --check tools/generate-owned-schemas.cjs && node --check src/auto-suggest.cjs",
-    "test": "node --test test/compiler.test.cjs test/workflow.test.cjs test/releases.test.cjs test/reference.test.cjs test/scripts.test.cjs test/experiments.test.cjs test/intelligence.test.cjs test/commands.test.cjs test/authored-schemas.test.cjs test/auto-suggest.test.cjs",
+    "check": "node --check src/core.cjs && node --check src/extension.cjs && node --check src/releases.cjs && node --check src/reference.cjs && node --check src/editor.cjs && node --check src/scripts.cjs && node --check src/experiments.cjs && node --check src/experiment-updates.cjs && node --check src/official-schemas.cjs && node --check src/content.cjs && node --check src/content-editor.cjs && node --check src/validation.cjs && node --check src/commands.cjs && node --check tools/generate-owned-schemas.cjs && node --check src/auto-suggest.cjs && node --check src/script-components.cjs && node --check tools/block-schema.cjs",
+    "test": "node --test test/compiler.test.cjs test/workflow.test.cjs test/releases.test.cjs test/reference.test.cjs test/scripts.test.cjs test/experiments.test.cjs test/intelligence.test.cjs test/commands.test.cjs test/authored-schemas.test.cjs test/auto-suggest.test.cjs test/blocks.test.cjs",
     "package": "vsce package --target win32-x64 --allow-missing-repository --skip-license",
     "build:sample": "node tools/build.cjs \"projects/SavageCraft v2\" beta",
     "export:sample": "node tools/build.cjs \"projects/SavageCraft v2\" stable",
@@ -32,6 +32,7 @@
     "schemas:generate": "node tools/generate-owned-schemas.cjs"
   },
   "dependencies": {
+    "@babel/parser": "7.29.11",
     "@minecraft/bedrock-schemas": "1.26.50",
     "ajv": "^8.17.1",
     "es-module-lexer": "^1.7.0",

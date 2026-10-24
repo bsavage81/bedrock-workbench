@@ -45,7 +45,7 @@ async function validateProject(root) {
         if (!unavailable.has(folder)) { unavailable.add(folder); issues.push(at(document, [], `Official schema check unavailable for ${folder}: ${error.message}`, 'information')); }
       }
     }
-    issues.push(...content.referenceIssues(index, document), ...content.molangIssues(document));
+    issues.push(...content.referenceIssues(index, document), ...content.customComponentIssues(index, document), ...content.molangIssues(document));
   }
   for (const type of ['entity', 'item', 'block', 'client_entity', 'geometry', 'animation', 'animation_controller', 'render_controller']) for (const [id, files] of index.values(type)) {
     const groups = new Map();

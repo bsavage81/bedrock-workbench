@@ -54,10 +54,51 @@ function attach(vscode, context, getProject, output) {
     if (disposed) return;
     const data = documentData(document);
     if (!data) { diagnostics.delete(document.uri); return; }
-    const issues = [...content.molangIssues(data), ...(cached ? content.referenceIssues(cached, data) : [])];
+    const issues = [...content.molangIssues(data), ...(cached ? [...content.referenceIssues(cached, data), ...content.customComponentIssues(cached, data)] : [])];
     diagnostics.set(document.uri, issues.map(issue => diagnostic(document, issue)));
   }
   const selector = [{ language: 'json', scheme: 'file' }, { language: 'jsonc', scheme: 'file' }];
+  function customAt(document, position) {
+    const data = documentData(document); if (!data) return;
+    const state = content.componentContext(data, document.offsetAt(position));
+    if (state) return { ...state, data };
+  }
+  context.subscriptions.push(
+    vscode.languages.registerCompletionItemProvider(selector, {
+      async provideCompletionItems(document, position) {
+        const state = customAt(document, position); if (!state) return;
+        const index = await ensure(); if (!index) return;
+        const parent = json.findNodeAtLocation(state.data.tree, state.location.path.slice(0, -1));
+        const existing = new Set(parent?.children?.filter(n => n.type === 'property').map(n => n.children[0].value));
+        return [...index.values(state.kind + '_component')].filter(([id]) => !existing.has(id) || state.id === id).map(([id, files]) => {
+          const item = new vscode.CompletionItem(id, state.mode === 'key' ? vscode.CompletionItemKind.Property : vscode.CompletionItemKind.Reference);
+          item.detail = `Project ${state.kind} custom component`;
+          item.documentation = files.map(file => path.relative(index.project.root, file)).join('\n');
+          if (state.node?.type === 'string') {
+            item.range = new vscode.Range(document.positionAt(state.node.offset + 1), document.positionAt(state.node.offset + state.node.length - 1)); item.insertText = id;
+          } else item.insertText = state.mode === 'key' ? new vscode.SnippetString(JSON.stringify(id) + ': {\n\t$0\n}') : JSON.stringify(id);
+          return item;
+        });
+      }
+    }, '"', ':'),
+    vscode.languages.registerHoverProvider(selector, {
+      async provideHover(document, position) {
+        const state = customAt(document, position); if (!state?.id || state.id.startsWith('minecraft:')) return;
+        const index = await ensure(), registrations = index?.customComponents.filter(value => value.kind === state.kind && value.id === state.id);
+        if (!registrations?.length) return;
+        const md = new vscode.MarkdownString(); md.appendText(`Custom ${state.kind} component: ${state.id}\n\n`);
+        for (const value of registrations) md.appendText(`${path.relative(index.project.root, value.file)}:${value.line + 1}${value.callbacks.length ? '\nCallbacks: ' + value.callbacks.join(', ') : ''}\n`);
+        return new vscode.Hover(md);
+      }
+    }),
+    vscode.languages.registerDefinitionProvider(selector, {
+      async provideDefinition(document, position) {
+        const state = customAt(document, position); if (!state?.id) return;
+        const index = await ensure();
+        return index?.customComponents.filter(value => value.kind === state.kind && value.id === state.id).map(value => new vscode.Location(vscode.Uri.file(value.file), new vscode.Position(value.line, value.column)));
+      }
+    })
+  );
   context.subscriptions.push(diagnostics,
     vscode.languages.registerCompletionItemProvider(selector, {
       async provideCompletionItems(document, position) {

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.0 — October 24, 2026
+
+- Add original block document/state/trait/permutation schemas and 23 common component definitions, with audited nested structural checks and legacy unions.
+- Statically discover block/item custom components from JS/TS registration calls, registry aliases, local constants, and relative imported/reexported constants without executing project code.
+- Complete registered IDs in components, permutations, and legacy custom-component arrays; add registration hovers, callbacks, and Go to Definition, with saved-file refreshes.
+- Keep arbitrary custom parameters and unresolved/external components permissive; identify item/block registry mismatches as informational findings.
+- Keep authored block component assistance authoritative over overlapping generated documentation schemas.
+
 ## 0.9.5 — October 24, 2026
 
 - Show one preferred spelling per loot function/condition while keeping namespaced aliases valid.

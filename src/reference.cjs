@@ -92,7 +92,7 @@ function closest(name, names) {
   function distance(a, b) { let row = Array.from({ length: b.length + 1 }, (_, i) => i); for (let i = 1; i <= a.length; i++) { const next = [i]; for (let j = 1; j <= b.length; j++) next[j] = Math.min(next[j - 1] + 1, row[j] + 1, row[j - 1] + (a[i - 1] !== b[j - 1])); row = next; } return row[b.length]; }
   return names.map(value => ({ value, distance: distance(name, value) })).filter(v => v.distance <= 2).sort((a, b) => a.distance - b.distance).slice(0, 3).map(v => v.value);
 }
-function componentSchema(index, kind) {
+function componentSchema(index, kind, { omit = [] } = {}) {
   function valueSchema(value) {
     const result = { description: value.description || '' };
     const page = { block: 'Blocks', entity: 'Entities', item: 'Item' }[kind];
@@ -104,7 +104,7 @@ function componentSchema(index, kind) {
     if (value.fields && Object.keys(value.fields).length) result.properties = Object.fromEntries(Object.entries(value.fields).map(([name, field]) => [name, valueSchema(field)]));
     return result;
   }
-  const components = { type: 'object', additionalProperties: true, properties: Object.fromEntries(Object.entries(index.components[kind]).map(([name, value]) => [name, valueSchema(value)])) };
+  const components = { type: 'object', additionalProperties: true, properties: Object.fromEntries(Object.entries(index.components[kind]).filter(([name]) => !omit.includes(name)).map(([name, value]) => [name, valueSchema(value)])) };
   return { $schema: 'http://json-schema.org/draft-07/schema#', title: `Mojang ${index.tag} ${kind} reference`, type: 'object', properties: {
     [`minecraft:${kind}`]: { type: 'object', properties: { components, component_groups: { type: 'object', additionalProperties: components }, permutations: { type: 'array', items: { type: 'object', properties: { components } } } } }
   } };

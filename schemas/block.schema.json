@@ -1,85 +1,127 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Bedrock block — foundational validation",
+  "title": "Bedrock Workbench block",
   "type": "object",
-  "required": [
-    "format_version",
-    "minecraft:block"
-  ],
   "properties": {
     "format_version": {
-      "type": "string"
+      "type": "string",
+      "description": "Block format version; older versions remain accepted."
     },
     "minecraft:block": {
       "type": "object",
-      "required": [
-        "description"
-      ],
       "properties": {
         "description": {
           "type": "object",
-          "required": [
-            "identifier"
-          ],
           "properties": {
             "identifier": {
               "type": "string",
               "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
             },
             "menu_category": {
-              "type": "object"
-            },
-            "states": {
-              "type": "object"
-            },
-            "traits": {
-              "type": "object"
-            }
-          }
-        },
-        "components": {
-          "type": "object",
-          "properties": {
-            "minecraft:geometry": {
-              "anyOf": [
-                {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "construction",
+                        "nature",
+                        "equipment",
+                        "items",
+                        "none"
+                      ]
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "group": {
                   "type": "string"
                 },
-                {
-                  "type": "object"
-                }
-              ]
-            },
-            "minecraft:material_instances": {
-              "type": "object"
-            },
-            "minecraft:collision_box": {
-              "anyOf": [
-                {
+                "is_hidden_in_commands": {
                   "type": "boolean"
-                },
-                {
-                  "type": "object"
                 }
-              ]
+              }
             },
-            "minecraft:selection_box": {
-              "anyOf": [
-                {
-                  "type": "boolean"
+            "states": {
+              "type": "object",
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": [
+                        "integer",
+                        "boolean",
+                        "string"
+                      ]
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "values": {
+                        "type": "object",
+                        "properties": {
+                          "min": {
+                            "type": "integer"
+                          },
+                          "max": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "min",
+                          "max"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "values"
+                    ]
+                  }
+                ]
+              }
+            },
+            "traits": {
+              "type": "object",
+              "properties": {
+                "minecraft:placement_direction": {
+                  "type": "object",
+                  "properties": {
+                    "enabled_states": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "y_rotation_offset": {
+                      "type": "number"
+                    }
+                  }
                 },
-                {
-                  "type": "object"
+                "minecraft:placement_position": {
+                  "type": "object",
+                  "properties": {
+                    "enabled_states": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
                 }
-              ]
+              }
             }
-          }
+          },
+          "required": [
+            "identifier"
+          ]
         },
-        "component_groups": {
-          "type": "object"
-        },
-        "events": {
-          "type": "object"
+        "components": {
+          "$ref": "#/definitions/components"
         },
         "permutations": {
           "type": "array",
@@ -87,48 +129,531 @@
             "type": "object",
             "properties": {
               "condition": {
-                "type": "string"
+                "type": "string",
+                "description": "Molang expression selecting this permutation."
               },
               "components": {
-                "type": "object",
-                "properties": {
-                  "minecraft:geometry": {
-                    "anyOf": [
-                      {
-                        "type": "string"
+                "$ref": "#/definitions/components"
+              }
+            },
+            "required": [
+              "condition",
+              "components"
+            ]
+          }
+        }
+      },
+      "required": [
+        "description"
+      ]
+    }
+  },
+  "required": [
+    "format_version",
+    "minecraft:block"
+  ],
+  "definitions": {
+    "vector": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "number"
+      }
+    },
+    "color": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      ]
+    },
+    "box": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "$ref": "#/definitions/vector"
+        },
+        "size": {
+          "$ref": "#/definitions/vector"
+        }
+      }
+    },
+    "components": {
+      "type": "object",
+      "properties": {
+        "minecraft:friction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.9,
+          "description": "Surface friction for entities moving across this block."
+        },
+        "minecraft:light_emission": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 15,
+          "description": "Light level emitted by the block."
+        },
+        "minecraft:light_dampening": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 15,
+          "description": "Amount of light blocked by the block."
+        },
+        "minecraft:destructible_by_mining": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "seconds_to_destroy": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "item_specific_speeds": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "item": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tags": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        ]
                       },
-                      {
-                        "type": "object"
+                      "destroy_speed": {
+                        "type": "number"
                       }
-                    ]
-                  },
-                  "minecraft:material_instances": {
-                    "type": "object"
-                  },
-                  "minecraft:collision_box": {
-                    "anyOf": [
-                      {
-                        "type": "boolean"
-                      },
-                      {
-                        "type": "object"
-                      }
-                    ]
-                  },
-                  "minecraft:selection_box": {
-                    "anyOf": [
-                      {
-                        "type": "boolean"
-                      },
-                      {
-                        "type": "object"
-                      }
+                    },
+                    "required": [
+                      "item",
+                      "destroy_speed"
                     ]
                   }
                 }
               }
+            },
+            {
+              "type": "boolean"
             }
-          }
+          ],
+          "description": "Mining behavior, with optional per-item speeds."
+        },
+        "minecraft:destructible_by_explosion": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "explosion_resistance": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "description": "Explosion resistance, or a boolean switch."
+        },
+        "minecraft:collision_box": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/box"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/box"
+              }
+            }
+          ],
+          "description": "Collision shape; box arrays require a supporting format and engine."
+        },
+        "minecraft:selection_box": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/box"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "description": "Outline used when targeting the block."
+        },
+        "minecraft:geometry": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "identifier": {
+                  "type": "string",
+                  "description": "Geometry identifier from a resource pack."
+                },
+                "bone_visibility": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": [
+                      "boolean",
+                      "string"
+                    ]
+                  }
+                },
+                "culling": {
+                  "type": "string"
+                },
+                "culling_layer": {
+                  "type": "string"
+                },
+                "culling_shape": {
+                  "type": "string"
+                },
+                "uv_lock": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "identifier"
+              ]
+            },
+            {
+              "type": "string",
+              "description": "Geometry identifier from a resource pack."
+            }
+          ],
+          "description": "Geometry and optional bone visibility/culling settings."
+        },
+        "minecraft:material_instances": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/material"
+              },
+              {
+                "type": "string",
+                "description": "Reference another named material instance."
+              }
+            ]
+          },
+          "description": "Maps geometry material slots or faces to textures and rendering settings."
+        },
+        "minecraft:transformation": {
+          "type": "object",
+          "properties": {
+            "translation": {
+              "$ref": "#/definitions/vector"
+            },
+            "rotation": {
+              "$ref": "#/definitions/vector"
+            },
+            "scale": {
+              "$ref": "#/definitions/vector"
+            },
+            "rotation_pivot": {
+              "$ref": "#/definitions/vector"
+            },
+            "scale_pivot": {
+              "$ref": "#/definitions/vector"
+            }
+          },
+          "description": "Local translation, rotation, and scaling vectors."
+        },
+        "minecraft:map_color": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/color"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "color": {
+                  "$ref": "#/definitions/color"
+                },
+                "tint_method": {
+                  "type": "string"
+                }
+              }
+            }
+          ],
+          "description": "Map color, retaining legacy color forms."
+        },
+        "minecraft:tick": {
+          "type": "object",
+          "properties": {
+            "interval_range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "looping": {
+              "type": "boolean"
+            }
+          },
+          "description": "Tick interval used by script-driven block behavior."
+        },
+        "minecraft:random_ticking": {
+          "type": "object",
+          "description": "Enable random-tick behavior; legacy fields remain allowed."
+        },
+        "minecraft:loot": {
+          "type": "string",
+          "description": "Loot-table path relative to the behavior pack."
+        },
+        "minecraft:display_name": {
+          "type": "string",
+          "description": "Display text or a localization key."
+        },
+        "minecraft:crafting_table": {
+          "type": "object",
+          "properties": {
+            "table_name": {
+              "type": "string"
+            },
+            "crafting_tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "description": "Custom crafting station name and accepted recipe tags."
+        },
+        "minecraft:flammable": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "catch_chance_modifier": {
+                  "type": "integer"
+                },
+                "destroy_chance_modifier": {
+                  "type": "integer"
+                }
+              }
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "description": "Fire behavior and spread modifiers."
+        },
+        "minecraft:placement_filter": {
+          "type": "object",
+          "properties": {
+            "conditions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "allowed_faces": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "up",
+                            "down",
+                            "north",
+                            "south",
+                            "east",
+                            "west",
+                            "side",
+                            "all"
+                          ]
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  },
+                  "block_filter": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "tags": {
+                              "type": "string"
+                            },
+                            "states": {
+                              "type": "object"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "description": "Placement and survival requirements."
+        },
+        "minecraft:entity_fall_on": {
+          "type": "object",
+          "properties": {
+            "minimum_fall_distance": {
+              "type": "number"
+            }
+          },
+          "description": "Fall distance threshold for script callbacks."
+        },
+        "minecraft:custom_components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Legacy custom-component ID list. Modern components use their ID directly as a component key."
+        },
+        "minecraft:tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags associated with the block."
+        },
+        "minecraft:movable": {
+          "type": "object",
+          "properties": {
+            "movement_type": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "push_pull",
+                    "push",
+                    "popped",
+                    "immovable"
+                  ]
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "sticky": {
+              "type": "string"
+            }
+          },
+          "description": "Piston movement behavior."
+        },
+        "minecraft:liquid_detection": {
+          "type": "object",
+          "properties": {
+            "detection_rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "liquid_type": {
+                    "type": "string"
+                  },
+                  "can_contain_liquid": {
+                    "type": "boolean"
+                  },
+                  "on_liquid_touches": {
+                    "type": "string"
+                  },
+                  "use_liquid_clipping": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "description": "Rules for interactions with liquids."
+        }
+      },
+      "additionalProperties": true,
+      "description": "Built-in and script-registered custom block components. Custom parameter values are not inferred."
+    },
+    "material": {
+      "type": "object",
+      "properties": {
+        "texture": {
+          "type": "string",
+          "description": "Texture-atlas identifier."
+        },
+        "render_method": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "opaque",
+                "alpha_test",
+                "alpha_test_single_sided",
+                "blend",
+                "double_sided"
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "ambient_occlusion": {
+          "type": [
+            "boolean",
+            "number"
+          ]
+        },
+        "face_dimming": {
+          "type": "boolean"
+        },
+        "isotropic": {
+          "type": "boolean"
+        },
+        "tint_method": {
+          "type": "string"
+        },
+        "alpha_masked_tint": {
+          "type": "boolean"
         }
       }
     }

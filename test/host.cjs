@@ -80,8 +80,8 @@ async function run() {
   await until(async () => {
     const hovers = await vscode.commands.executeCommand('vscode.executeHoverProvider', blockUri, keyPosition);
     assert.ok(hovers.length <= 1, 'Component documentation was duplicated by multiple hover providers');
-    return hovers.some(hover => hover.contents.some(content => content.value?.includes('Controls block friction.')));
-  }, 'Mojang schema documentation hover missing');
+    return hovers.some(hover => hover.contents.some(content => content.value?.includes('Surface friction')));
+  }, 'Workbench block documentation hover missing');
   assert.ok(await blockDoc.save());
   const badType = new vscode.WorkspaceEdit();
   const valueOffset = blockDoc.getText().indexOf('0.4');
@@ -284,6 +284,48 @@ async function run() {
     await editorSettings.update('suggestOnTriggerCharacters', previousTriggers, vscode.ConfigurationTarget.WorkspaceFolder);
     await vscode.commands.executeCommand('hideSuggestWidget');
   }
+  const customIds = path.join(root, 'BP/scripts/component-ids.ts'), customScript = path.join(root, 'BP/scripts/custom-components.ts');
+  await fs.mkdir(path.dirname(customIds), { recursive: true });
+  await fs.writeFile(customIds, "export const BLOCK_ID = 'test:host_block' as const;");
+  await fs.writeFile(customScript, "import {system} from '@minecraft/server'; import {BLOCK_ID} from './component-ids.js'; system.beforeEvents.startup.subscribe(({blockComponentRegistry: blocks, itemComponentRegistry}) => { blocks.registerCustomComponent(BLOCK_ID, {onTick() {}}); itemComponentRegistry.registerCustomComponent('test:host_item', {}); });");
+  const customUri = vscode.Uri.file(path.join(root, 'BP/blocks/custom-components.json'));
+  await core.writeJson(customUri.fsPath, { format_version: '1.21.90', 'minecraft:block': { description: { identifier: 'test:host_custom' }, components: { '': {} } } });
+  const customDoc = await vscode.workspace.openTextDocument(customUri); await vscode.window.showTextDocument(customDoc);
+  const customPosition = customDoc.positionAt(customDoc.getText().indexOf('"":') + 1);
+  await until(async () => {
+    const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, customPosition);
+    assert.ok(!completion?.items.some(item => item.label === 'test:host_item'), 'Item-only custom component leaked into block suggestions');
+    return completion?.items.some(item => item.label === 'test:host_block' && item.detail === 'Project block custom component');
+  }, 'Imported script-registered block component completion missing');
+  async function setCustomBlock(components, permutations) {
+    const edit = new vscode.WorkspaceEdit();
+    edit.replace(customUri, new vscode.Range(customDoc.positionAt(0), customDoc.positionAt(customDoc.getText().length)), JSON.stringify({ format_version: '1.21.90', 'minecraft:block': { description: { identifier: 'test:host_custom' }, components, ...(permutations ? { permutations } : {}) } }));
+    assert.ok(await vscode.workspace.applyEdit(edit));
+  }
+  await setCustomBlock({ 'test:host_block': { arbitrary_parameter: true } });
+  const registeredPosition = customDoc.positionAt(customDoc.getText().indexOf('test:host_block') + 6);
+  const componentHover = await vscode.commands.executeCommand('vscode.executeHoverProvider', customUri, registeredPosition);
+  assert.ok(componentHover.some(h => h.contents.some(c => c.value?.includes('onTick'))), 'Custom component registration hover missing');
+  const componentDefinitions = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', customUri, registeredPosition);
+  assert.ok(componentDefinitions.some(definition => definition.uri?.fsPath.toLowerCase() === customScript.toLowerCase()), 'Custom component registration navigation missing');
+  await setCustomBlock({}, [{ condition: '1', components: { '': {} } }]);
+  await until(async () => {
+    const position = customDoc.positionAt(customDoc.getText().indexOf('"":') + 1);
+    const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, position);
+    return completion?.items.some(item => item.label === 'test:host_block');
+  }, 'Custom component completion missing in permutations');
+  await setCustomBlock({ 'minecraft:custom_components': [''] });
+  await until(async () => {
+    const position = customDoc.positionAt(customDoc.getText().indexOf('[""') + 2);
+    const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, position);
+    return completion?.items.some(item => item.label === 'test:host_block');
+  }, 'Legacy custom-component list completion missing');
+  await fs.writeFile(customIds, "export const BLOCK_ID = 'test:host_updated' as const;");
+  await until(async () => {
+    const position = customDoc.positionAt(customDoc.getText().indexOf('[""') + 2);
+    const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, position);
+    return completion?.items.some(item => item.label === 'test:host_updated') && !completion.items.some(item => item.label === 'test:host_block');
+  }, 'Saved imported component ID changes did not refresh suggestions');
   const validationReport = await core.readJson(path.join(root, '.bedrock/validation-report.json'));
   assert.ok(validationReport.files >= 6); assert.equal(validationReport.schemaVersion, '1.26.50');
   state = await core.readJson(stateFile);

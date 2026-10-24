@@ -48,3 +48,24 @@ Primary references consulted October 23, 2026:
 Next candidates: deeper entity/block/item component checks. Metadata-derived documentation must retain its source/provenance separately from our authored validation rules. Do not treat the newest format as mandatory for older valid documents.
 
 Completion behavior in 0.9.5: discriminator patterns accept namespaced aliases without adding those aliases to the name dropdown. Each name has one preferred completion spelling. New function objects initially offer the function selector; explicit conditions remain validated through a pattern property, and selected functions may offer conditions where relevant. This preserves the documented syntax while reducing initial completion noise.
+
+## Block schemas and script registrations (0.10.0)
+
+The original block schema is maintained in tools/block-schema.cjs and emitted to schemas/block.schema.json by the common generator. It replaces the official block entry point and the previous foundational block schema. This first batch covers the document wrapper, identifier, menu category, states, placement traits, permutations, and 23 common component definitions. Remaining built-in component names/fields can still receive compatible Mojang documentation assistance; overlapping authored rules are omitted from that generated reference to preserve our types and one hover source.
+
+Audited shapes include friction/light values, mining/explosion unions, box vectors, geometry, materials, transformations, color representations, tick intervals, placement filters, loot, tags, and liquid interaction settings. Legacy forms and unknown fields remain open. Engine/format-specific feature availability, geometry/material pairing across permutations, state-expression evaluation, and the remaining built-in component payloads are future work. Material ambient-occlusion booleans remain accepted for older document versions.
+
+Custom block and item registries are analyzed separately using the pinned Node-compatible @babel/parser package (MIT, shipped with its dependency notices). src/script-components.cjs is original Workbench analysis code. It never executes imports, handlers, constructors, or project statements. Discovery supports string literals, constant concatenation/templates/object members, lexical registry aliases, and relative named/default/namespace imports and reexports. Saved JS/TS source changes, renamed/deleted scripts, and imported-constant changes rebuild the registry view. Only behavior-pack source files up to 2 MiB each are inspected; type declaration files and ignored directories are excluded.
+
+Registered component IDs are suggested at component keys, permutation keys, and legacy custom-component lists, with source/callback hovers and registration navigation. Custom JSON parameter values remain unrestricted: handler interfaces do not provide a reliable parameter schema. Components registered for the opposite pack-content kind receive an informational finding; unresolved/external IDs remain allowed. Runtime-computed IDs, helper-call argument flow, third-party package exports, unsaved source buffers, and proof that registration code is reachable/executed are outside this initial scope.
+
+Verification: all 98 relevant Mojang v1.26.50.4 block examples and all five SavageCraft block definitions passed the authored schema. The registry index found all five SavageCraft block registrations (including the imported FERTILIZABLE constant) separately from three item registrations. Full saved-project validation of 721 JSON files reported zero errors and warnings; informational reference findings may remain.
+
+Primary references consulted October 24, 2026:
+- https://learn.microsoft.com/en-us/minecraft/creator/documents/scripting/custom-components?view=minecraft-bedrock-stable
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/blockcomponentslist?view=minecraft-bedrock-stable
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable
+- https://github.com/Mojang/bedrock-samples/tree/v1.26.50.4 (block examples and documentation metadata)
+- https://babeljs.io/docs/babel-parser (parser API)

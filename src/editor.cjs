@@ -3,6 +3,7 @@ const json = require('jsonc-parser');
 const reference = require('./reference.cjs');
 const core = require('./core.cjs');
 const officialSchemas = require('./official-schemas.cjs');
+const ownedBlocks = require('../schemas/block.schema.json').definitions.components.properties;
 function attach(vscode, context, getProject, output) {
   if (!vscode.languages.registerCompletionItemProvider) return { refresh() {} };
   let index, activeKey, generation = 0;
@@ -18,6 +19,7 @@ function attach(vscode, context, getProject, output) {
     const text = document.getText(), location = json.getLocation(text, document.offsetAt(position));
     const keys = location.path, c = keys.lastIndexOf('components');
     if (c < 0 || keys[0] !== `minecraft:${kind}`) return;
+    if (c !== 1 && !(c === 3 && ((keys[1] === 'permutations' && typeof keys[2] === 'number') || (kind === 'entity' && keys[1] === 'component_groups')))) return;
     const components = index.components[kind];
     return { text, location, keys, c, kind, components };
   }
@@ -41,7 +43,8 @@ function attach(vscode, context, getProject, output) {
         const data = info(document, position);
         if (!data?.location.isAtPropertyKey) return;
         const level = data.keys.length - data.c - 1;
-        const values = level === 1 ? data.components : level === 2 ? data.components[data.keys[data.c + 1]]?.fields : undefined;
+        if (data.kind === 'block' && level === 2 && Object.hasOwn(ownedBlocks, data.keys[data.c + 1])) return;
+        const values = level === 1 ? Object.fromEntries(Object.entries(data.components).filter(([name]) => data.kind !== 'block' || !Object.hasOwn(ownedBlocks, name))) : level === 2 ? data.components[data.keys[data.c + 1]]?.fields : undefined;
         if (!values) return;
         const parent = json.findNodeAtLocation(json.parseTree(data.text), data.keys.slice(0, -1));
         const existing = new Set(parent?.children?.map(n => n.children?.[0]?.value));
@@ -62,8 +65,8 @@ function attach(vscode, context, getProject, output) {
         const data = info(document, range.start);
         if (!data?.location.isAtPropertyKey || data.keys.length !== data.c + 2) return [];
         const name = data.keys.at(-1), node = keyNode(document, data);
-        if (!node || typeof name !== 'string' || !name.startsWith('minecraft:') || data.components[name]) return [];
-        return reference.closest(name, Object.keys(data.components)).map(replacement => {
+        if (!node || typeof name !== 'string' || !name.startsWith('minecraft:') || data.components[name] || (data.kind === 'block' && Object.hasOwn(ownedBlocks, name))) return [];
+        return reference.closest(name, [...new Set([...Object.keys(data.components), ...(data.kind === 'block' ? Object.keys(ownedBlocks) : [])])]).map(replacement => {
           const action = new vscode.CodeAction(`Change to ${replacement}`, vscode.CodeActionKind.QuickFix);
           action.edit = new vscode.WorkspaceEdit();
           action.edit.replace(document.uri, new vscode.Range(document.positionAt(node.offset), document.positionAt(node.offset + node.length)), JSON.stringify(replacement));
@@ -79,8 +82,8 @@ function attach(vscode, context, getProject, output) {
         const key = node.children[0];
         if (typeof key.value === 'string' && key.value.startsWith('minecraft:')) {
           const data = info(document, document.positionAt(key.offset + 1));
-          if (data && data.keys.length === data.c + 2 && !data.components[key.value]) {
-            const suggestions = reference.closest(key.value, Object.keys(data.components));
+          if (data && data.keys.length === data.c + 2 && !data.components[key.value] && !(data.kind === 'block' && Object.hasOwn(ownedBlocks, key.value))) {
+            const suggestions = reference.closest(key.value, [...new Set([...Object.keys(data.components), ...(data.kind === 'block' ? Object.keys(ownedBlocks) : [])])]);
             if (suggestions.length) items.push(new vscode.Diagnostic(new vscode.Range(document.positionAt(key.offset), document.positionAt(key.offset + key.length)), `Possible component spelling: ${suggestions.join(', ')} (Mojang ${index.tag}).`, vscode.DiagnosticSeverity.Information));
           }
         }
@@ -116,7 +119,7 @@ function attach(vscode, context, getProject, output) {
       const associations = [];
       for (const [folder, kind] of Object.entries({ blocks: 'block', items: 'item', entities: 'entity' })) {
         const file = await core.local(project.root, `.bedrock/reference/${kind}.schema.json`);
-        await core.writeJson(file, reference.componentSchema(index, kind));
+        await core.writeJson(file, reference.componentSchema(index, kind, { omit: kind === 'block' ? Object.keys(ownedBlocks) : [] }));
         associations.push({ fileMatch: [path.join(project.packs.behavior, folder, '**/*.json').replaceAll(path.sep, '/')], url: vscode.Uri.file(file).toString() });
       }
       associations.push(...(official?.associations || []));
