@@ -16,8 +16,9 @@
           },
           "conditions": {
             "type": "array",
+            "description": "Requirements for this pool, entry, or function. Choose a condition starter.",
             "items": {
-              "type": "object"
+              "$ref": "#/definitions/lootCondition"
             }
           },
           "entries": {
@@ -47,8 +48,9 @@
                 },
                 "conditions": {
                   "type": "array",
+                  "description": "Requirements for this pool, entry, or function. Choose a condition starter.",
                   "items": {
-                    "type": "object"
+                    "$ref": "#/definitions/lootCondition"
                   }
                 }
               }
@@ -133,8 +135,9 @@
         },
         "conditions": {
           "type": "array",
+          "description": "Requirements for this pool, entry, or function. Choose a condition starter.",
           "items": {
-            "type": "object"
+            "$ref": "#/definitions/lootCondition"
           }
         }
       },
@@ -608,7 +611,7 @@
               "conditions": {
                 "type": "array",
                 "items": {
-                  "type": "object"
+                  "$ref": "#/definitions/lootCondition"
                 }
               }
             }
@@ -992,6 +995,662 @@
               "loot_table": {
                 "type": "string"
               }
+            }
+          }
+        }
+      ]
+    },
+    "lootCondition": {
+      "type": "object",
+      "properties": {
+        "condition": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "random_chance",
+                "random_chance_with_looting",
+                "random_difficulty_chance",
+                "random_regional_difficulty_chance",
+                "killed_by_player",
+                "killed_by_player_or_pets",
+                "killed_by_entity",
+                "damaged_by_entity",
+                "entity_killed",
+                "passenger_of_entity",
+                "is_baby",
+                "has_variant",
+                "has_mark_variant",
+                "bool_property",
+                "biome_has_tag",
+                "entity_properties",
+                "match_tool"
+              ]
+            },
+            {
+              "type": "string",
+              "description": "Condition identifier; additional engine conditions remain allowed."
+            }
+          ],
+          "description": "Requirement to test before selecting loot."
+        }
+      },
+      "required": [
+        "condition"
+      ],
+      "defaultSnippets": [
+        {
+          "label": "random_chance",
+          "description": "Test a drop probability.",
+          "body": {
+            "condition": "random_chance",
+            "chance": 0.5
+          }
+        },
+        {
+          "label": "random_chance_with_looting",
+          "description": "Adjust probability for Looting.",
+          "body": {
+            "condition": "random_chance_with_looting",
+            "chance": 0.1,
+            "looting_multiplier": 0.02
+          }
+        },
+        {
+          "label": "random_difficulty_chance",
+          "description": "Choose probability by world difficulty.",
+          "body": {
+            "condition": "random_difficulty_chance",
+            "default_chance": 0.5,
+            "peaceful": 0,
+            "hard": 0.6
+          }
+        },
+        {
+          "label": "random_regional_difficulty_chance",
+          "description": "Test regional drop probability.",
+          "body": {
+            "condition": "random_regional_difficulty_chance",
+            "max_chance": 0.15
+          }
+        },
+        {
+          "label": "killed_by_player",
+          "description": "Require a player kill.",
+          "body": {
+            "condition": "killed_by_player"
+          }
+        },
+        {
+          "label": "killed_by_player_or_pets",
+          "description": "Include player and pet kills.",
+          "body": {
+            "condition": "killed_by_player_or_pets"
+          }
+        },
+        {
+          "label": "killed_by_entity",
+          "description": "Require a particular killer.",
+          "body": {
+            "condition": "killed_by_entity",
+            "entity_type": "minecraft:skeleton"
+          }
+        },
+        {
+          "label": "damaged_by_entity",
+          "description": "Check the damaging entity type.",
+          "body": {
+            "condition": "damaged_by_entity",
+            "entity_type": "minecraft:fireball"
+          }
+        },
+        {
+          "label": "entity_killed",
+          "description": "Check the defeated entity type.",
+          "body": {
+            "condition": "entity_killed",
+            "entity_type": "minecraft:slime"
+          }
+        },
+        {
+          "label": "passenger_of_entity",
+          "description": "Check the ridden entity type.",
+          "body": {
+            "condition": "passenger_of_entity",
+            "entity_type": "minecraft:chicken"
+          }
+        },
+        {
+          "label": "is_baby",
+          "description": "Require a baby entity.",
+          "body": {
+            "condition": "is_baby"
+          }
+        },
+        {
+          "label": "has_variant",
+          "description": "Check the entity variant.",
+          "body": {
+            "condition": "has_variant",
+            "value": 0
+          }
+        },
+        {
+          "label": "has_mark_variant",
+          "description": "Check the marked variant.",
+          "body": {
+            "condition": "has_mark_variant",
+            "value": 0
+          }
+        },
+        {
+          "label": "bool_property",
+          "description": "Check an entity boolean property.",
+          "body": {
+            "condition": "bool_property",
+            "domain": "example:property",
+            "value": true
+          }
+        },
+        {
+          "label": "biome_has_tag",
+          "description": "Check a biome tag.",
+          "body": {
+            "condition": "biome_has_tag",
+            "tag": "forest",
+            "operator": "=="
+          }
+        },
+        {
+          "label": "entity_properties",
+          "description": "Check properties of an entity.",
+          "body": {
+            "condition": "entity_properties",
+            "entity": "this",
+            "properties": {
+              "on_fire": true
+            }
+          }
+        },
+        {
+          "label": "match_tool",
+          "description": "Check the tool used for loot.",
+          "body": {
+            "condition": "match_tool",
+            "item": "minecraft:diamond_sword"
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "random_chance",
+                  "minecraft:random_chance"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Test a drop probability.",
+            "properties": {
+              "chance": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "random_chance_with_looting",
+                  "minecraft:random_chance_with_looting"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Adjust probability for Looting.",
+            "properties": {
+              "chance": {
+                "type": "number"
+              },
+              "looting_multiplier": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "random_difficulty_chance",
+                  "minecraft:random_difficulty_chance"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Choose probability by world difficulty.",
+            "properties": {
+              "default_chance": {
+                "type": "number"
+              },
+              "peaceful": {
+                "type": "number"
+              },
+              "easy": {
+                "type": "number"
+              },
+              "normal": {
+                "type": "number"
+              },
+              "hard": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "random_regional_difficulty_chance",
+                  "minecraft:random_regional_difficulty_chance"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Test regional drop probability.",
+            "properties": {
+              "max_chance": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "killed_by_player",
+                  "minecraft:killed_by_player"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Require a player kill.",
+            "properties": {}
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "killed_by_player_or_pets",
+                  "minecraft:killed_by_player_or_pets"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Include player and pet kills.",
+            "properties": {}
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "killed_by_entity",
+                  "minecraft:killed_by_entity"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Require a particular killer.",
+            "properties": {
+              "entity_type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "damaged_by_entity",
+                  "minecraft:damaged_by_entity"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Check the damaging entity type.",
+            "properties": {
+              "entity_type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "entity_killed",
+                  "minecraft:entity_killed"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Check the defeated entity type.",
+            "properties": {
+              "entity_type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "passenger_of_entity",
+                  "minecraft:passenger_of_entity"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Check the ridden entity type.",
+            "properties": {
+              "entity_type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "is_baby",
+                  "minecraft:is_baby"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Require a baby entity.",
+            "properties": {}
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "has_variant",
+                  "minecraft:has_variant"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Check the entity variant.",
+            "properties": {
+              "value": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "has_mark_variant",
+                  "minecraft:has_mark_variant"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Check the marked variant.",
+            "properties": {
+              "value": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "bool_property",
+                  "minecraft:bool_property"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Check an entity boolean property.",
+            "properties": {
+              "domain": {
+                "type": "string"
+              },
+              "value": {
+                "type": "boolean"
+              },
+              "operator": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "biome_has_tag",
+                  "minecraft:biome_has_tag"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Check a biome tag.",
+            "properties": {
+              "tag": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "entity_properties",
+                  "minecraft:entity_properties"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Check properties of an entity.",
+            "properties": {
+              "entity": {
+                "type": "string",
+                "description": "Entity context, such as this."
+              },
+              "properties": {
+                "type": "object",
+                "properties": {
+                  "on_fire": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "condition": {
+                "enum": [
+                  "match_tool",
+                  "minecraft:match_tool"
+                ]
+              }
+            },
+            "required": [
+              "condition"
+            ]
+          },
+          "then": {
+            "description": "Check the tool used for loot.",
+            "properties": {
+              "item": {
+                "type": "string",
+                "description": "Tool item identifier."
+              },
+              "count": {
+                "$ref": "#/definitions/toolRange"
+              },
+              "durability": {
+                "$ref": "#/definitions/toolRange"
+              },
+              "enchantments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "enchantment": {
+                      "type": "string"
+                    },
+                    "levels": {
+                      "$ref": "#/definitions/toolRange"
+                    }
+                  }
+                }
+              },
+              "minecraft:match_tool_filter_any": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Tool item tags to match (any)."
+              },
+              "minecraft:match_tool_filter_all": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Tool item tags to match (all)."
+              },
+              "minecraft:match_tool_filter_none": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Tool item tags to match (none)."
+              }
+            }
+          }
+        }
+      ]
+    },
+    "toolRange": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "range_min": {
+              "type": "number"
+            },
+            "range_max": {
+              "type": "number"
             }
           }
         }

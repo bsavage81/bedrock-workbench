@@ -80,7 +80,7 @@ const functions = {
   enchant_random_gear: ['Apply mob-equipment enchantment rules.', { chance: { type: 'number' } }, { chance: 0.25 }],
   specific_enchants: ['Choose explicit enchantments.', { enchants: array({ anyOf: [string(), object({ id: { type: ['string', 'integer'] }, level: { anyOf: [ref('range'), array({ type: 'number' })] } })] }) }, { enchants: [{ id: 'sharpness', level: 1 }] }],
   looting_enchant: ['Adjust drops for Looting.', { count: ref('range'), limit: { type: 'number' } }, { count: { min: 0, max: 1 } }],
-  furnace_smelt: ['Use the cooked item variant.', { conditions: array({ type: 'object' }) }, {}],
+  furnace_smelt: ['Use the cooked item variant.', { conditions: array(ref('lootCondition')) }, {}],
   explosion_decay: ['Reduce drops after an explosion.', {}, {}],
   set_actor_id: ['Choose a spawn-egg entity.', { id: string() }, { id: 'minecraft:pig' }],
   set_data_from_color_index: ['Inherit the source entity color.', {}, {}],
@@ -98,14 +98,44 @@ const functions = {
   fill_container: ['Fill a placed container from loot.', { loot_table: string() }, { loot_table: 'loot_tables/chests/custom.json' }]
 };
 const aliases = ['set_count', 'set_damage', 'enchant_randomly', 'set_stew_effect', 'set_potion', 'set_data_from_color_index'].map(name => 'minecraft:' + name);
+const toolRange = { anyOf: [{ type: 'number' }, object({ range_min: { type: 'number' }, range_max: { type: 'number' } })] };
+const conditions = {
+  random_chance: ['Test a drop probability.', { chance: { type: 'number' } }, { chance: 0.5 }],
+  random_chance_with_looting: ['Adjust probability for Looting.', { chance: { type: 'number' }, looting_multiplier: { type: 'number' } }, { chance: 0.1, looting_multiplier: 0.02 }],
+  random_difficulty_chance: ['Choose probability by world difficulty.', Object.fromEntries(['default_chance', 'peaceful', 'easy', 'normal', 'hard'].map(key => [key, { type: 'number' }])), { default_chance: 0.5, peaceful: 0, hard: 0.6 }],
+  random_regional_difficulty_chance: ['Test regional drop probability.', { max_chance: { type: 'number' } }, { max_chance: 0.15 }],
+  killed_by_player: ['Require a player kill.', {}, {}],
+  killed_by_player_or_pets: ['Include player and pet kills.', {}, {}],
+  killed_by_entity: ['Require a particular killer.', { entity_type: string() }, { entity_type: 'minecraft:skeleton' }],
+  damaged_by_entity: ['Check the damaging entity type.', { entity_type: string() }, { entity_type: 'minecraft:fireball' }],
+  entity_killed: ['Check the defeated entity type.', { entity_type: string() }, { entity_type: 'minecraft:slime' }],
+  passenger_of_entity: ['Check the ridden entity type.', { entity_type: string() }, { entity_type: 'minecraft:chicken' }],
+  is_baby: ['Require a baby entity.', {}, {}],
+  has_variant: ['Check the entity variant.', { value: { type: 'integer' } }, { value: 0 }],
+  has_mark_variant: ['Check the marked variant.', { value: { type: 'integer' } }, { value: 0 }],
+  bool_property: ['Check an entity boolean property.', { domain: string(), value: { type: 'boolean' }, operator: string() }, { domain: 'example:property', value: true }],
+  biome_has_tag: ['Check a biome tag.', { tag: string(), operator: string() }, { tag: 'forest', operator: '==' }],
+  entity_properties: ['Check properties of an entity.', { entity: string('Entity context, such as this.'), properties: object({ on_fire: { type: 'boolean' } }) }, { entity: 'this', properties: { on_fire: true } }],
+  match_tool: ['Check the tool used for loot.', {
+    item: string('Tool item identifier.'), count: ref('toolRange'), durability: ref('toolRange'),
+    enchantments: array(object({ enchantment: string(), levels: ref('toolRange') })),
+    ...Object.fromEntries(['any', 'all', 'none'].map(kind => ['minecraft:match_tool_filter_' + kind, { ...array(string()), description: 'Tool item tags to match (' + kind + ').' }]))
+  }, { item: 'minecraft:diamond_sword' }]
+};
+const lootCondition = {
+  ...object({ condition: { anyOf: [{ type: 'string', enum: Object.keys(conditions) }, string('Condition identifier; additional engine conditions remain allowed.')], description: 'Requirement to test before selecting loot.' } }, ['condition']),
+  defaultSnippets: Object.entries(conditions).map(([name, [description, , body]]) => ({ label: name, description, body: { condition: name, ...body } })),
+  allOf: Object.entries(conditions).map(([name, [description, properties]]) => ({ if: { properties: { condition: { enum: [name, 'minecraft:' + name] } }, required: ['condition'] }, then: { description, properties } }))
+};
+const lootConditions = { type: 'array', description: 'Requirements for this pool, entry, or function. Choose a condition starter.', items: ref('lootCondition') };
 const lootFunction = {
-  ...object({ function: { anyOf: [{ type: 'string', enum: [...Object.keys(functions), ...aliases] }, string('Function identifier; additional engine functions remain allowed.')], description: 'Loot modifier to apply to this item.' }, conditions: array({ type: 'object' }) }, ['function']),
+  ...object({ function: { anyOf: [{ type: 'string', enum: [...Object.keys(functions), ...aliases] }, string('Function identifier; additional engine functions remain allowed.')], description: 'Loot modifier to apply to this item.' }, conditions: lootConditions }, ['function']),
   defaultSnippets: Object.entries(functions).map(([name, [description, , body]]) => ({ label: name, description, body: { function: name === 'set_stew_effect' ? 'minecraft:set_stew_effect' : name, ...body } })),
   allOf: Object.entries(functions).map(([name, [description, properties]]) => ({ if: { properties: { function: { enum: [name, 'minecraft:' + name] } }, required: ['function'] }, then: { description, properties } }))
 };
 const lootFunctions = { type: 'array', description: 'Item modifiers. Add a function object or choose a starter.', items: ref('lootFunction') };
-const lootEntry = object({ type: string('Entry kind, such as item, loot_table, or empty.'), name: string(), weight: { type: 'number' }, quality: { type: 'number' }, functions: lootFunctions, conditions: array({ type: 'object' }) });
-const loot = { ...header('loot table'), ...object({ pools: array(object({ rolls: ref('range'), bonus_rolls: ref('range'), conditions: array({ type: 'object' }), entries: array(lootEntry), functions: lootFunctions })) }),
-  definitions: { range: { anyOf: [{ type: 'number' }, object({ min: { type: 'number' }, max: { type: 'number' } })] }, lootFunction }
+const lootEntry = object({ type: string('Entry kind, such as item, loot_table, or empty.'), name: string(), weight: { type: 'number' }, quality: { type: 'number' }, functions: lootFunctions, conditions: lootConditions });
+const loot = { ...header('loot table'), ...object({ pools: array(object({ rolls: ref('range'), bonus_rolls: ref('range'), conditions: lootConditions, entries: array(lootEntry), functions: lootFunctions })) }),
+  definitions: { range: { anyOf: [{ type: 'number' }, object({ min: { type: 'number' }, max: { type: 'number' } })] }, lootFunction, lootCondition, toolRange }
 };
 for (const [name, schema] of Object.entries({ recipe, 'texture-atlas': atlas, 'sound-definitions': sounds, 'loot-table': loot })) fs.writeFileSync(path.join(__dirname, '../schemas', name + '.schema.json'), JSON.stringify(schema, null, 2) + '\n');

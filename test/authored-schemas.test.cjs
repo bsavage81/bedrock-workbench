@@ -7,6 +7,11 @@ const atlas = ajv.compile(require('../schemas/texture-atlas.schema.json'));
 const sounds = ajv.compile(require('../schemas/sound-definitions.schema.json'));
 const loot = ajv.compile(require('../schemas/loot-table.schema.json'));
 const lootDoc = functions => ({ pools: [{ entries: [{ type: 'item', name: 'minecraft:iron_sword', functions }] }] });
+test('loot conditions work on pools, entries and functions, including tool predicates and extensions', () => {
+  const conditions = [{ condition: 'random_chance', chance: 0.5 }, { condition: 'match_tool', count: 1, durability: { range_min: 1 }, enchantments: [{ enchantment: 'sharpness', levels: { range_max: 6 } }], 'minecraft:match_tool_filter_any': ['minecraft:is_tool'] }, { condition: 'custom:requirement', custom: true }];
+  assert.ok(loot({ pools: [{ conditions, entries: [{ conditions, functions: [{ function: 'furnace_smelt', conditions: [{ condition: 'entity_properties', entity: 'this', properties: { on_fire: true } }] }] }] }] }));
+  for (const value of [{ condition: 'random_chance', chance: 'wrong' }, { condition: 'random_chance_with_looting', looting_multiplier: 'wrong' }, { condition: 'entity_properties', properties: { on_fire: 'wrong' } }, { condition: 'match_tool', durability: { range_min: 'wrong' } }, { condition: 'match_tool', 'minecraft:match_tool_filter_all': [42] }, {}]) assert.equal(loot({ pools: [{ entries: [{ conditions: [value] }] }] }), false);
+});
 test('loot functions preserve aliases/extensions and validate documented parameter shapes', () => {
   assert.ok(loot(lootDoc([{ function: 'set_count', count: { min: 1, max: 3 } }, { function: 'minecraft:set_damage', damage: 0.7 }, { function: 'specific_enchants', enchants: [{ id: 'sharpness', level: [1, 3] }] }, { function: 'custom:modifier', custom_payload: true }])));
   assert.ok(!loot(lootDoc([{ function: 'set_count', count: 'wrong' }])));

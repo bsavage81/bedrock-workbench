@@ -2,9 +2,11 @@
 
 Workbench schemas are authored independently from format documentation and tested behavior. Existing official Mojang schema coverage remains available while we replace individual routes with tested schemas we maintain.
 
-First migrated route: `schemas/loot-table.schema.json`, used instead of the bundled Mojang loot-table entry point for compatible targets. It checks document/pool/entry structure and numeric ranges, permits unknown fields, and leaves condition payloads and function extensions open. It is deliberately not a complete runtime validator.
+First migrated route: `schemas/loot-table.schema.json`, used instead of the bundled Mojang loot-table entry point for compatible targets. It checks document/pool/entry structure and numeric ranges while allowing unknown fields and condition/function extensions. It is deliberately not a complete runtime validator.
 
 As of 0.9.2, loot function entries also provide starter snippets, function-name suggestions, and conditional parameter completion/validation for documented functions. Known namespaced aliases are supported; unknown function identifiers and extension fields remain open. Trade-only functions are not offered as loot starters. These definitions are maintained by the original generator alongside the other Workbench schemas. References checked October 24, 2026: https://learn.microsoft.com/en-us/minecraft/creator/documents/lootandtradetablefunctions?view=minecraft-bedrock-stable and Mojang v1.26.50.4 sample loot tables.
+
+As of 0.9.3, conditions on pools, entries, and functions share starter snippets, name suggestions, and selected-condition parameter schemas. This includes probability tests, entity/variant predicates, and match_tool fields with range_min/range_max ranges and item-tag filters. Unknown identifiers and extension fields remain open; validation does not prove the condition is available in every engine/context. References checked October 24, 2026: https://learn.microsoft.com/en-us/minecraft/creator/documents/loottableconditions?view=minecraft-bedrock-stable and Mojang v1.26.50.4 sample loot tables.
 
 References consulted (October 23, 2026):
 - https://learn.microsoft.com/en-us/minecraft/creator/documents/introductiontoloottables?view=minecraft-bedrock-stable

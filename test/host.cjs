@@ -184,6 +184,40 @@ async function run() {
     const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', functionLootUri, position);
     return ['levels', 'treasure'].every(key => completion?.items.some(item => String(item.label).replaceAll('"', '') === key));
   }, 'Loot function parameters did not follow the selected function');
+  const conditionUri = vscode.Uri.file(path.join(root, 'BP/loot_tables/condition-completion.json'));
+  const entry = { type: 'item', name: 'minecraft:iron_sword', weight: 6 };
+  const conditionContexts = [
+    { pools: [{ entries: [{ ...entry, conditions: [] }] }] },
+    { pools: [{ conditions: [], entries: [entry] }] },
+    { pools: [{ entries: [{ ...entry, functions: [{ function: 'furnace_smelt', conditions: [] }] }] }] }
+  ];
+  await fs.writeFile(conditionUri.fsPath, JSON.stringify(conditionContexts[0]));
+  const conditionDoc = await vscode.workspace.openTextDocument(conditionUri); await vscode.window.showTextDocument(conditionDoc);
+  async function setConditionsDocument(data) {
+    const edit = new vscode.WorkspaceEdit();
+    edit.replace(conditionUri, new vscode.Range(conditionDoc.positionAt(0), conditionDoc.positionAt(conditionDoc.getText().length)), JSON.stringify(data));
+    assert.ok(await vscode.workspace.applyEdit(edit));
+  }
+  for (const data of conditionContexts) {
+    await setConditionsDocument(data);
+    await until(async () => {
+      const position = conditionDoc.positionAt(conditionDoc.getText().indexOf('[]') + 1);
+      const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', conditionUri, position);
+      return completion?.items.some(item => item.label === 'random_chance' && String(item.insertText?.value || item.insertText).includes('condition'));
+    }, 'Loot condition starters missing in a pool, entry, or function');
+  }
+  await setConditionsDocument({ pools: [{ entries: [{ ...entry, conditions: [{ condition: '' }] }] }] });
+  await until(async () => {
+    const position = conditionDoc.positionAt(conditionDoc.getText().indexOf('"condition":""') + '"condition":"'.length);
+    const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', conditionUri, position);
+    return completion?.items.some(item => String(item.label).replaceAll('"', '') === 'match_tool');
+  }, 'Loot condition names missing inside a quoted value');
+  await setConditionsDocument({ pools: [{ entries: [{ ...entry, conditions: [{ condition: 'random_chance_with_looting', '': 0 }] }] }] });
+  await until(async () => {
+    const position = conditionDoc.positionAt(conditionDoc.getText().indexOf('"":0') + 1);
+    const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', conditionUri, position);
+    return ['chance', 'looting_multiplier'].every(key => completion?.items.some(item => String(item.label).replaceAll('"', '') === key));
+  }, 'Loot condition parameters did not follow the selected condition');
   const validationReport = await core.readJson(path.join(root, '.bedrock/validation-report.json'));
   assert.ok(validationReport.files >= 6); assert.equal(validationReport.schemaVersion, '1.26.50');
   state = await core.readJson(stateFile);

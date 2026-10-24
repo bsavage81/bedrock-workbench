@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.3 — October 24, 2026
+
+- Add loot condition starters, condition-name suggestions, and conditional parameter completion on pools, entries, and functions.
+- Cover probability, entity/variant, and tool predicates, including tool-tag filters and numeric ranges, while preserving unknown condition extensions.
+
 ## 0.9.2 — October 24, 2026
 
 - Add loot function starter snippets inside empty arrays, function-name suggestions, and parameter completion based on the selected function.
