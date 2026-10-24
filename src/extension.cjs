@@ -86,7 +86,7 @@ function activate(context) {
           case 'icons': return [await packIconItem('behavior'), await packIconItem('resource')];
           case 'beta': return [item('Auto deploy', 'bedrock.autoDeploy', 'sync', config.build.autoDeploy ? 'On' : 'Off'), item('Build beta', 'bedrock.build', 'tools'), item('Deploy beta', 'bedrock.deploy', 'debug-start')];
           case 'stable': return [item('Deploy stable', 'bedrock.deployStable', 'cloud-upload'), item('Export .mcaddon', 'bedrock.export', 'export')];
-          case 'tools': return [item('Validate project', 'bedrock.validate', 'checklist'), item('Bump version', 'bedrock.version', 'arrow-up'), item('Extension tracker', 'bedrock.tracker', 'checklist')];
+          case 'tools': return [item('Validate project', 'bedrock.validate', 'checklist'), item('Review intended references','bedrock.validationIgnores','list-filter',String(config.validation?.ignoredReferences?.length||0)), item('Bump version', 'bedrock.version', 'arrow-up'), item('Extension tracker', 'bedrock.tracker', 'checklist')];
           default: return [];
         }
       }
@@ -415,7 +415,7 @@ function activate(context) {
     await vscode.window.showTextDocument(vscode.Uri.file(path.join(root, 'bedrock-project.json')));
   });
   register('build', () => run('build'));
-  register('validate', async () => {
+  async function runValidation() {
     await requireProject(); validationDiagnostics.clear(); status = 'Validating saved files…'; refresh();
     try { await require('./reference.cjs').loadReference(root,project.config.targetVersion); } catch(error) { output.warn(`Vanilla samples reference unavailable: ${error.message}`); }
     const result = await require('./validation.cjs').validateProject(root,{vanillaSource:vanillaSource()});
@@ -427,6 +427,7 @@ function activate(context) {
       const position = offset => { const lines = text.slice(0, offset).split('\n'); return new vscode.Position(lines.length - 1, lines.at(-1).length); };
       const diagnostic = new vscode.Diagnostic(new vscode.Range(position(issue.offset), position(issue.offset + issue.length)), issue.message, issue.severity === 'error' ? vscode.DiagnosticSeverity.Error : issue.severity === 'warning' ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Information);
       diagnostic.source = 'Bedrock project validation';
+      if(issue.code)diagnostic.code=issue.code;
       if (!grouped.has(issue.file)) grouped.set(issue.file, []); grouped.get(issue.file).push(diagnostic);
     }
     for (const [file, items] of grouped) validationDiagnostics.set(vscode.Uri.file(file), items);
@@ -434,7 +435,20 @@ function activate(context) {
     output.info(`${status}; ${result.issues.filter(issue => issue.severity === 'information').length} informational findings. Schemas: ${result.schemaVersion || 'older target; foundational checks'}.`);
     await core.writeJson(await core.local(root, '.bedrock/validation-report.json'), { date: new Date().toISOString(), ...result });
     await vscode.commands.executeCommand('workbench.actions.view.problems');
-  });
+  }
+  register('validate',runValidation);
+  context.subscriptions.push(vscode.commands.registerCommand('bedrock.ignoreReference',selection=>enqueue(async()=>{
+    await requireProject();
+    if(!selection||!['file','project'].includes(selection.scope)||typeof selection.type!=='string'||!/^[a-z_]+$/.test(selection.type)||typeof selection.value!=='string'||!selection.value||typeof selection.file!=='string')throw Error('Select an unresolved reference to mark as intended');
+    const file=path.resolve(root,selection.file);
+    if(!Object.values(project.packs).some(pack=>core.inside(pack,file)))throw Error('The reference must belong to this project pack');
+    const {config}=await core.loadProject(root);
+    const rule={type:selection.type,value:selection.value,...(selection.scope==='file'?{file:require('./validation-ignores.cjs').relative(root,file)}:{}),...(selection.reason?{reason:String(selection.reason)}:{})};
+    config.validation||={};config.validation.ignoredReferences||=[];
+    if(!config.validation.ignoredReferences.some(existing=>existing.type===rule.type&&existing.value===rule.value&&existing.file===rule.file))config.validation.ignoredReferences.push(rule);
+    await saveConfig(config);await runValidation();
+  })));
+  register('validationIgnores',async()=>{await requireProject();await vscode.window.showTextDocument(vscode.Uri.file(path.join(root,'bedrock-project.json')));});
   register('deploy', () => manualRun('deploy'));
   register('deployStable', () => manualRun('deployStable'));
   register('export', () => manualRun('export'));

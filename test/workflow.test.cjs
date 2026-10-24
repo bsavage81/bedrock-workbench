@@ -341,3 +341,18 @@ test('Validate project produces a saved report without changing pack manifests o
   assert.equal(report.files, 2); assert.equal(report.schemaVersion, null);
   assert.equal(await fs.readFile(file, 'utf8'), before); assert.deepEqual(h.errors, []);
 });
+test('mark-as-intended persists scoped rules and reports suppressed findings without changing pack files',async t=>{
+  const h=await harness(t),file=path.join(h.root,'RP/entity/reference.json');
+  await core.writeJson(file,{'minecraft:client_entity':{description:{identifier:'test:mob',textures:{default:'textures/intended'}}}});
+  const before=await fs.readFile(file,'utf8');
+  await h.commands.get('bedrock.ignoreReference')({type:'texture',value:'textures/intended',file,scope:'file',reason:'External pack'});
+  assert.deepEqual(h.errors,[]);
+  let config=(await core.loadProject(h.root)).config;
+  assert.equal(config.validation.ignoredReferences[0].file,'RP/entity/reference.json');
+  let report=await core.readJson(path.join(h.root,'.bedrock/validation-report.json'));
+  assert.equal(report.suppressedIssues.length,1);assert.equal(report.suppressedIssues[0].ignoreRule.reason,'External pack');
+  assert.equal(await fs.readFile(file,'utf8'),before);
+  config.validation.ignoredReferences=[];await core.writeJson(path.join(h.root,'bedrock-project.json'),config);
+  await h.commands.get('bedrock.validate')();report=await core.readJson(path.join(h.root,'.bedrock/validation-report.json'));
+  assert.ok(report.issues.some(i=>i.reference?.value==='textures/intended'));assert.equal(report.suppressedIssues.length,0);
+});

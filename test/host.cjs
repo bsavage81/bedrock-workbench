@@ -118,12 +118,40 @@ async function run() {
   const molangCompletions = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', animationUri, molangPosition);
   assert.ok(molangCompletions.items.some(item => item.label === 'query.anim_time' && item.detail === 'Mojang Molang reference'), 'Molang completion missing');
   assert.ok(commands.includes('bedrock.vanillaSource'),'Vanilla reference source command missing');
-  await core.writeJson(path.join(root,'BP/recipes/vanilla-validation.json'),{format_version:'1.26.50','minecraft:recipe_shapeless':{description:{identifier:'test:vanilla_validation'},tags:['crafting_table'],ingredients:[{item:'minecraft:diamnod'}],result:'minecraft:diamond'}});
+  const referenceFixtureFile=path.join(root,'.bedrock/reference/components.json'),referenceFixture=await core.readJson(referenceFixtureFile);
+  referenceFixture.vanillaReferences={item:['minecraft:horsearmoriron']};await core.writeJson(referenceFixtureFile,referenceFixture);
+  await core.writeJson(path.join(root,'BP/recipes/vanilla-validation.json'),{format_version:'1.26.50','minecraft:recipe_shapeless':{description:{identifier:'test:vanilla_validation'},tags:['crafting_table'],ingredients:[{item:'minecraft:diamnod'},{item:'minecraft:horsearmoriron'}],result:'minecraft:diamond'}});
   await vscode.commands.executeCommand('bedrock.validate');
   const vanillaReport=await core.readJson(path.join(root,'.bedrock/validation-report.json'));
   assert.ok(vanillaReport.vanillaSources.some(source=>source.type==='samples'),'Validation report omitted the vanilla source');
   assert.ok(vanillaReport.issues.some(issue=>issue.message.includes("'minecraft:diamnod'")&&issue.severity==='information'),'Unknown vanilla item was not identified');
   assert.ok(!vanillaReport.issues.some(issue=>issue.message.includes("'minecraft:diamond' was not found")),'Valid vanilla item was marked missing');
+  assert.ok(!vanillaReport.issues.some(issue=>issue.message.includes("'minecraft:horsearmoriron' was not found")),'Known vanilla legacy name was marked missing');
+  const intendedUris=['first','second'].map(name=>vscode.Uri.file(path.join(root,'RP/entity/intended-'+name+'.json')));
+  const intendedDocs=[];
+  for(const [i,uri]of intendedUris.entries()) {
+    await core.writeJson(uri.fsPath,{format_version:'1.10.0','minecraft:client_entity':{description:{identifier:'test:intended_'+i,textures:{default:'textures/intended_external'}}}});
+    intendedDocs.push(await vscode.workspace.openTextDocument(uri));
+  }
+  await vscode.window.showTextDocument(intendedDocs[0]);
+  await until(async()=>vscode.languages.getDiagnostics(intendedUris[0]).some(d=>d.code==='bedrock.missingReference'),'Intended-reference diagnostic missing');
+  async function intendedAction(i,scope) {
+    const position=intendedDocs[i].positionAt(intendedDocs[i].getText().indexOf('textures/intended_external')+4);
+    const actions=await vscode.commands.executeCommand('vscode.executeCodeActionProvider',intendedUris[i],new vscode.Range(position,position));
+    const action=actions.find(a=>a.command?.command==='bedrock.ignoreReference'&&a.command.arguments[0].scope===scope);
+    assert.ok(action,'Mark-as-intended Quick Fix missing: '+scope);
+    await vscode.commands.executeCommand(action.command.command,...action.command.arguments);
+  }
+  await intendedAction(0,'file');
+  await until(async()=>!vscode.languages.getDiagnostics(intendedUris[0]).some(d=>d.code==='bedrock.missingReference'),'File ignore did not clear live findings');
+  await until(async()=>vscode.languages.getDiagnostics(intendedUris[1]).some(d=>d.code==='bedrock.missingReference'),'File ignore leaked into another file');
+  await intendedAction(1,'project');
+  await until(async()=>!vscode.languages.getDiagnostics(intendedUris[1]).some(d=>d.code==='bedrock.missingReference'),'Project ignore did not clear live findings');
+  const ignoredReport=await core.readJson(path.join(root,'.bedrock/validation-report.json'));
+  assert.equal(ignoredReport.suppressedIssues.filter(i=>i.reference?.value==='textures/intended_external').length,2);
+  const intendedConfig=await core.readJson(path.join(root,'bedrock-project.json'));intendedConfig.validation.ignoredReferences=[];
+  await core.writeJson(path.join(root,'bedrock-project.json'),intendedConfig);
+  await until(async()=>vscode.languages.getDiagnostics(intendedUris[0]).some(d=>d.code==='bedrock.missingReference'),'Removing ignore rules did not restore live findings');
   const functionUri = vscode.Uri.file(path.join(root, 'BP/functions/editor.mcfunction'));
   await fs.mkdir(path.dirname(functionUri.fsPath), { recursive: true });
   await fs.writeFile(functionUri.fsPath, 'give @s minecraft:di');

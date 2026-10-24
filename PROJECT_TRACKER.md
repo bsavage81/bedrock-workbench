@@ -1,5 +1,7 @@
 # Bedrock VS Code Extension — project tracker
 
+Included in 0.14.0: recognize legacy names and asset paths used by vanilla samples without duplicating completion aliases; normalize item auxiliary-data and entity spawn-event suffixes. Reference cache version 4/local index version 2 refresh old data. SavageCraft rerun: 721 JSON files, 0 errors, 0 warnings, 10 informational findings (previously 185). Remaining findings are numbered villager textures absent from the project and matching Mojang release. Source pack files unchanged; cache and validation report updated.
+
 Included in 0.13.0: collision_box array/object starter completions and a clearer multi-box hover are fixed locally and verified in VS Code. Publication authorized October 24, 2026.
 
 Also included in 0.13.0: custom parameter/reference value completions and new-key snippets supply missing commas before following object properties or array entries, preserving existing commas and skipping JSONC comments. String values are inserted with complete escaped quotes. Unit and native VS Code acceptance checks pass; release verification completed before distribution.
@@ -213,3 +215,10 @@ Remaining: general function argument flow, external package types, unsaved scrip
 - Release packaging and local installation authorized October 24, 2026.
 
 - [x] Microsoft Learn is a primary requirements source. Component and nested-field documentation links use the official stable Learn pages, with bundled URL metadata and legacy-page coverage.
+
+## 0.14.0 intended references
+
+- Mark as intended Quick Fixes support exact file or project scope.
+- Rules are reviewable in project settings, with optional reasons.
+- Live checks and validation reports share suppression rules; syntax/schema findings are preserved.
+- Native VS Code verification covers both scopes, reports, and removing rules.

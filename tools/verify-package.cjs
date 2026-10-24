@@ -61,6 +61,8 @@ const { unzipSync } = require('fflate');
     const vanilla=require(path.join(unpacked,'extension/src/vanilla.cjs'));
     const names=vanilla.collector();names.file('behavior','items/test.json',{'minecraft:item':{description:{identifier:'minecraft:packaged_test'}}});
     assert.deepEqual(names.finish().item,['minecraft:packaged_test']);
+    const ignores=require(path.join(unpacked,'extension/src/validation-ignores.cjs'));
+    assert.equal(typeof ignores.partition,'function');
     const blockSchema=JSON.parse(Buffer.from(archive['extension/schemas/block.schema.json']).toString());
     assert.equal(Object.keys(blockSchema.definitions.components.properties).length,46);
     assert.match(blockSchema.definitions.components.properties['minecraft:flower_pottable'].markdownDescription,/learn.microsoft.com/);

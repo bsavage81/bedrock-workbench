@@ -18,7 +18,7 @@ const core = require('../src/core.cjs');
   // Prepare bundled data before starting VS Code: thousands of cache-file
   // events must not race the separate pack-file watcher regression checks.
   await require('../src/official-schemas.cjs').prepare(await core.loadProject(root));
-  await core.writeJson(path.join(root, '.bedrock/reference/components.json'), { intelligenceVersion: 3, vanilla: { item: ['minecraft:diamond'], block: ['minecraft:stone'] }, commands: { command_enums: [], commands: [{ name: 'give', description: 'Give an item', overloads: [{ params: [{ name: 'player', type: { name: 'SELECTION' } }, { name: 'item', type: { name: 'ITEM' } }] }] }] }, tag: 'v1.26.50.4', engine: '1.26.50', target: config.targetVersion, updated: Date.now(), components: {
+  await core.writeJson(path.join(root, '.bedrock/reference/components.json'), { intelligenceVersion: 4, vanilla: { item: ['minecraft:diamond'], block: ['minecraft:stone'] }, commands: { command_enums: [], commands: [{ name: 'give', description: 'Give an item', overloads: [{ params: [{ name: 'player', type: { name: 'SELECTION' } }, { name: 'item', type: { name: 'ITEM' } }] }] }] }, tag: 'v1.26.50.4', engine: '1.26.50', target: config.targetVersion, updated: Date.now(), components: {
     block: { 'minecraft:friction': { type: 'number', description: 'Controls block friction.', fields: {} } }, entity: {}, item: {}
   } });
   await core.writeJson(path.join(root, '.bedrock/experiments/catalog.json'), { formatVersion: 1, revision: 1, updated: Date.now(), latestRelease: '1.21.0', definitions: [{ id: 'betaApis', label: 'Beta APIs' }, { id: 'upcomingCreatorFeatures', label: 'Upcoming Creator Features' }], removed: [], events: [] });

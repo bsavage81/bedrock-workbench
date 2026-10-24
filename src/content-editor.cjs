@@ -23,7 +23,7 @@ function attach(vscode, context, getProject, output) {
   }
   async function ensure() {
     const project = getProject(); if (!project || disposed) return;
-    const next = JSON.stringify([project.root, project.packs,project.vanillaSource,project.config.target,project.config.targetVersion]);
+    const next = JSON.stringify([project.root, project.packs,project.vanillaSource,project.config.target,project.config.targetVersion,project.config.validation]);
     if (next !== key) { key = next; dirty = true; cached = undefined; pendingFiles.clear(); }
     if (running) { await running; return ensure(); }
     if (!dirty && cached) return cached;
@@ -51,7 +51,7 @@ function attach(vscode, context, getProject, output) {
   }
   function diagnostic(document, issue) {
     const result = new vscode.Diagnostic(new vscode.Range(document.positionAt(issue.offset), document.positionAt(issue.offset + issue.length)), issue.message, issue.severity === 'warning' ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Information);
-    result.source = 'Bedrock Workbench'; return result;
+    result.source = 'Bedrock Workbench';if(issue.code)result.code=issue.code; return result;
   }
   function validate(document) {
     if (disposed) return;
@@ -61,6 +61,16 @@ function attach(vscode, context, getProject, output) {
     diagnostics.set(document.uri, issues.map(issue => diagnostic(document, issue)));
   }
   const selector = [{ language: 'json', scheme: 'file' }, { language: 'jsonc', scheme: 'file' }];
+  if(vscode.languages.registerCodeActionsProvider)context.subscriptions.push(vscode.languages.registerCodeActionsProvider(selector,{
+    async provideCodeActions(document,range) {
+      const data=documentData(document);if(!data)return;
+      const index=await ensure();if(!index)return;
+      return content.referenceIssues(index,data).filter(issue=>range.intersection(new vscode.Range(document.positionAt(issue.offset),document.positionAt(issue.offset+issue.length)))).flatMap(issue=>['file','project'].map(scope=>{
+        const action=new vscode.CodeAction(`Mark '${issue.reference.value}' as intended ${scope==='file'?'in this file':'throughout project'}`,vscode.CodeActionKind.QuickFix);
+        action.command={command:'bedrock.ignoreReference',title:action.title,arguments:[{...issue.reference,file:document.uri.fsPath,scope}]};return action;
+      }));
+    }
+  },{providedCodeActionKinds:[vscode.CodeActionKind.QuickFix]}));
   function completeKey(item, document, state, key, valueSnippet, position) {
     const edit = keyEdit(state.data.text, state.node, key, valueSnippet,document.offsetAt(position));
     if (edit.start !== undefined) item.range = new vscode.Range(document.positionAt(edit.start), document.positionAt(edit.end));
@@ -261,6 +271,9 @@ function attach(vscode, context, getProject, output) {
     // Config rediscovery briefly clears the active project. Keep using the
     // indexed project during that gap so saved-file events are not dropped.
     const project = getProject() || cached?.project;
+    if(project && path.resolve(uri.fsPath).toLowerCase()===path.join(project.root,'bedrock-project.json').toLowerCase()) {
+      dirty=true;clearTimeout(timer);timer=setTimeout(()=>{void ensure().then(()=>{for(const document of vscode.workspace.textDocuments)validate(document);});},500);return;
+    }
     if (project && path.resolve(uri.fsPath).toLowerCase() === path.join(project.root, '.bedrock/reference/components.json').toLowerCase()) { vanillaKey = undefined; dirty=true; void ensure().then(()=>{for(const document of vscode.workspace.textDocuments)validate(document);}); return; }
     if (!project || !content.fileKind(project, uri.fsPath)) return;
     dirty = true; pendingFiles.add(uri.fsPath); clearTimeout(timer);

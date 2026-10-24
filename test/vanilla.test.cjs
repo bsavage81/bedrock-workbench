@@ -17,6 +17,27 @@ test('vanilla identifiers are checked when cataloged, with unknowns informationa
   index.reference=undefined;
   assert.equal(content.referenceIssues(index,document).some(i=>i.message.includes('minecraft:diamnod')),false,'Missing catalogs cannot establish an unknown vanilla name');
 });
+test('vanilla pack usage resolves legacy names and asset references without adding duplicate completion spellings',()=>{
+  const collected=vanilla.collector();
+  collected.file('behavior','loot_tables/chests/example.json',{pools:[{entries:[{type:'item',name:'minecraft:horsearmoriron'},{type:'item',name:'minecraft:map'}]}]});
+  collected.file('behavior','recipes/example.json',{'minecraft:recipe_furnace':{input:'minecraft:sign'}});
+  collected.file('behavior','trading/example.json',{tiers:[{trades:[{wants:[{item:'minecraft:dye'}]}]}]});
+  collected.file('behavior','entities/example.json',{'minecraft:entity':{components:{'minecraft:loot':{table:'loot_tables/entities/piglin.json'}}}});
+  collected.file('resource','attachables/example.json',{'minecraft:attachable':{description:{textures:{enchanted:'textures/misc/enchanted_item_glint'}}}});
+  collected.file('resource','particles/example.json',{particle_effect:{description:{basic_render_parameters:{texture:'textures/particle/particles'}}}});
+  const index=new content.ContentIndex({config:{targetVersion:'1.26.50'}});
+  index.reference={vanilla:{item:['minecraft:potion','minecraft:iron_horse_armor']},vanillaReferences:collected.references()};
+  index.add('entity','test:bull','bull.json');
+  const text=JSON.stringify({'minecraft:recipe_shapeless':{ingredients:[{item:'minecraft:horsearmoriron'},{item:'minecraft:map'},{item:'minecraft:dye'},{item:'minecraft:potion:3'},{item:'minecraft:sign'}]}});
+  const doc={side:'behavior',relative:'recipes/test.json',file:'test.json',text,tree:json.parseTree(text)};
+  assert.deepEqual(content.referenceIssues(index,doc),[]);
+  assert.ok(!content.referenceValues(index,'item',doc).has('minecraft:horsearmoriron'),'Legacy aliases should not duplicate canonical completion spellings');
+  const entity=JSON.stringify({'minecraft:entity':{components:{'minecraft:transformation':{into:'test:bull<minecraft:entity_born>'}}}});
+  assert.deepEqual(content.referenceIssues(index,{side:'behavior',relative:'entities/test.json',file:'entity.json',text:entity,tree:json.parseTree(entity)}),[]);
+  assert.ok(collected.references().texture.includes('textures/misc/enchanted_item_glint'));
+  assert.ok(collected.references().texture.includes('textures/particle/particles'));
+  assert.ok(collected.references().loot_table.includes('loot_tables/entities/piglin.json'));
+});
 test('selected vanilla folders are indexed read-only and matched to channel, version, and selection',async t=>{
   await fs.mkdir('.test-temp',{recursive:true});
   const root=await fs.mkdtemp(path.resolve('.test-temp/vanilla-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));

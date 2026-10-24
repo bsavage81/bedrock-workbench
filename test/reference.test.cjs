@@ -21,7 +21,7 @@ function archive() {
 }
 test('Mojang documentation and schema references supply component and field descriptions without beta content', () => {
   const index = buildIndex(archive(), 'v1.26.50.4');
-  assert.equal(index.intelligenceVersion, 3);
+  assert.equal(index.intelligenceVersion, 4);
   assert.deepEqual(index.vanilla.terrain_texture, ['stone']);
   assert.deepEqual(index.vanilla.item_texture, ['apple']);
   assert.ok(index.vanilla.item.includes('minecraft:apple'));

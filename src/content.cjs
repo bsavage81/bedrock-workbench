@@ -207,14 +207,17 @@ function references(document) {
   }
   if (document.tree) walk(document.tree); return result;
 }
-function referenceIssues(index, document) {
-  return references(document).filter(ref => {
+function referenceIssues(index, document, {includeIgnored=false}={}) {
+  const issues=references(document).filter(ref => {
     if(!ref.value||/[?()[\]{}]/.test(ref.value))return false;
-    const values=referenceValues(index,ref.type,document);
-    if(values.has(ref.value)||(['item','block','entity'].includes(ref.type)&&!ref.value.includes(':')&&values.has('minecraft:'+ref.value)))return false;
+    const values=referenceValues(index,ref.type,document), accepted=new Set(index.reference?.vanillaReferences?.[ref.type]||[]);
+    const id=ref.type==='entity'?ref.value.replace(/<[^<>]*>$/,''):ref.type==='item'?ref.value.replace(/:\d+$/,''):ref.value;
+    const candidates=[id];if(['item','block','entity'].includes(ref.type)&&!id.includes(':'))candidates.push('minecraft:'+id);
+    if(candidates.some(id=>values.has(id)||accepted.has(id)))return false;
     if(ref.value.startsWith('minecraft:')&&!index.reference?.vanilla?.[ref.type]?.length)return false;
     return true;
-  }).map(ref => ({ file: document.file, offset: ref.node.offset + 1, length: Math.max(1, ref.node.length - 2), severity: 'information', message: `${ref.type.replaceAll('_', ' ')} '${ref.value}' was not found in this project${index.reference?.vanilla?.[ref.type]?.length?' or the indexed vanilla references':''}. It may be supplied by Minecraft or another pack.` }));
+  }).map(ref => ({ code:'bedrock.missingReference',reference:{type:ref.type,value:ref.value},file: document.file, offset: ref.node.offset + 1, length: Math.max(1, ref.node.length - 2), severity: 'information', message: `${ref.type.replaceAll('_', ' ')} '${ref.value}' was not found in this project${index.reference?.vanilla?.[ref.type]?.length?' or the indexed vanilla references':''}. It may be supplied by Minecraft or another pack.` }));
+  return includeIgnored?issues:issues.filter(issue=>!require('./validation-ignores.cjs').match(index.project,issue));
 }
 function molangNodes(document) {
   if (!/^(?:animations|animation_controllers|particles|entity|attachables)\//.test(document.relative)) return [];

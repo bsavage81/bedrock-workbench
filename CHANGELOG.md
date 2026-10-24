@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.14.0 — October 24, 2026
+
+- Recognize legacy vanilla names and referenced assets from compatible samples, including recipes/trades, attachables, and particles. Normalize entity spawn-event and item auxiliary-data suffixes for reference checks.
+- Keep validation-only aliases separate from canonical completion names; rebuild older reference caches.
+- Add Mark as intended Quick Fixes for unresolved references, scoped to a file or the project. Rules live in project settings, accept optional reasons, and can be reviewed or removed from Project tools.
+- Apply intended-reference rules to live checks and whole-project validation; retain suppressed findings in the report without hiding syntax or schema errors.
+
 ## 0.13.0 — October 24, 2026
 
 - Offer collision-box array and single-box starters, including box entries within arrays; clarify supported forms in the Learn-linked hover.
