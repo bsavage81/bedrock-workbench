@@ -95,6 +95,8 @@ function closest(name, names) {
 function componentSchema(index, kind) {
   function valueSchema(value) {
     const result = { description: value.description || '' };
+    const page = { block: 'Blocks', entity: 'Entities', item: 'Item' }[kind];
+    result.markdownDescription = [value.description || '', value.type ? `Type: ${value.type}` : '', `[Mojang documentation (${index.tag})](https://github.com/Mojang/bedrock-samples/blob/${index.tag}/documentation/${page}.html)`].filter(Boolean).join('\n\n');
     // HTML type labels with alternatives or legacy names are intentionally
     // advisory. Only unambiguous primitive types become validation rules.
     const type = { String: 'string', string: 'string', Boolean: 'boolean', boolean: 'boolean', Integer: 'integer', integer: 'integer', number: 'number', object: 'object', array: 'array' }[value.type];

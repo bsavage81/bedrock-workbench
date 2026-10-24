@@ -57,14 +57,6 @@ function attach(vscode, context, getProject, output) {
         });
       }
     }, '"', ':'),
-    vscode.languages.registerHoverProvider(selector, {
-      provideHover(document, position) {
-        const data = info(document, position); if (!data) return;
-        const component = data.components[data.keys[data.c + 1]];
-        const value = data.keys.length === data.c + 2 ? component : component?.fields?.[data.keys[data.c + 2]];
-        if (value) return new vscode.Hover(markdown(value, data.kind));
-      }
-    }),
     vscode.languages.registerCodeActionsProvider(selector, {
       provideCodeActions(document, range) {
         const data = info(document, range.start);
@@ -119,12 +111,15 @@ function attach(vscode, context, getProject, output) {
     try {
       const loaded = await task; if (ticket !== generation) return;
       index = loaded; output.info(`Mojang reference loaded: ${index.tag}`);
-      const associations = [...(official?.associations || [])];
+      // The JSON service uses the first matching documented schema for hover.
+      // Prefer our versioned component reference over the broader fallback.
+      const associations = [];
       for (const [folder, kind] of Object.entries({ blocks: 'block', items: 'item', entities: 'entity' })) {
         const file = await core.local(project.root, `.bedrock/reference/${kind}.schema.json`);
         await core.writeJson(file, reference.componentSchema(index, kind));
         associations.push({ fileMatch: [path.join(project.packs.behavior, folder, '**/*.json').replaceAll(path.sep, '/')], url: vscode.Uri.file(file).toString() });
       }
+      associations.push(...(official?.associations || []));
       if (ticket !== generation) return;
       await associate(associations);
       for (const document of vscode.workspace.textDocuments) validate(document);

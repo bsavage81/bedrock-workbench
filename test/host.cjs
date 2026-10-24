@@ -77,8 +77,11 @@ async function run() {
     return !!fix?.edit;
   }, 'Component spelling quick fix missing');
   assert.ok(await vscode.workspace.applyEdit(fix.edit));
-  const hovers = await vscode.commands.executeCommand('vscode.executeHoverProvider', blockUri, keyPosition);
-  assert.ok(hovers.some(hover => hover.contents.some(content => content.value?.includes('Controls block friction.'))), 'Mojang documentation hover missing');
+  await until(async () => {
+    const hovers = await vscode.commands.executeCommand('vscode.executeHoverProvider', blockUri, keyPosition);
+    assert.ok(hovers.length <= 1, 'Component documentation was duplicated by multiple hover providers');
+    return hovers.some(hover => hover.contents.some(content => content.value?.includes('Controls block friction.')));
+  }, 'Mojang schema documentation hover missing');
   assert.ok(await blockDoc.save());
   const badType = new vscode.WorkspaceEdit();
   const valueOffset = blockDoc.getText().indexOf('0.4');

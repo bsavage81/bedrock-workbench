@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1 — October 23, 2026
+
+- Remove the duplicate component hover provider; let VS Code's JSON schema hover own component and field documentation. Generated schemas retain versioned documentation links and type information.
+
 ## 0.8.0 — October 23, 2026
 
 - Add target-compatible Mojang vanilla identifier suggestions to supported JSON reference fields.
