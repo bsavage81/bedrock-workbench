@@ -4,6 +4,8 @@ A Windows-first VS Code extension for Minecraft Bedrock add-ons. The initial pac
 
 ## Command and vanilla assistance
 
+Creating an empty `[]`, `{}`, or `""` in a pack JSON/JSONC editor automatically opens available suggestions, including a new object after an existing function/condition. This uses the current schema and project completions, waits for the caret to settle, and stays quiet when no choices are available. It respects **Editor: Suggest On Trigger Characters**; Ctrl+Space remains available manually.
+
 Supported JSON reference values include vanilla identifiers from the newest compatible released Mojang sample snapshot, alongside your project identifiers. `.mcfunction` files offer command names, metadata-backed argument choices, signature help, selector type/tag values, and nested `execute … run` completion. Function paths, literal scoreboard objective declarations, and selector tag additions are indexed from project function files. Project sounds and particles are also indexed. Snapshots are cached for offline use; Preview currently uses compatible released references and may omit Preview-only content.
 
 This is completion assistance rather than a full command validator. Runtime-generated identifiers and script-registered custom commands are not yet discovered. Independently authored Workbench schemas validate loot tables, seven recipe variants, item/terrain texture atlases, and client sound definitions. They provide field completion, descriptions, and nested structural checks while retaining legacy forms and unknown extensions. These routes currently apply to project targets 1.26.50 and newer; other content still uses the bundled official Mojang schemas and documented component metadata. Blockception code and schemas are not included.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.4 — October 24, 2026
+
+- Automatically open available JSON suggestions after inserting empty arrays, objects, and quoted strings in pack files, including subsequent list entries and inserted property values.
+- Keep automatic popups scoped to the active pack editor, honor disabled trigger-character suggestions, and discard stale responses after edits or cursor moves.
+
 ## 0.9.3 — October 24, 2026
 
 - Add loot condition starters, condition-name suggestions, and conditional parameter completion on pools, entries, and functions.

@@ -29,6 +29,7 @@ function activate(context) {
   }
   const editor = require('./editor.cjs').attach(vscode, context, () => project && ({ ...project, root }), output);
   require('./content-editor.cjs').attach(vscode, context, () => project && ({ ...project, root }), output);
+  require('./auto-suggest.cjs').attach(vscode, context, () => project && ({ ...project, root }), output);
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 30);
   statusBar.command = 'bedrock.build';
   const refresh = () => { statusBar.text = `$(package) Bedrock: ${status}`; statusBar.show(); changed.fire(); };

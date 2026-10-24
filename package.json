@@ -2,7 +2,7 @@
   "name": "bedrock-workbench",
   "displayName": "Bedrock Workbench",
   "description": "Build, deploy and export Minecraft Bedrock add-ons with separate beta and stable profiles.",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "publisher": "bsavage81",
   "license": "UNLICENSED",
   "engines": {
@@ -23,8 +23,8 @@
     "virtualWorkspaces": false
   },
   "scripts": {
-    "check": "node --check src/core.cjs && node --check src/extension.cjs && node --check src/releases.cjs && node --check src/reference.cjs && node --check src/editor.cjs && node --check src/scripts.cjs && node --check src/experiments.cjs && node --check src/experiment-updates.cjs && node --check src/official-schemas.cjs && node --check src/content.cjs && node --check src/content-editor.cjs && node --check src/validation.cjs && node --check src/commands.cjs && node --check tools/generate-owned-schemas.cjs",
-    "test": "node --test test/compiler.test.cjs test/workflow.test.cjs test/releases.test.cjs test/reference.test.cjs test/scripts.test.cjs test/experiments.test.cjs test/intelligence.test.cjs test/commands.test.cjs test/authored-schemas.test.cjs",
+    "check": "node --check src/core.cjs && node --check src/extension.cjs && node --check src/releases.cjs && node --check src/reference.cjs && node --check src/editor.cjs && node --check src/scripts.cjs && node --check src/experiments.cjs && node --check src/experiment-updates.cjs && node --check src/official-schemas.cjs && node --check src/content.cjs && node --check src/content-editor.cjs && node --check src/validation.cjs && node --check src/commands.cjs && node --check tools/generate-owned-schemas.cjs && node --check src/auto-suggest.cjs",
+    "test": "node --test test/compiler.test.cjs test/workflow.test.cjs test/releases.test.cjs test/reference.test.cjs test/scripts.test.cjs test/experiments.test.cjs test/intelligence.test.cjs test/commands.test.cjs test/authored-schemas.test.cjs test/auto-suggest.test.cjs",
     "package": "vsce package --target win32-x64 --allow-missing-repository --skip-license",
     "build:sample": "node tools/build.cjs \"projects/SavageCraft v2\" beta",
     "export:sample": "node tools/build.cjs \"projects/SavageCraft v2\" stable",

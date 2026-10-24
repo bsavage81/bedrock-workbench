@@ -218,6 +218,47 @@ async function run() {
     const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', conditionUri, position);
     return ['chance', 'looting_multiplier'].every(key => completion?.items.some(item => String(item.label).replaceAll('"', '') === key));
   }, 'Loot condition parameters did not follow the selected condition');
+  // Exercise real typing/caret updates and the real completion providers. The
+  // probe observes the automatic trigger command; ordinary native triggers are
+  // disabled temporarily so they cannot produce a false positive.
+  const editorSettings = vscode.workspace.getConfiguration('editor', conditionUri);
+  const previousTriggers = editorSettings.inspect('suggestOnTriggerCharacters')?.workspaceFolderValue;
+  await editorSettings.update('suggestOnTriggerCharacters', false, vscode.ConfigurationTarget.WorkspaceFolder);
+  const automaticContext = { subscriptions: [] }; let automaticTriggers = 0;
+  const probe = {
+    window: vscode.window,
+    workspace: { onDidChangeTextDocument: vscode.workspace.onDidChangeTextDocument, getConfiguration: (section, uri) => section === 'editor' ? { get: (name, fallback) => name === 'suggestOnTriggerCharacters' ? true : vscode.workspace.getConfiguration(section, uri).get(name, fallback) } : vscode.workspace.getConfiguration(section, uri) },
+    commands: { executeCommand: async (name, ...args) => {
+      if (name === 'editor.action.triggerSuggest') automaticTriggers++;
+      return vscode.commands.executeCommand(name, ...args);
+    } }
+  };
+  const coreProject = await core.loadProject(root);
+  require('../src/auto-suggest.cjs').attach(probe, automaticContext, () => coreProject, { warn: message => console.error(message) });
+  try {
+    const typingCases = [
+      ['{"pools":[{"entries":[{"functions":|}]}]}', '[', 'array'],
+      ['{"pools":[{"entries":[{"functions":[{"function":"set_count","count":1},|]}]}]}', '{', 'object'],
+      ['{"pools":[{"entries":[{"functions":[{"function":|}]}]}]}', '"', 'string']
+    ];
+    for (const [source, character, kind] of typingCases) {
+      await vscode.commands.executeCommand('hideSuggestWidget');
+      const edit = new vscode.WorkspaceEdit();
+      edit.replace(conditionUri, new vscode.Range(conditionDoc.positionAt(0), conditionDoc.positionAt(conditionDoc.getText().length)), source.replace('|', ''));
+      assert.ok(await vscode.workspace.applyEdit(edit));
+      const editor = await vscode.window.showTextDocument(conditionDoc), position = conditionDoc.positionAt(source.indexOf('|'));
+      editor.selection = new vscode.Selection(position, position);
+      await new Promise(resolve => setTimeout(resolve, 120));
+      const before = automaticTriggers;
+      await vscode.commands.executeCommand('type', { text: character });
+      await until(async () => automaticTriggers > before, `Empty ${kind} did not automatically trigger available suggestions`);
+      assert.equal(require('../src/auto-suggest.cjs').emptyContext(conditionDoc.getText(), conditionDoc.offsetAt(editor.selection.active)), kind);
+    }
+  } finally {
+    automaticContext.subscriptions.forEach(subscription => subscription.dispose());
+    await editorSettings.update('suggestOnTriggerCharacters', previousTriggers, vscode.ConfigurationTarget.WorkspaceFolder);
+    await vscode.commands.executeCommand('hideSuggestWidget');
+  }
   const validationReport = await core.readJson(path.join(root, '.bedrock/validation-report.json'));
   assert.ok(validationReport.files >= 6); assert.equal(validationReport.schemaVersion, '1.26.50');
   state = await core.readJson(stateFile);
