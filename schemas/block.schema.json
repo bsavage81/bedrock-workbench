@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bedrock block — foundational validation",
+  "type": "object",
+  "required": [
+    "format_version",
+    "minecraft:block"
+  ],
+  "properties": {
+    "format_version": {
+      "type": "string"
+    },
+    "minecraft:block": {
+      "type": "object",
+      "required": [
+        "description"
+      ],
+      "properties": {
+        "description": {
+          "type": "object",
+          "required": [
+            "identifier"
+          ],
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+            },
+            "menu_category": {
+              "type": "object"
+            },
+            "states": {
+              "type": "object"
+            },
+            "traits": {
+              "type": "object"
+            }
+          }
+        },
+        "components": {
+          "type": "object",
+          "properties": {
+            "minecraft:geometry": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            },
+            "minecraft:material_instances": {
+              "type": "object"
+            },
+            "minecraft:collision_box": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            },
+            "minecraft:selection_box": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            }
+          }
+        },
+        "component_groups": {
+          "type": "object"
+        },
+        "events": {
+          "type": "object"
+        },
+        "permutations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": {
+                "type": "string"
+              },
+              "components": {
+                "type": "object",
+                "properties": {
+                  "minecraft:geometry": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "minecraft:material_instances": {
+                    "type": "object"
+                  },
+                  "minecraft:collision_box": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "minecraft:selection_box": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,107 @@
+# Bedrock Workbench
+
+A Windows-first VS Code extension for Minecraft Bedrock add-ons. The initial package targets Windows x64. Build into Minecraft's development folders and export stable releases with separate identities and branding.
+
+## Command and vanilla assistance
+
+Supported JSON reference values include vanilla identifiers from the newest compatible released Mojang sample snapshot, alongside your project identifiers. `.mcfunction` files offer command names, metadata-backed argument choices, signature help, selector type/tag values, and nested `execute … run` completion. Function paths, literal scoreboard objective declarations, and selector tag additions are indexed from project function files. Project sounds and particles are also indexed. Snapshots are cached for offline use; Preview currently uses compatible released references and may omit Preview-only content.
+
+This is completion assistance rather than a full command validator. Runtime-generated identifiers and script-registered custom commands are not yet discovered. Our first independently authored replacement schema validates loot-table structure; other content still uses the bundled official Mojang schemas and documented component metadata. Blockception code and schemas are not included.
+
+## Start
+
+1. Install the local `.vsix` using VS Code's **Extensions: Install from VSIX** command.
+2. Open the project folder containing `bedrock-project.json`. For an existing standard add-on with `BP` and `RP`, run **Bedrock: Initialize Project** once.
+3. Open the Bedrock activity-bar sidebar. Choose **Build beta** to compile without deploying.
+4. Choose the Minecraft **release** or **preview** target. Use **Minecraft folder** to override discovery with that installation's `com.mojang` folder.
+5. Choose **Deploy beta** for a manual deployment, or turn **Auto deploy** on. Saved changes and external changes, including added or deleted files, trigger deployment after a short delay. The project must be trusted.
+6. Use **Deploy stable** to compile directly into the selected Minecraft installation's `behavior_packs` and `resource_packs` folders. Use **Export stable .mcaddon** for distribution instead.
+7. Manual **Deploy beta**, **Deploy stable**, and **Export stable .mcaddon** commands ask for a version, prefilled with the project's current version. Canceling changes nothing. After a successful action, that version is written to the project and both source manifests, including module versions and dependencies linking BP/RP. Script API versions and UUIDs stay unchanged.
+
+Use VS Code's standard Explorer to browse and edit project files. The Bedrock sidebar keeps the project name and build status at the top, followed by collapsible **Settings**, **Pack icons**, **Beta development**, **Stable releases**, and **Project tools** sections. Beta and stable tasks start expanded; the other sections start collapsed. VS Code retains your expansion choices as the sidebar refreshes. Select the project name at the top to open its settings.
+
+Choose **BP pack icon** and **RP pack icon** in the sidebar to select PNG images from any local folder. Each selection is validated and copied into the appropriate source pack as `pack_icon.png`. The sidebar shows thumbnails, and the project name uses the BP icon with RP as a fallback. Thumbnails refresh when image contents change, even at the same filename. Canceling keeps the existing icon; an invalid image cannot overwrite it. With Auto deploy enabled, changing the source icon triggers the normal beta build.
+
+## Profiles and versions
+
+Beta and stable use separate UUIDs saved in project settings. Stable retains existing pack identities when initializing an add-on. Modules receive persistent profile identities, and dependencies between the two packs are rewritten consistently.
+
+Both profiles use one explicit three-part project version. **Bump version** updates the project config, both source manifests, every manifest module, and dependency versions linking BP/RP. Comments and unrelated manifest fields are preserved. Version updates snapshot original files and restore them if a write fails; failed recovery retains originals with a journal.
+
+Saving never increments the version or displays a prompt. Automatic beta deployment remains silent. After a successful stable deploy/export, beta is rebuilt at the selected version and redeployed if Auto deploy is enabled; otherwise the refreshed beta build stays local. Stable actions are recorded separately in `.bedrock/state.json`. If beta refresh or version synchronization fails after a release was written, the error identifies that partial success.
+
+Successful extension beta builds have a separate local build counter in `.bedrock/state.json`. Release filenames include the version, and exporting refuses to overwrite an existing release file. To intentionally rebuild the same version, move or delete that local export first. Stable deployment updates owned stable folders directly, without creating an mcaddon. An imported pack with the same UUID in an unowned folder must be moved/removed before stable deployment to avoid duplicates.
+
+Set `profiles.beta.title` and `profiles.stable.title` for branding. Development folders and pack titles use `SavageCraft v2 beta 1.0.0 BP` and `SavageCraft v2 beta 1.0.0 RP`. A trailing `Beta` in the configured beta title is normalized so it is included only once. Stable exports use `SavageCraft v2 1.0.0.mcaddon`, containing `SavageCraft v2 1.0.0 BP` and `SavageCraft v2 1.0.0 RP` folders. Names are sanitized only where Windows forbids filename characters.
+
+Deployment migrates older owned folder names and versions while keeping UUIDs unchanged. Unowned folders are preserved. If Minecraft prevents removing an emptied old folder, its manifest is removed to avoid duplicate packs and the empty folder is cleaned up on a later deployment.
+
+Both profiles use each source pack's `pack_icon.png`. Stable builds keep it in color, and beta builds always generate a grayscale copy while preserving transparency. Source images stay in color. There are no beta-specific icon settings. Existing projects migrate old stable icon selections into source packs, then remove the obsolete per-profile icon settings; legacy beta-only selections are discarded.
+
+Changing module count requires deliberately updating the persisted profile module UUID arrays. Keep their order consistent with the source manifests. Do not regenerate UUIDs for ordinary updates.
+
+## Compiler
+
+Only the configured behavior and resource pack directories are compiled. JSON comments, byte-order marks, and trailing commas normalize to plain JSON. Scripts compile from TypeScript or JavaScript to ECMAScript modules; relative imports resolve to `.js`. Script API package imports remain external. Builds detect duplicate output names, malformed JSON, missing relative imports, invalid project settings, and missing script entry points.
+
+This first compiler transpiles TypeScript; VS Code's TypeScript service provides type checking when your project has the relevant Script API type packages and `tsconfig.json`. Compiler plugins, bridge generator syntax, npm package bundling, and path aliases are not supported. Use standard Bedrock content and relative script imports.
+
+Deployment uses current Windows GDK locations, with legacy UWP fallbacks. It synchronizes files only inside folders bearing this project's ownership marker, keeping pack root directories in place so Minecraft can hold them open. Unchanged files are skipped, stale files are removed, and temporary file locks are retried. Before changing either pack, deployment snapshots changed and deleted files. A failed update attempts to restore both packs; if a lock also prevents recovery, previous files and a journal are retained at the paths shown in the error. A failed compile leaves deployed content intact. Minecraft may require a world reload to observe file changes.
+
+## JSON assistance
+
+Bundled schemas provide project settings and format-2 manifest completion/validation. Configured BP/RP paths receive compatible official schema assistance and documentation-based component help, with foundational schemas retained for older targets. Content schemas allow unknown components and are not exhaustive Bedrock runtime validators. See **Official schemas and project intelligence** below for coverage and compatibility limits.
+
+The selected `targetVersion` sets `min_engine_version`; it does not install Minecraft, select an older game binary, change Script API dependency versions, or enable world experiments. Project experiment flags are notes for the creator.
+
+## Development
+
+Run `npm install`, `npm run check`, and `npm test`. Packaging uses `npm run package` with Node 22 or newer. Press F5 using the supplied launch configuration to open the SavageCraft working copy in an Extension Development Host.
+
+The extension's `PROJECT_TRACKER.md` is available through **Bedrock: Open Extension Project Tracker**. The independent test add-on under `projects/SavageCraft v2` is excluded from source control and the VSIX. Its original bridge project remains unchanged.
+
+## Target engine checks and Mojang reference data
+
+Opening a project checks the current released Windows Bedrock engine using official Minecraft download metadata. A newer release prompts **Update target** or **Not now**. Accepting updates `targetVersion` and both source manifests' `min_engine_version` in one transaction; pack/module versions, UUIDs, content format versions, and Script API dependencies remain unchanged. The prompt does not block builds. Offline checks are quiet, never downgrade a newer target, and can be retried using **Settings > Target engine version**.
+
+On first opening, the extension downloads Mojang's text-only [bedrock-samples release archive](https://github.com/Mojang/bedrock-samples/releases), then caches an index in `.bedrock/reference`. The HTML documentation under `documentation` is represented by `metadata/doc_modules`; item definitions also use `metadata/json_schemas`. The newest released samples at or below the project's target supply component/field completions, documentation hovers, conservative type validation, and explicit component spelling Quick Fixes for configured behavior-pack block, item, and entity folders. Component groups and block permutations are supported. Custom components and undocumented fields remain allowed. Source content is never automatically corrected on save.
+
+Generated file-based schemas are associated through workspace `json.schemas` settings, preserving unrelated associations. Cached references work offline; **Settings > Refresh Mojang reference** forces a download retry. Samples can lag Minecraft hotfixes, so reference version and current game release are checked separately. Preview projects initially use released sample references too; Preview-specific documentation, exhaustive validation, and vanilla identifier suggestions remain future work. Downloaded documentation is used as data only and remains subject to [Mojang's repository license](https://github.com/Mojang/bedrock-samples/blob/main/LICENSE.md).
+
+## Script dependencies and world experiments
+
+**Settings > Beta Script APIs** selects regular APIs (Off) or beta APIs (On). The **Beta APIs** row in **World experiments** controls the same project setting, `experimentalGameplay.betaApis`. Existing bridge-era experiment names are normalized when loaded and saved under their current setting names when settings are edited. This choice is independent of beta/stable build branding and UUIDs.
+
+The **Script dependencies** section lists modules declared by BP/RP manifests, with **Check script versions**, **Add script dependency**, and **Install matching typings** tasks. Opening a project or changing its channel/engine/API-track settings checks official Minecraft npm metadata. A prompt lists proposed manifest and exact npm type versions before applying changes. Accepting updates module-name dependencies transactionally, then installs matching typings into the project using npm; pack versions and UUIDs stay unchanged. Existing npm type dependencies are checked too. No source scripts are migrated automatically, so API changes may require code changes. Declining leaves dependencies untouched; automatic checks remain quiet offline.
+
+Release targets use published regular APIs or Release-specific beta variants. Preview targets can use Preview RC typings for regular APIs or Preview beta typings when beta APIs are enabled. Runtime manifests receive the short API version, while npm receives the exact game-specific package version. Engine-tagged metadata bounds selections to the target engine; published stable APIs with no historical mapping rely on npm's published version information. Internal packages are excluded. Modules without beta variants retain regular typings.
+
+Typings installation requires Node.js/npm on PATH. It uses an explicit project prefix, exact versions, disabled lifecycle scripts, and explicit shared Minecraft type dependencies so Preview peer ranges cannot substitute regular APIs. It creates or updates the project's `package.json`, `package-lock.json`, and `node_modules`. If npm fails after manifest synchronization, the error identifies that partial success; **Install matching typings** retries installation.
+
+**World experiments** contains individual project requirement toggles filtered by target engine and Release/Preview, plus retained saved requirements for older/custom experiments. The catalog is maintained with the extension; future Minecraft builds may add or retire switches. These settings describe the world's required configuration. They do not edit `level.dat` or enable switches inside Minecraft automatically. Enable the corresponding switches in Minecraft's world settings. Beta API requirements also control dependency selection; other toggles record requirements. See [Microsoft's experiment documentation](https://learn.microsoft.com/en-us/minecraft/creator/documents/experimentalfeaturestoggle) and [Script API versioning](https://learn.microsoft.com/en-us/minecraft/creator/documents/scripting/versioning).
+
+## Experiment reference updates
+
+Experiment availability now uses the Bedrock sections and version history of the [Minecraft Wiki Experiments page](https://minecraft.wiki/w/Experiments#Bedrock_Edition_2), fetched as revision-stamped wikitext through its public API. Only Bedrock entries are used. Release and Preview version history, preview-only flags, and upcoming/until annotations determine availability; removed entries do not remain active merely because old translation strings still exist. Historical targets can retain experiments removed from newer Minecraft releases. The bundled catalog remains a fallback when no verified cache is available.
+
+Checks run on project opening and target/channel changes. While VS Code stays open, the extension checks every six hours, fetching a fresh reference at most once per 24 hours. **World experiments > Check experiments** forces an online refresh. The revision and last good catalog are cached in `.bedrock/experiments`; offline errors or an unrecognized page layout retain the last good reference rather than deleting saved settings.
+
+A popup offers **Choose experiments**, **Keep disabled**, or **Later** for active experiment requirements not previously configured/reviewed. The chooser is a multi-select list with nothing selected initially; only selected entries are enabled. Keep disabled remembers the decision without adding requirements. Later or dismissing snoozes the prompt for 24 hours; a manual check can ask again. Decisions persist per project, so ordinary sidebar refreshes do not repeatedly prompt.
+
+Experiment rows use native VS Code checkboxes. Checking or unchecking explicitly saves the requested state, refreshes the sidebar, and keeps Beta APIs synchronized with the Settings toggle. Confirmed removed entries have no active checkbox and offer a separate prompt to remove their saved project requirements. Keeping a retired requirement preserves it with a Removed label. Deprecated entries are labeled, and unknown/custom saved settings are preserved as unverified. World files are never edited by these controls.
+
+The reference is a community-maintained source and can change its markup; parser consistency checks protect the cached catalog. Source text is cached locally with revision attribution and is not bundled into the extension. Availability cannot be inferred safely from language-file names alone. The current 26.52 Release and 26.70 Preview lists were checked against the supplied wiki page and official Minecraft lifecycle notes during this update.
+
+## Official schemas and project intelligence
+
+Bedrock Workbench bundles Mojang's `@minecraft/bedrock-schemas` **1.26.50** for offline BP/RP schema assistance. It attaches only when the project target is at least that engine version; older targets keep the existing foundational/documentation schemas. Preview currently uses this compatible released schema snapshot, supplemented by the project's cached Mojang documentation. Schema package updates ship with extension updates; this feature does not automatically follow the npm beta tag.
+
+Coverage includes entities, blocks, items, biomes, features/rules, recipes, loot tables, trading, dialogue, animations/controllers, models, particles, attachables, fogs, render controllers, texture metadata, languages, sounds, UI, and supported lighting/water/PBR documents. Associations respect the configured BP/RP paths and specific file roles. Official data is copied into `.bedrock/reference/official-1.26.50`, preserving unrelated workspace JSON associations.
+
+The published generator has incomplete nested constraints, incorrect array/vector/root shapes in several formats, and an omitted shared expression definition. A local compatibility layer keeps document structure/type checks and completion/hover documentation while treating unreliable nested constraints conservatively. Recipe variants, texture atlases/sets, flipbook arrays, languages, trade tables, feature-rule wrappers, and schema reference bases receive targeted adapters. Unknown/custom properties remain allowed. This is not an exhaustive Bedrock runtime validator.
+
+**Project tools > Validate project** checks saved pack JSON, manifest structure, duplicate manifest UUIDs and content identifiers, script entry paths, linked pack versions, available structural schemas, Molang syntax basics, and project references. Results appear in Problems and `.bedrock/validation-report.json`. It does not deploy, change versions, or rewrite source files. Explicit validation scans all saved pack files; ordinary builds still use the existing compiler checks. JSON files larger than 2 MiB are omitted from the content index/explicit JSON validation; normal compiler validation is unchanged.
+
+JSON value completions, hovers, and Go to Definition now use project identifiers and resources: item/block/entity IDs in supported fields, geometry, animation/controllers, textures/atlas names, and loot-table paths. Missing references are informational because Minecraft or another pack may provide them. The initial index is cached in memory; saved file changes update it incrementally. Global identifier suggestions from vanilla metadata and subpack-aware resolution remain future work.
+
+Molang support reuses Mojang Creator Tools' parser and query/math descriptions from the pinned source recorded in [the pinned upstream source](https://github.com/Mojang/minecraft-creator-tools/blob/a8f2cd2fc7aa7e7e075dbf54a4597319aa8b71e1/app/src/langcore/molang/MolangParser.ts) and the bundled provenance file. Recognized expression strings in animation/controller, particle, client-entity, and attachable documents receive basic delimiter/token diagnostics, query/math completion, and hovers. This is not a full interpreter, query availability check, or type checker. Expressions over 16 KiB are not analyzed by these editor helpers. See the retained [MIT license](https://github.com/Mojang/minecraft-creator-tools/blob/a8f2cd2fc7aa7e7e075dbf54a4597319aa8b71e1/LICENSE.md).

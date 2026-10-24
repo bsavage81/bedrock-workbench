@@ -1,0 +1,129 @@
+const fs = require('node:fs/promises');
+const path = require('node:path');
+const json = require('jsonc-parser');
+const core = require('./core.cjs');
+const { molangParser, MOLANG_QUERIES, MOLANG_MATH } = require('./vendor/molang.cjs');
+class ContentIndex {
+  constructor(project) { this.project = project; this.types = new Map(); this.documents = new Map(); this.issues = []; }
+  add(type, id, file) {
+    if (typeof id !== 'string' || !id) return;
+    if (!this.types.has(type)) this.types.set(type, new Map());
+    const entries = this.types.get(type); if (!entries.has(id)) entries.set(id, []); entries.get(id).push(file);
+  }
+  values(type) { return this.types.get(type) || new Map(); }
+  remove(file) {
+    const normalize = value => process.platform === 'win32' ? path.resolve(value).toLowerCase() : path.resolve(value);
+    const matches = candidate => normalize(candidate) === normalize(file) || core.inside(file, candidate);
+    for (const candidate of this.documents.keys()) if (matches(candidate)) this.documents.delete(candidate);
+    this.issues = this.issues.filter(issue => !matches(issue.file));
+    for (const values of this.types.values()) for (const [id, files] of values) {
+      const kept = files.filter(candidate => !matches(candidate)); if (kept.length) values.set(id, kept); else values.delete(id);
+    }
+  }
+}
+function fileKind(project, file) {
+  for (const side of ['behavior', 'resource']) if (core.inside(project.packs[side], file)) return { side, relative: path.relative(project.packs[side], file).replaceAll(path.sep, '/') };
+}
+async function scan(project) {
+  const index = new ContentIndex(project);
+  let batch = [];
+  for (const side of ['behavior', 'resource']) for await (const relative of core.files(project.packs[side])) {
+    batch.push(() => indexFile(index, side, relative).catch(error => { if (error.code !== 'ENOENT') throw error; }));
+    if (batch.length === 8) { await Promise.all(batch.map(run => run())); batch = []; }
+  }
+  await Promise.all(batch.map(run => run())); return index;
+}
+async function indexFile(index, side, relative) {
+    const project = index.project;
+    const file = await core.local(project.root, path.relative(project.root, path.join(project.packs[side], relative)));
+    const rel = relative.replaceAll(path.sep, '/');
+    if (side === 'behavior' && /^functions\/.*\.mcfunction$/i.test(rel)) {
+      index.add('function', rel.slice(10, -11), file);
+      if ((await fs.stat(file)).size <= 2 * 1024 * 1024) {
+        const source = await fs.readFile(file, 'utf8');
+        for (const line of source.split(/\r?\n/)) {
+          if (line.trimStart().startsWith('#')) continue;
+          const objective = /(?:^|\brun\s+)\s*scoreboard\s+objectives\s+add\s+([\w.-]+)/.exec(line);
+          if (objective) index.add('objective', objective[1], file);
+          const tag = /\btag\s+@\w(?:\[[^\]]*\])?\s+add\s+([\w.-]+)/.exec(line);
+          if (tag) index.add('tag', tag[1], file);
+        }
+      }
+    }
+    if (side === 'resource' && /^textures\/.*\.(png|tga|jpe?g)$/i.test(rel)) index.add('texture', rel.replace(/\.[^.]+$/, ''), file);
+    if (side === 'behavior' && /^loot_tables\/.*\.json$/i.test(rel)) index.add('loot_table', rel, file);
+    if (!rel.endsWith('.json') || (await fs.stat(file)).size > 2 * 1024 * 1024) return;
+    const text = await fs.readFile(file, 'utf8'), errors = [], tree = json.parseTree(text.replace(/^\uFEFF/, ' '), errors, { allowTrailingComma: true });
+    if (errors.length) { index.issues.push({ file, offset: errors[0].offset, length: errors[0].length, severity: 'error', message: `JSON: ${json.printParseErrorCode(errors[0].error)}` }); return; }
+    const data = json.getNodeValue(tree); index.documents.set(file, { file, side, relative: rel, text, tree, data });
+    for (const [root, type] of [['minecraft:entity', 'entity'], ['minecraft:item', 'item'], ['minecraft:block', 'block'], ['minecraft:client_entity', 'client_entity'], ['minecraft:attachable', 'attachable']]) {
+      if ((side === 'behavior') === ['entity', 'item', 'block'].includes(type)) index.add(type, data?.[root]?.description?.identifier, file);
+    }
+    if (side === 'resource') {
+      index.add('particle', data?.particle_effect?.description?.identifier, file);
+      for (const id of Object.keys(data?.sound_definitions || {})) index.add('sound', id, file);
+      for (const geometry of Array.isArray(data?.['minecraft:geometry']) ? data['minecraft:geometry'] : []) index.add('geometry', geometry?.description?.identifier, file);
+      for (const id of Object.keys(data || {})) if (id.startsWith('geometry.')) index.add('geometry', id, file);
+      for (const id of Object.keys(data?.texture_data || {})) index.add(rel.endsWith('terrain_texture.json') ? 'terrain_texture' : 'item_texture', id, file);
+    }
+    for (const id of Object.keys(data?.animations || {})) index.add('animation', id, file);
+    for (const id of Object.keys(data?.animation_controllers || {})) index.add('animation_controller', id, file);
+    for (const id of Object.keys(data?.render_controllers || {})) index.add('render_controller', id, file);
+}
+async function update(index, file) {
+  const kind = fileKind(index.project, file); if (!kind) return false;
+  await core.local(index.project.root, path.relative(index.project.root, file));
+  const stat = await fs.stat(file).catch(error => { if (error.code !== 'ENOENT') throw error; });
+  index.remove(file);
+  if (!stat) return true;
+  if (stat.isDirectory()) return false;
+  await indexFile(index, kind.side, kind.relative); return true;
+}
+function referenceKind(keys, value, document) {
+  const key = keys.at(-1), parent = keys.at(-2), root = keys[0];
+  if (document.side === 'resource' && ['minecraft:client_entity', 'minecraft:attachable'].includes(root) && keys[1] === 'description') {
+    if (keys[2] === 'textures' && keys.length === 4) return 'texture';
+    if (keys[2] === 'geometry' && keys.length === 4) return 'geometry';
+    if (keys[2] === 'animations' && keys.length === 4) return value?.startsWith('controller.animation.') ? 'animation_controller' : 'animation';
+    if (keys[2] === 'render_controllers' && keys.length === 4) return 'render_controller';
+  }
+  if (root === 'minecraft:block' && keys.includes('material_instances') && key === 'texture') return 'terrain_texture';
+  if (String(root).startsWith('minecraft:recipe_') && ['item', 'result', 'input', 'output', 'reagent', 'base', 'addition', 'template'].includes(key)) return 'item';
+  if (root === 'minecraft:entity' && ['entity_type', 'spawn_entity', 'into'].includes(key)) return 'entity';
+  if (root === 'minecraft:entity' && keys.includes('minecraft:loot') && key === 'table') return 'loot_table';
+}
+function references(document) {
+  const result = [];
+  function walk(node) {
+    if (node.type === 'string' && !(node.parent?.type === 'property' && node.parent.children[0] === node)) {
+      const keys = json.getNodePath(node), type = referenceKind(keys, node.value, document);
+      if (type) result.push({ type, value: node.value, node, keys });
+    }
+    for (const child of node.children || []) walk(child);
+  }
+  if (document.tree) walk(document.tree); return result;
+}
+function referenceIssues(index, document) {
+  return references(document).filter(ref => ref.value && !index.values(ref.type).has(ref.value) && !(ref.type === 'item' && index.values('block').has(ref.value)) && !ref.value.startsWith('minecraft:') && !/[?()[\]{}]/.test(ref.value)).map(ref => ({ file: document.file, offset: ref.node.offset + 1, length: Math.max(1, ref.node.length - 2), severity: 'information', message: `${ref.type.replaceAll('_', ' ')} '${ref.value}' was not found in this project. It may be supplied by Minecraft or another pack.` }));
+}
+function molangNodes(document) {
+  if (!/^(?:animations|animation_controllers|particles|entity|attachables)\//.test(document.relative)) return [];
+  const result = [];
+  function walk(node) {
+    if (node.type === 'string' && node.value.length <= 16384 && !(node.parent?.type === 'property' && node.parent.children[0] === node) && /\b(?:query|q|variable|v|temp|t|context|c|math)\.|^\s*(?:return|loop|for_each)\b/i.test(node.value)) result.push(node);
+    for (const child of node.children || []) walk(child);
+  }
+  if (document.tree) walk(document.tree); return result;
+}
+function rawOffsets(text, node) {
+  const offsets = []; const raw = text.slice(node.offset + 1, node.offset + node.length - 1); let i = 0;
+  while (i < raw.length) { offsets.push(node.offset + 1 + i); i += raw[i] === '\\' ? raw[i + 1] === 'u' ? 6 : 2 : 1; }
+  offsets.push(node.offset + node.length - 1); return offsets;
+}
+function molangIssues(document) {
+  return molangNodes(document).flatMap(node => {
+    const offsets = rawOffsets(document.text, node);
+    return molangParser.parse(node.value).errors.map(error => ({ file: document.file, offset: offsets[error.start] || node.offset + 1, length: Math.max(1, (offsets[error.end] || offsets[error.start] || node.offset + 1) - (offsets[error.start] || node.offset + 1)), severity: 'warning', message: `Molang: ${error.message}` }));
+  });
+}
+module.exports = { ContentIndex, scan, update, fileKind, referenceKind, references, referenceIssues, molangNodes, molangIssues, rawOffsets, MOLANG_QUERIES, MOLANG_MATH, molangParser };

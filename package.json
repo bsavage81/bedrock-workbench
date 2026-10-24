@@ -1,0 +1,210 @@
+{
+  "name": "bedrock-workbench",
+  "displayName": "Bedrock Workbench",
+  "description": "Build, deploy and export Minecraft Bedrock add-ons with separate beta and stable profiles.",
+  "version": "0.8.0",
+  "publisher": "bsavage81",
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages"
+  ],
+  "main": "./src/extension.cjs",
+  "activationEvents": [
+    "workspaceContains:bedrock-project.json"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false
+    },
+    "virtualWorkspaces": false
+  },
+  "scripts": {
+    "check": "node --check src/core.cjs && node --check src/extension.cjs && node --check src/releases.cjs && node --check src/reference.cjs && node --check src/editor.cjs && node --check src/scripts.cjs && node --check src/experiments.cjs && node --check src/experiment-updates.cjs && node --check src/official-schemas.cjs && node --check src/content.cjs && node --check src/content-editor.cjs && node --check src/validation.cjs && node --check src/commands.cjs",
+    "test": "node --test test/compiler.test.cjs test/workflow.test.cjs test/releases.test.cjs test/reference.test.cjs test/scripts.test.cjs test/experiments.test.cjs test/intelligence.test.cjs test/commands.test.cjs",
+    "package": "vsce package --target win32-x64 --allow-missing-repository --skip-license",
+    "build:sample": "node tools/build.cjs \"projects/SavageCraft v2\" beta",
+    "export:sample": "node tools/build.cjs \"projects/SavageCraft v2\" stable",
+    "vendor:molang": "esbuild third_party/mojang/MolangParser.ts --outfile=src/vendor/molang.cjs --platform=node --format=cjs --target=node20"
+  },
+  "dependencies": {
+    "@minecraft/bedrock-schemas": "1.26.50",
+    "ajv": "^8.17.1",
+    "es-module-lexer": "^1.7.0",
+    "esbuild": "^0.25.0",
+    "fflate": "^0.8.2",
+    "jsonc-parser": "^3.3.1",
+    "pngjs": "^7.0.0"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.2.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "bedrock.initialize",
+        "title": "Bedrock: Initialize Project"
+      },
+      {
+        "command": "bedrock.build",
+        "title": "Bedrock: Build Beta"
+      },
+      {
+        "command": "bedrock.deploy",
+        "title": "Bedrock: Deploy Beta to Minecraft"
+      },
+      {
+        "command": "bedrock.deployStable",
+        "title": "Bedrock: Deploy Stable to Minecraft"
+      },
+      {
+        "command": "bedrock.iconBP",
+        "title": "Bedrock: Select BP Pack Icon"
+      },
+      {
+        "command": "bedrock.iconRP",
+        "title": "Bedrock: Select RP Pack Icon"
+      },
+      {
+        "command": "bedrock.export",
+        "title": "Bedrock: Export Stable mcaddon"
+      },
+      {
+        "command": "bedrock.autoDeploy",
+        "title": "Bedrock: Toggle Automatic Deployment"
+      },
+      {
+        "command": "bedrock.target",
+        "title": "Bedrock: Select Release or Preview"
+      },
+      {
+        "command": "bedrock.checkTargetVersion",
+        "title": "Bedrock: Check Target Engine Version"
+      },
+      {
+        "command": "bedrock.destination",
+        "title": "Bedrock: Select Minecraft Folder"
+      },
+      {
+        "command": "bedrock.version",
+        "title": "Bedrock: Bump Project Version"
+      },
+      {
+        "command": "bedrock.settings",
+        "title": "Bedrock: Open Project Settings"
+      },
+      {
+        "command": "bedrock.refresh",
+        "title": "Bedrock: Refresh Project"
+      },
+      {
+        "command": "bedrock.tracker",
+        "title": "Bedrock: Open Extension Project Tracker"
+      },
+      {
+        "command": "bedrock.refreshReference",
+        "title": "Bedrock: Refresh Mojang Reference Data"
+      },
+      {
+        "command": "bedrock.checkScriptVersions",
+        "title": "Bedrock: Check Script API Versions"
+      },
+      {
+        "command": "bedrock.addScriptDependency",
+        "title": "Bedrock: Add Script Dependency"
+      },
+      {
+        "command": "bedrock.betaScripts",
+        "title": "Bedrock: Toggle Beta Script APIs"
+      },
+      {
+        "command": "bedrock.experiment",
+        "title": "Bedrock: Toggle World Experiment Requirement"
+      },
+      {
+        "command": "bedrock.installScriptTypings",
+        "title": "Bedrock: Install Matching Script API Typings"
+      },
+      {
+        "command": "bedrock.checkExperiments",
+        "title": "Bedrock: Check Available Experiments"
+      },
+      {
+        "command": "bedrock.experimentReference",
+        "title": "Bedrock: Open Experiment Reference"
+      },
+      {
+        "command": "bedrock.validate",
+        "title": "Bedrock: Validate Project"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "bedrock",
+          "title": "Bedrock",
+          "icon": "media/bedrock.svg"
+        }
+      ]
+    },
+    "views": {
+      "bedrock": [
+        {
+          "id": "bedrock.project",
+          "name": "Project"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "bedrock.project",
+        "contents": "Open a folder containing bedrock-project.json, or initialize an existing BP/RP project.\n[Initialize Project](command:bedrock.initialize)"
+      }
+    ],
+    "jsonValidation": [
+      {
+        "fileMatch": "bedrock-project.json",
+        "url": "./schemas/project.schema.json"
+      },
+      {
+        "fileMatch": "**/manifest.json",
+        "url": "./schemas/manifest.schema.json"
+      },
+      {
+        "fileMatch": "**/BP/items/*.json",
+        "url": "./schemas/item.schema.json"
+      },
+      {
+        "fileMatch": "**/BP/blocks/*.json",
+        "url": "./schemas/block.schema.json"
+      },
+      {
+        "fileMatch": "**/BP/entities/*.json",
+        "url": "./schemas/entity.schema.json"
+      }
+    ],
+    "languages": [
+      {
+        "id": "mcfunction",
+        "aliases": [
+          "Minecraft Function",
+          "mcfunction"
+        ],
+        "extensions": [
+          ".mcfunction"
+        ]
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bsavage81/bedrock-workbench.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bsavage81/bedrock-workbench/issues"
+  },
+  "homepage": "https://github.com/bsavage81/bedrock-workbench#readme"
+}

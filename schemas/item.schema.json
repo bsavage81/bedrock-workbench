@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bedrock item — foundational validation",
+  "type": "object",
+  "required": [
+    "format_version",
+    "minecraft:item"
+  ],
+  "properties": {
+    "format_version": {
+      "type": "string"
+    },
+    "minecraft:item": {
+      "type": "object",
+      "required": [
+        "description"
+      ],
+      "properties": {
+        "description": {
+          "type": "object",
+          "required": [
+            "identifier"
+          ],
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+            },
+            "menu_category": {
+              "type": "object"
+            }
+          }
+        },
+        "components": {
+          "type": "object",
+          "properties": {
+            "minecraft:display_name": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string"
+                }
+              }
+            },
+            "minecraft:icon": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            },
+            "minecraft:max_stack_size": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 64
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            },
+            "minecraft:tags": {
+              "type": "object",
+              "properties": {
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "component_groups": {
+          "type": "object"
+        },
+        "events": {
+          "type": "object"
+        },
+        "permutations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": {
+                "type": "string"
+              },
+              "components": {
+                "type": "object",
+                "properties": {
+                  "minecraft:display_name": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "minecraft:icon": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "minecraft:max_stack_size": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 64
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "minecraft:tags": {
+                    "type": "object",
+                    "properties": {
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

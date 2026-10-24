@@ -1,0 +1,157 @@
+const path = require('node:path');
+const json = require('jsonc-parser');
+const content = require('./content.cjs');
+const reference = require('./reference.cjs');
+const commands = require('./commands.cjs');
+function attach(vscode, context, getProject, output) {
+  if (!vscode.languages.registerCompletionItemProvider) return;
+  const diagnostics = vscode.languages.createDiagnosticCollection('bedrock-content');
+  let cached, dirty = true, running, key, timer, disposed = false;
+  const pendingFiles = new Set();
+  let vanilla, vanillaKey, vanillaPending;
+  async function referenceData() {
+    const project = getProject(); if (!project) return;
+    const next = JSON.stringify([project.root, project.config.targetVersion]);
+    if (next !== vanillaKey) {
+      vanillaKey = next; vanilla = undefined;
+      vanillaPending = reference.loadReference(project.root, project.config.targetVersion).then(value => { if (vanillaKey === next) vanilla = value; return value; }).catch(error => { output.warn(`Command reference: ${error.message}`); });
+    }
+    return vanilla || vanillaPending;
+  }
+  async function ensure() {
+    const project = getProject(); if (!project || disposed) return;
+    const next = JSON.stringify([project.root, project.packs]);
+    if (next !== key) { key = next; dirty = true; cached = undefined; pendingFiles.clear(); }
+    if (running) { await running; return ensure(); }
+    if (!dirty && cached) return cached;
+    dirty = false; const requestedKey = key;
+    const files = [...pendingFiles]; pendingFiles.clear();
+    running = (async () => {
+      if (cached && files.length) {
+        for (const file of files) if (!await content.update(cached, file)) return content.scan(project);
+        return cached;
+      }
+      return content.scan(project);
+    })().then(index => { if (requestedKey === key && !disposed) cached = index; return index; }).catch(error => { dirty = true; cached = undefined; output.warn(`Content indexing: ${error.message}`); }).finally(() => { running = undefined; });
+    return running;
+  }
+  function documentData(document) {
+    const project = getProject(); if (!project || document.uri.scheme !== 'file') return;
+    const kind = content.fileKind(project, document.uri.fsPath); if (!kind || !document.uri.fsPath.endsWith('.json')) return;
+    const text = document.getText(); return { ...kind, file: document.uri.fsPath, text, tree: json.parseTree(text.replace(/^\uFEFF/, ' ')) };
+  }
+  function at(document, position) {
+    const data = documentData(document); if (!data?.tree) return;
+    const offset = document.offsetAt(position), location = json.getLocation(data.text, offset), node = json.findNodeAtOffset(data.tree, offset, true);
+    if (!node || node.type !== 'string' || (node.parent?.type === 'property' && node.parent.children[0] === node)) return;
+    return { data, node, location, offset };
+  }
+  function diagnostic(document, issue) {
+    const result = new vscode.Diagnostic(new vscode.Range(document.positionAt(issue.offset), document.positionAt(issue.offset + issue.length)), issue.message, issue.severity === 'warning' ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Information);
+    result.source = 'Bedrock Workbench'; return result;
+  }
+  function validate(document) {
+    if (disposed) return;
+    const data = documentData(document);
+    if (!data) { diagnostics.delete(document.uri); return; }
+    const issues = [...content.molangIssues(data), ...(cached ? content.referenceIssues(cached, data) : [])];
+    diagnostics.set(document.uri, issues.map(issue => diagnostic(document, issue)));
+  }
+  const selector = [{ language: 'json', scheme: 'file' }, { language: 'jsonc', scheme: 'file' }];
+  context.subscriptions.push(diagnostics,
+    vscode.languages.registerCompletionItemProvider(selector, {
+      async provideCompletionItems(document, position) {
+        const state = at(document, position); if (!state) return;
+        const { data, node, offset, location } = state;
+        const before = data.text.slice(node.offset + 1, offset), molang = content.molangNodes(data).includes(node);
+        const prefix = /(?:query|q|math)\.[a-z_]*$/i.exec(before)?.[0];
+        const range = new vscode.Range(document.positionAt(node.offset + 1), document.positionAt(node.offset + node.length - 1));
+        if (molang && prefix) return [...content.MOLANG_QUERIES, ...content.MOLANG_MATH].filter(value => (prefix.startsWith('q.') ? value.name.replace(/^query\./, 'q.') : value.name).startsWith(prefix)).map(value => {
+          const name = prefix.startsWith('q.') ? value.name.replace(/^query\./, 'q.') : value.name;
+          const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Function); item.detail = 'Mojang Molang reference'; item.documentation = value.description;
+          item.range = new vscode.Range(document.positionAt(offset - prefix.length), position); item.insertText = name; return item;
+        });
+        const kind = content.referenceKind(location.path, node.value, data); if (!kind) return;
+        const index = await ensure(); if (!index) return;
+        const values = new Map(index.values(kind));
+        const refs = await referenceData();
+        for (const id of refs?.vanilla?.[kind] || []) if (!values.has(id)) values.set(id, []);
+        if (kind === 'item') for (const entry of index.values('block')) values.set(...entry);
+        if (kind === 'animation') for (const entry of index.values('animation_controller')) values.set(...entry);
+        return [...values].map(([id, files]) => {
+          const item = new vscode.CompletionItem(id, vscode.CompletionItemKind.Reference); item.range = range; item.insertText = id;
+          item.detail = files.length ? `Project ${kind.replaceAll('_', ' ')}` : `Minecraft ${refs.tag}`; item.documentation = files.length ? files.map(file => path.relative(index.project.root, file)).join('\n') : refs.source; return item;
+        });
+      }
+    }, '"', '.', ':'),
+    vscode.languages.registerHoverProvider(selector, {
+      async provideHover(document, position) {
+        const state = at(document, position); if (!state) return;
+        const { data, node, location, offset } = state;
+        if (content.molangNodes(data).includes(node)) {
+          const offsets = content.rawOffsets(data.text, node), decoded = Math.max(0, offsets.findIndex(value => value >= offset));
+          const token = content.molangParser.getCursorContext(node.value, decoded).tokenAtCursor;
+          const id = token?.fullIdentifier?.replace(/^q\./, 'query.');
+          const reference = [...content.MOLANG_QUERIES, ...content.MOLANG_MATH].find(entry => entry.name === id);
+          if (reference) return new vscode.Hover(`${reference.name}: ${reference.description}${reference.syntax ? '\n\n' + reference.syntax : ''}`);
+        }
+        const kind = content.referenceKind(location.path, node.value, data); if (!kind) return;
+        const index = await ensure(), files = index?.values(kind).get(node.value);
+        if (files?.length) return new vscode.Hover(`Project ${kind.replaceAll('_', ' ')}: ${node.value}\n\n${files.map(file => path.relative(getProject().root, file)).join('\n')}`);
+      }
+    }),
+    vscode.languages.registerDefinitionProvider(selector, {
+      async provideDefinition(document, position) {
+        const state = at(document, position); if (!state) return;
+        const kind = content.referenceKind(state.location.path, state.node.value, state.data); if (!kind) return;
+        const index = await ensure(); return index?.values(kind).get(state.node.value)?.map(file => new vscode.Location(vscode.Uri.file(file), new vscode.Position(0, 0)));
+      }
+    }),
+    vscode.workspace.onDidOpenTextDocument(document => { validate(document); void ensure().then(() => validate(document)); }),
+    vscode.workspace.onDidChangeTextDocument(event => validate(event.document)),
+    vscode.workspace.onDidCloseTextDocument(document => diagnostics.delete(document.uri))
+  );
+  const functionSelector = [{ language: 'mcfunction', scheme: 'file' }];
+  async function commandState(document, position) {
+    const project = getProject();
+    if (!project || !content.fileKind(project, document.uri.fsPath) || !document.uri.fsPath.endsWith('.mcfunction')) return;
+    const index = await ensure(), refs = await referenceData();
+    return commands.context(document.lineAt(position.line).text.slice(0, position.character), refs, index);
+  }
+  context.subscriptions.push(vscode.languages.registerCompletionItemProvider(functionSelector, {
+    async provideCompletionItems(document, position) {
+      const state = await commandState(document, position); if (!state) return;
+      // Include the suffix of the current token when completing in its middle.
+      const suffix = /^[\w:./-]*/.exec(document.lineAt(position.line).text.slice(position.character))[0];
+      return state.values.map(value => {
+        const item = new vscode.CompletionItem(value, vscode.CompletionItemKind.Value);
+        item.insertText = value; item.range = new vscode.Range(position.line, state.start, position.line, state.end + suffix.length);
+        item.detail = 'Bedrock command / project reference'; return item;
+      });
+    }
+  }, ' ', ':', '=', '[', ','));
+  if (vscode.languages.registerSignatureHelpProvider) context.subscriptions.push(vscode.languages.registerSignatureHelpProvider(functionSelector, {
+    async provideSignatureHelp(document, position) {
+      const state = await commandState(document, position); if (!state?.signatures.length) return;
+      const result = new vscode.SignatureHelp();
+      result.signatures = state.signatures.slice(0, 30).map(({ command, overload, parameter }) => {
+        const signature = new vscode.SignatureInformation(command.name + ' ' + overload.params.map(p => `${p.is_optional ? '[' : '<'}${p.name}: ${p.type.name}${p.is_optional ? ']' : '>'}`).join(' '), command.description);
+        signature.parameters = overload.params.map(p => new vscode.ParameterInformation(`${p.name}: ${p.type.name}`));
+        signature.activeParameter = parameter; return signature;
+      });
+      result.activeSignature = 0; result.activeParameter = state.signatures[0].parameter; return result;
+    }
+  }, ' '));
+  const watcher = vscode.workspace.createFileSystemWatcher('**/*');
+  function change(uri) {
+    // Config rediscovery briefly clears the active project. Keep using the
+    // indexed project during that gap so saved-file events are not dropped.
+    const project = getProject() || cached?.project;
+    if (project && path.resolve(uri.fsPath).toLowerCase() === path.join(project.root, '.bedrock/reference/components.json').toLowerCase()) { vanillaKey = undefined; return; }
+    if (!project || !content.fileKind(project, uri.fsPath)) return;
+    dirty = true; pendingFiles.add(uri.fsPath); clearTimeout(timer);
+    timer = setTimeout(() => { void ensure().then(() => { for (const document of vscode.workspace.textDocuments) validate(document); }); }, 500);
+  }
+  context.subscriptions.push(watcher, watcher.onDidCreate(change), watcher.onDidChange(change), watcher.onDidDelete(change), { dispose() { disposed = true; clearTimeout(timer); } });
+}
+module.exports = { attach };

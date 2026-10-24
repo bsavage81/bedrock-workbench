@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bedrock Workbench loot table",
+  "description": "Independently authored structural checks. Unknown fields and function/condition extensions remain allowed.",
+  "type": "object",
+  "properties": {
+    "pools": {
+      "type": "array",
+      "description": "Loot selection pools.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rolls": { "$ref": "#/definitions/range" },
+          "bonus_rolls": { "$ref": "#/definitions/range" },
+          "conditions": { "type": "array", "items": { "type": "object" } },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string", "description": "Entry kind, such as item, loot_table, or empty." },
+                "name": { "type": "string" },
+                "weight": { "type": "number" },
+                "quality": { "type": "number" },
+                "functions": { "type": "array", "items": { "type": "object" } },
+                "conditions": { "type": "array", "items": { "type": "object" } }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "range": {
+      "anyOf": [
+        { "type": "number" },
+        { "type": "object", "properties": { "min": { "type": "number" }, "max": { "type": "number" } } }
+      ]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+projects/**
+test/**
+tools/**
+.git/**
+.vscode/**
+*.vsix
+COPY_VERIFICATION.json
+HOST_VERIFICATION.json
+package-lock.json
+.test-temp/**
+node_modules/@vscode/vsce/**
+node_modules/@minecraft/bedrock-schemas/forms/**
+node_modules/@minecraft/bedrock-schemas/types/**
