@@ -25,7 +25,18 @@
         "tags": {
           "type": "array",
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "crafting_table"
+                ]
+              },
+              {
+                "type": "string",
+                "description": "Custom recipe station tag."
+              }
+            ]
           },
           "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
         },
@@ -104,7 +115,20 @@
         "tags": {
           "type": "array",
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "crafting_table",
+                  "stonecutter",
+                  "cartography_table"
+                ]
+              },
+              {
+                "type": "string",
+                "description": "Custom recipe station tag."
+              }
+            ]
           },
           "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
         },
@@ -163,7 +187,22 @@
         "tags": {
           "type": "array",
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "furnace",
+                  "blast_furnace",
+                  "smoker",
+                  "campfire",
+                  "soul_campfire"
+                ]
+              },
+              {
+                "type": "string",
+                "description": "Custom recipe station tag."
+              }
+            ]
           },
           "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
         },
@@ -217,7 +256,18 @@
         "tags": {
           "type": "array",
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "brewing_stand"
+                ]
+              },
+              {
+                "type": "string",
+                "description": "Custom recipe station tag."
+              }
+            ]
           },
           "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
         },
@@ -275,7 +325,18 @@
         "tags": {
           "type": "array",
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "brewing_stand"
+                ]
+              },
+              {
+                "type": "string",
+                "description": "Custom recipe station tag."
+              }
+            ]
           },
           "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
         },
@@ -333,7 +394,18 @@
         "tags": {
           "type": "array",
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "smithing_table"
+                ]
+              },
+              {
+                "type": "string",
+                "description": "Custom recipe station tag."
+              }
+            ]
           },
           "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
         },
@@ -394,7 +466,18 @@
         "tags": {
           "type": "array",
           "items": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "smithing_table"
+                ]
+              },
+              {
+                "type": "string",
+                "description": "Custom recipe station tag."
+              }
+            ]
           },
           "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
         },

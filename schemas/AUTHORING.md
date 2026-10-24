@@ -19,6 +19,8 @@ For each additional route:
 
 `recipe.schema.json` covers shaped, shapeless, furnace, brewing mix/container, smithing transform, and smithing trim. It checks nested ingredient/result types, counts, shaped pattern/key structure, and essential variant fields. It accepts string/object ingredients, item tags, object/array results, object/array unlock conditions, older two-part format versions, and legacy transforms without templates. Unknown recipe kinds remain structurally open; material reduction and engine-specific availability are not yet audited. Pattern-to-key consistency is a future semantic check.
 
+Recipe tag strings suggest built-in stations appropriate to the recipe kind. An open string alternative preserves custom station tags. Internal `deprecated` tags found in vanilla samples are not suggested as crafting stations.
+
 `texture-atlas.schema.json` covers RP item and terrain atlases, including string paths, arrays, and path objects with tint/overlay settings. Optional pack/atlas labels stay optional for existing add-ons. It does not verify that an image exists.
 
 `sound-definitions.schema.json` covers the `sound_definitions` map, string/object audio entries, typed playback settings, nullable distances, and legacy flag strings. Category values stay open. Legacy flat root layouts and server sound definitions are outside this first audited scope.

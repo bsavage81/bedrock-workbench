@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.1 — October 23, 2026
+
+- Suggest built-in station tags inside recipe tag strings, scoped to the recipe type, while continuing to allow custom tags.
+
 ## 0.9.0 — October 23, 2026
 
 - Replace recipe, item/terrain atlas, and client sound-definition entry points with independently authored Workbench schemas.

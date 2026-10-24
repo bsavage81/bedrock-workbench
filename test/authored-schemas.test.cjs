@@ -20,6 +20,7 @@ const validRecipes = [
 test('recipe compatibility: legacy forms, tag ingredients, modern unlock forms and each verified variant', () => {
   for (const value of validRecipes) assert.ok(recipe(value), JSON.stringify(recipe.errors));
   assert.ok(recipe(doc('future_station', { custom_future_payload: true })));
+  assert.ok(recipe(doc('furnace', { input: 'example:ore', output: 'example:ingot', tags: ['example:custom_furnace'] })));
 });
 test('recipe defects: missing fields, invalid nested counts, symbol keys and container types', () => {
   const invalid = [

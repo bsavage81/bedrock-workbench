@@ -151,6 +151,14 @@ async function run() {
   const streamPosition = soundsDoc.positionAt(soundsDoc.getText().indexOf('stream') + 3);
   const soundHover = await vscode.commands.executeCommand('vscode.executeHoverProvider', soundsUri, streamPosition);
   assert.ok(soundHover.some(h => h.contents.some(c => c.value?.includes('Stream this audio'))), 'Authored sound field hover missing');
+  const tagUri = vscode.Uri.file(path.join(root, 'BP/recipes/furnace-tags.json'));
+  await fs.writeFile(tagUri.fsPath, '{"format_version":"1.20.10","minecraft:recipe_furnace":{"description":{"identifier":"test:tags"},"input":"minecraft:stone","output":"minecraft:diamond","tags":[""]}}');
+  const tagDoc = await vscode.workspace.openTextDocument(tagUri); await vscode.window.showTextDocument(tagDoc);
+  const tagPosition = tagDoc.positionAt(tagDoc.getText().indexOf('[""') + 2);
+  await until(async () => {
+    const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', tagUri, tagPosition);
+    return ['furnace', 'blast_furnace', 'smoker', 'campfire', 'soul_campfire'].every(tag => completion?.items.some(item => String(item.label).replaceAll('"', '') === tag));
+  }, 'Recipe station tags were not suggested inside an empty quoted string');
   const validationReport = await core.readJson(path.join(root, '.bedrock/validation-report.json'));
   assert.ok(validationReport.files >= 6); assert.equal(validationReport.schemaVersion, '1.26.50');
   state = await core.readJson(stateFile);

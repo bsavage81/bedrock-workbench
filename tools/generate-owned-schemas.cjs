@@ -31,7 +31,19 @@ const variants = {
   smithing_transform: object({ ...common, template: ref('ingredient'), base: ref('ingredient'), addition: ref('ingredient'), result: ref('result') }, ['description', 'base', 'addition', 'result']),
   smithing_trim: object({ ...common, template: ref('ingredient'), base: ref('ingredient'), addition: ref('ingredient') }, ['description', 'template', 'base', 'addition'])
 };
-for (const [kind, schema] of Object.entries(variants)) schema.description = `Workbench structural validation for ${kind.replaceAll('_', ' ')} recipes. Unknown extension fields are allowed.`;
+const stationTags = {
+  shaped: ['crafting_table'],
+  shapeless: ['crafting_table', 'stonecutter', 'cartography_table'],
+  furnace: ['furnace', 'blast_furnace', 'smoker', 'campfire', 'soul_campfire'],
+  brewing_mix: ['brewing_stand'], brewing_container: ['brewing_stand'],
+  smithing_transform: ['smithing_table'], smithing_trim: ['smithing_table']
+};
+for (const [kind, schema] of Object.entries(variants)) {
+  schema.description = `Workbench structural validation for ${kind.replaceAll('_', ' ')} recipes. Unknown extension fields are allowed.`;
+  // The enum contributes native JSON suggestions; the open string alternative
+  // keeps custom station tags valid rather than turning suggestions into limits.
+  schema.properties.tags = { ...common.tags, items: { anyOf: [{ type: 'string', enum: stationTags[kind] }, string('Custom recipe station tag.')] } };
+}
 const recipe = { ...header('recipe'), ...object({ format_version: string('Recipe format version; older two-part versions remain valid.'), ...Object.fromEntries(Object.entries(variants).map(([kind, value]) => ['minecraft:recipe_' + kind, value])) }, ['format_version']),
   patternProperties: { '^minecraft:recipe_': { type: 'object' } },
   definitions: { ingredient, result, unlock: object({ item: string(), data: { type: 'integer' }, context: string('Recipe discovery context, such as AlwaysUnlocked.') }), results: { anyOf: [ref('result'), { ...array(ref('result')), minItems: 1 }] } }
