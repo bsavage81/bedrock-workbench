@@ -446,6 +446,17 @@ async function run() {
     const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, position);
     return completion?.items.some(item => item.label === 'test:host_updated') && !completion.items.some(item => item.label === 'test:host_block');
   }, 'Saved imported component ID changes did not refresh suggestions');
+  const syntaxUri=vscode.Uri.file(path.join(root,'RP/entity/duplicate-syntax.json'));
+  await fs.writeFile(syntaxUri.fsPath,'{"format_version":"1.10.0","minecraft:client_entity":{"description":{"identifier": }}}');
+  const syntaxDoc=await vscode.workspace.openTextDocument(syntaxUri);await vscode.window.showTextDocument(syntaxDoc);
+  await until(async()=>vscode.languages.getDiagnostics(syntaxUri).some(d=>String(d.code)==='516'),'Native JSON syntax diagnostic missing');
+  await vscode.commands.executeCommand('bedrock.validate');
+  await vscode.commands.executeCommand('bedrock.build');
+  const syntaxDiagnostics=vscode.languages.getDiagnostics(syntaxUri);
+  assert.equal(syntaxDiagnostics.filter(d=>String(d.code)==='516'||d.code==='bedrock.jsonSyntax').length,1,'Build/validation duplicated the native syntax error');
+  const syntaxReport=await core.readJson(path.join(root,'.bedrock/validation-report.json'));
+  assert.ok(syntaxReport.issues.some(i=>i.file.toLowerCase()===syntaxUri.fsPath.toLowerCase()&&i.code==='bedrock.jsonSyntax'),'Syntax error was lost from the saved validation report');
+  await fs.unlink(syntaxUri.fsPath);
   const validationReport = await core.readJson(path.join(root, '.bedrock/validation-report.json'));
   assert.ok(validationReport.files >= 6); assert.equal(validationReport.schemaVersion, '1.26.50');
   state = await core.readJson(stateFile);

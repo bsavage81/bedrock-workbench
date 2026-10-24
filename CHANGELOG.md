@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.1 — October 24, 2026
+
+- Show one JSON syntax diagnostic for open JSON/JSONC documents by deferring to VS Code's enabled JSON service.
+- Preserve Workbench syntax findings in saved reports and for closed files or unavailable native JSON validation.
+- Remove earlier Workbench syntax entries when native JSON validation takes ownership; retain other build and validation findings.
+
 ## 0.14.0 — October 24, 2026
 
 - Recognize legacy vanilla names and referenced assets from compatible samples, including recipes/trades, attachables, and particles. Normalize entity spawn-event and item auxiliary-data suffixes for reference checks.

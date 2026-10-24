@@ -34,7 +34,7 @@ async function readJson(file) {
     const message = printParseErrorCode(errors[0].error), offset = errors[0].offset;
     const lines = text.slice(0, offset).split('\n');
     const error = new Error(`${file}: ${message} at offset ${offset}`);
-    error.errors = [{ text: message, location: { file, line: lines.length, column: lines.at(-1).length, length: 1 } }];
+    error.errors = [{ code:'bedrock.jsonSyntax',text: message, location: { file, line: lines.length, column: lines.at(-1).length, length: 1 } }];
     throw error;
   }
   return data;

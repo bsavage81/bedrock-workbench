@@ -63,6 +63,8 @@ const { unzipSync } = require('fflate');
     assert.deepEqual(names.finish().item,['minecraft:packaged_test']);
     const ignores=require(path.join(unpacked,'extension/src/validation-ignores.cjs'));
     assert.equal(typeof ignores.partition,'function');
+    const diagnosticPolicy=require(path.join(unpacked,'extension/src/diagnostic-policy.cjs'));
+    assert.equal(diagnosticPolicy.visible({workspace:{textDocuments:[]}},path.join(isolatedSample,'RP/entity/check.json'),{code:'bedrock.jsonSyntax'}),true);
     const blockSchema=JSON.parse(Buffer.from(archive['extension/schemas/block.schema.json']).toString());
     assert.equal(Object.keys(blockSchema.definitions.components.properties).length,46);
     assert.match(blockSchema.definitions.components.properties['minecraft:flower_pottable'].markdownDescription,/learn.microsoft.com/);

@@ -7,6 +7,7 @@ const releases = require('./releases.cjs');
 const scripts = require('./scripts.cjs');
 const experiments = require('./experiments.cjs');
 const experimentUpdates = require('./experiment-updates.cjs');
+const diagnosticPolicy = require('./diagnostic-policy.cjs');
 
 function activate(context) {
   const output = vscode.window.createOutputChannel('Bedrock Workbench', { log: true });
@@ -276,7 +277,9 @@ function activate(context) {
     status = 'Build failed'; refresh(); output.error(error.stack || String(error));
     if (error.errors) for (const e of error.errors) if (e.location?.file) {
       const loc = e.location, uri = vscode.Uri.file(path.isAbsolute(loc.file) ? loc.file : path.resolve(root, loc.file));
+      if(!diagnosticPolicy.visible(vscode,uri.fsPath,e))continue;
       const diagnostic = new vscode.Diagnostic(new vscode.Range(Math.max(0, loc.line - 1), loc.column, Math.max(0, loc.line - 1), loc.column + Math.max(loc.length, 1)), e.text, vscode.DiagnosticSeverity.Error);
+      diagnostic.source='Bedrock build';if(e.code)diagnostic.code=e.code;
       diagnostics.set(uri, [...(diagnostics.get(uri) || []), diagnostic]);
     }
     if (interactive) vscode.window.showErrorMessage(`Bedrock: ${error.message}`);
@@ -422,6 +425,7 @@ function activate(context) {
     if(result.referenceWarning)output.warn(result.referenceWarning);
     const grouped = new Map(), texts = new Map();
     for (const issue of result.issues) {
+      if(!diagnosticPolicy.visible(vscode,issue.file,issue))continue;
       if (!texts.has(issue.file)) texts.set(issue.file, await fs.readFile(issue.file, 'utf8'));
       const text = texts.get(issue.file);
       const position = offset => { const lines = text.slice(0, offset).split('\n'); return new vscode.Position(lines.length - 1, lines.at(-1).length); };
@@ -449,6 +453,15 @@ function activate(context) {
     await saveConfig(config);await runValidation();
   })));
   register('validationIgnores',async()=>{await requireProject();await vscode.window.showTextDocument(vscode.Uri.file(path.join(root,'bedrock-project.json')));});
+  function clearDuplicateSyntax(document) {
+    if(!diagnosticPolicy.nativeOwnsSyntax(vscode,document.uri.fsPath))return;
+    for(const collection of [diagnostics,validationDiagnostics]) {
+      const existing=collection.get(document.uri);
+      if(existing?.some(issue=>issue.code==='bedrock.jsonSyntax'))collection.set(document.uri,existing.filter(issue=>issue.code!=='bedrock.jsonSyntax'));
+    }
+  }
+  if(vscode.workspace.onDidOpenTextDocument)context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(clearDuplicateSyntax));
+  if(vscode.workspace.onDidChangeTextDocument)context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(event=>clearDuplicateSyntax(event.document)));
   register('deploy', () => manualRun('deploy'));
   register('deployStable', () => manualRun('deployStable'));
   register('export', () => manualRun('export'));

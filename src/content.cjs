@@ -72,7 +72,7 @@ async function indexFile(index, side, relative) {
     if (side === 'behavior' && /^loot_tables\/.*\.json$/i.test(rel)) index.add('loot_table', rel, file);
     if (!rel.endsWith('.json') || (await fs.stat(file)).size > 2 * 1024 * 1024) return;
     const text = await fs.readFile(file, 'utf8'), errors = [], tree = json.parseTree(text.replace(/^\uFEFF/, ' '), errors, { allowTrailingComma: true });
-    if (errors.length) { index.issues.push({ file, offset: errors[0].offset, length: errors[0].length, severity: 'error', message: `JSON: ${json.printParseErrorCode(errors[0].error)}` }); return; }
+    if (errors.length) { index.issues.push({ code:'bedrock.jsonSyntax',file, offset: errors[0].offset, length: errors[0].length, severity: 'error', message: `JSON: ${json.printParseErrorCode(errors[0].error)}` }); return; }
     const data = json.getNodeValue(tree); index.documents.set(file, { file, side, relative: rel, text, tree, data });
     for (const [root, type] of [['minecraft:entity', 'entity'], ['minecraft:item', 'item'], ['minecraft:block', 'block'], ['minecraft:client_entity', 'client_entity'], ['minecraft:attachable', 'attachable']]) {
       if ((side === 'behavior') === ['entity', 'item', 'block'].includes(type)) index.add(type, data?.[root]?.description?.identifier, file);

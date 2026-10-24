@@ -1,5 +1,7 @@
 # Bedrock VS Code Extension — project tracker
 
+Included in 0.14.1: remove duplicate JSON syntax Problems from build/project validation when VS Code's enabled JSON service owns an open JSON/JSONC document. Workbench still records syntax failures in saved reports and reports closed files or files without native JSON validation. Native VS Code verification confirms one ValueExpected diagnostic after both Validate Pack and Build.
+
 Included in 0.14.0: recognize legacy names and asset paths used by vanilla samples without duplicating completion aliases; normalize item auxiliary-data and entity spawn-event suffixes. Reference cache version 4/local index version 2 refresh old data. SavageCraft rerun: 721 JSON files, 0 errors, 0 warnings, 10 informational findings (previously 185). Remaining findings are numbered villager textures absent from the project and matching Mojang release. Source pack files unchanged; cache and validation report updated.
 
 Included in 0.13.0: collision_box array/object starter completions and a clearer multi-box hover are fixed locally and verified in VS Code. Publication authorized October 24, 2026.
