@@ -6,7 +6,9 @@ const { compareVersions } = require('./releases.cjs');
 const PACKAGE = path.dirname(require.resolve('@minecraft/bedrock-schemas/catalog.json'));
 const VERSION = require(path.join(PACKAGE, 'package.json')).version;
 const catalog = require('@minecraft/bedrock-schemas/catalog.json');
-const BUILD = 9;
+const documentation = require('./documentation.cjs');
+const documentationCatalog = require('./documentation-links.json');
+const BUILD = 11;
 // Independent Workbench replacements. Broader Mojang routes remain fallbacks.
 const OWNED = {
   'bp/blocks/index.schema.json': require('../schemas/block.schema.json'),
@@ -29,6 +31,21 @@ function adapt(schema, relative) {
     }
   }
   visit(schema);
+  const kind=relative.startsWith('bp/entities/') ? 'entity' : relative.startsWith('bp/items/') ? 'item' : relative.startsWith('bp/blocks/') ? 'block' : undefined;
+  function linkComponents(node, component) {
+    if(!node || typeof node!=='object') return;
+    if(component && (node.description || node.markdownDescription || node.$ref)) node.markdownDescription=(node.description || node.markdownDescription?.replace(/\[[^\]]*\]\(https?:\/\/[^)]+\)/g,'').trim() || '')+'\n\n'+documentation.componentLink(kind,component);
+    for(const [key,value] of Object.entries(node)) {
+      if(key==='properties') for(const [name,child]of Object.entries(value)) linkComponents(child, documentationCatalog.components[kind]?.[name] ? name : component);
+      else if(Array.isArray(value)) value.forEach(child=>linkComponents(child,component));
+      else if(value && typeof value==='object') linkComponents(value,component);
+    }
+  }
+  if(kind) {
+    const fileId=/^(?:entity|item|block)_minecraft_(.+)\.schema\.json$/.exec(path.posix.basename(relative))?.[1];
+    const component=fileId && Object.keys(documentationCatalog.components[kind]).find(id=>id.slice(10).replaceAll('.','_')===fileId);
+    linkComponents(schema,component);
+  }
   if (relative === 'bp/recipes/index.schema.json') {
     const kinds = ['shaped', 'shapeless', 'furnace', 'brewing_mix', 'brewing_container', 'smithing_transform', 'smithing_trim', 'material_reduction'];
     schema = { $schema: schema.$schema, title: 'Bedrock recipe', type: 'object', required: ['format_version'], properties: { format_version: { type: 'string' }, ...Object.fromEntries(kinds.map(kind => ['minecraft:recipe_' + kind, kind === 'brewing_mix' ? { $ref: './brewing_mix_recipe_definition.schema.json' } : { type: 'object', description: `Bedrock ${kind.replaceAll('_', ' ')} recipe.`, properties: { description: { type: 'object', properties: { identifier: { type: 'string' } } }, tags: { type: 'array', items: { type: 'string' } }, ingredients: { type: 'array', items: { type: 'object' } }, pattern: { type: 'array', items: { type: 'string' } }, key: { type: 'object' }, result: { anyOf: [{ type: 'string' }, { type: 'object' }, { type: 'array' }] } } }])) } };

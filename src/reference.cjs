@@ -3,6 +3,7 @@ const path = require('node:path');
 const { unzipSync } = require('fflate');
 const { compareVersions } = require('./releases.cjs');
 const core = require('./core.cjs');
+const documentation = require('./documentation.cjs');
 const API = 'https://api.github.com/repos/Mojang/bedrock-samples/releases?per_page=100';
 function engine(tag) { return /^v(\d+\.\d+\.\d+)\.\d+$/.exec(tag)?.[1]; }
 function chooseRelease(list, target) {
@@ -97,18 +98,17 @@ function closest(name, names) {
   return names.map(value => ({ value, distance: distance(name, value) })).filter(v => v.distance <= 2).sort((a, b) => a.distance - b.distance).slice(0, 3).map(v => v.value);
 }
 function componentSchema(index, kind, { omit = [] } = {}) {
-  function valueSchema(value) {
+  function valueSchema(value, component) {
     const result = { description: value.description || '' };
-    const page = { block: 'Blocks', entity: 'Entities', item: 'Item' }[kind];
-    result.markdownDescription = [value.description || '', value.type ? `Type: ${value.type}` : '', `[Mojang documentation (${index.tag})](https://github.com/Mojang/bedrock-samples/blob/${index.tag}/documentation/${page}.html)`].filter(Boolean).join('\n\n');
+    result.markdownDescription = [value.description || '', value.type ? `Type: ${value.type}` : '', `Reference data: Mojang ${index.tag}.`, documentation.componentLink(kind, component)].filter(Boolean).join('\n\n');
     // HTML type labels with alternatives or legacy names are intentionally
     // advisory. Only unambiguous primitive types become validation rules.
     const type = { String: 'string', string: 'string', Boolean: 'boolean', boolean: 'boolean', Integer: 'integer', integer: 'integer', number: 'number', object: 'object', array: 'array' }[value.type];
     if (type) result.type = type;
-    if (value.fields && Object.keys(value.fields).length) result.properties = Object.fromEntries(Object.entries(value.fields).map(([name, field]) => [name, valueSchema(field)]));
+    if (value.fields && Object.keys(value.fields).length) result.properties = Object.fromEntries(Object.entries(value.fields).map(([name, field]) => [name, valueSchema(field, component)]));
     return result;
   }
-  const components = { type: 'object', additionalProperties: true, properties: Object.fromEntries(Object.entries(index.components[kind]).filter(([name]) => !omit.includes(name)).map(([name, value]) => [name, valueSchema(value)])) };
+  const components = { type: 'object', additionalProperties: true, properties: Object.fromEntries(Object.entries(index.components[kind]).filter(([name]) => !omit.includes(name)).map(([name, value]) => [name, valueSchema(value,name)])) };
   return { $schema: 'http://json-schema.org/draft-07/schema#', title: `Mojang ${index.tag} ${kind} reference`, type: 'object', properties: {
     [`minecraft:${kind}`]: { type: 'object', properties: { components, component_groups: { type: 'object', additionalProperties: components }, permutations: { type: 'array', items: { type: 'object', properties: { components } } } } }
   } };

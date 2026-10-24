@@ -15,6 +15,35 @@ test('original block rules cover common components, permutations, legacy unions 
   assert.ok(validate(block({ 'minecraft:custom_components': ['test:legacy'], 'minecraft:collision_box': [{ origin: [0, 0, 0], size: [1, 1, 1] }] })));
   for (const components of [{ 'minecraft:friction': 1.5 }, { 'minecraft:light_emission': 16 }, { 'minecraft:geometry': 42 }, { 'minecraft:material_instances': { '*': { face_dimming: 'wrong' } } }, { 'minecraft:tick': { interval_range: [1] } }, { 'minecraft:collision_box': { size: [1, 2] } }]) assert.equal(validate(block(components)), false);
 });
+
+test('expanded block rules cover offset, potted/embedded/item visuals, redstone and block/item descriptors', () => {
+  const components = {
+    'minecraft:random_offset': {x:{range:{min:-4,max:4},steps:0},z:{range:{min:-4,max:4},steps:0}},
+    'minecraft:flower_pottable': {},
+    'minecraft:embedded_visual': {geometry:{identifier:'geometry.potted'},material_instances:{'*':{texture:'plant',render_method:'alpha_test'}}},
+    'minecraft:item_visual': {geometry:'geometry.item',material_instances:{'*':{texture:'plant'}}},
+    'minecraft:placement_filter': {conditions:[{allowed_faces:['up'],block_filter:['minecraft:dirt',{name:'test:soil',states:{'test:wet':true}}]}]},
+    'minecraft:destructible_by_mining': {item_specific_speeds:[{item:{name:'minecraft:iron_pickaxe'},destroy_speed:2}]},
+    'minecraft:redstone_producer':{power:15,connected_faces:['up']},
+    'minecraft:block_entity': {container:{slot_count:27},dynamic_properties:true}
+  };
+  assert.ok(validate(block(components)), JSON.stringify(validate.errors));
+  for (const bad of [
+    {'minecraft:random_offset':{x:{range:{min:'wrong'}}}},
+    {'minecraft:random_offset':{z:{steps:1.5}}},
+    {'minecraft:flower_pottable':[]},
+    {'minecraft:redstone_producer':{power:16}},
+    {'minecraft:connection_rule':{enabled_directions:['up']}},
+    {'minecraft:block_entity':{container:{slot_count:55}}},
+    {'minecraft:liquid_detection':{detection_rules:[{on_liquid_touches:'unknown'}]}},
+    {'minecraft:placement_filter':{conditions:[{block_filter:[{states:{bad:[]}}]}]}}
+  ]) assert.equal(validate(block(bad)),false,JSON.stringify(bad));
+  assert.ok(validate(block({'minecraft:precipitation_interactions':{precipitation_behavior:'snow_log_no_collision'},'minecraft:redstone_consumer':{propogates_power:true}})));
+  const rules=require('../schemas/block.schema.json').definitions.components.properties;
+  assert.equal(Object.keys(rules).length,46);
+  assert.match(rules['minecraft:flower_pottable'].description,/No parameters/);
+  assert.match(rules['minecraft:random_offset'].properties.x.properties.steps.description,/Zero/);
+});
 test('script discovery handles TypeScript, imported/reexported constants, registry aliases and block/item separation', () => {
   const base = path.resolve('fixtures/BP/scripts');
   const sources = new Map([

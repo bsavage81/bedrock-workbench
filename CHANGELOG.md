@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.12.0 — October 24, 2026
+
+- Expand authored block rules to 46 current/legacy components, including random offsets, flower pots, visuals, redstone, connections, containers, and particle settings. Add nested field descriptions and value choices.
+- Offer project/vanilla block IDs in placement filters and item IDs in mining-tool selectors; complete held/embedded geometry and material references.
+- Link component and field documentation to Microsoft Learn stable pages using an official navigation catalog, with legacy-page and custom-component guide coverage.
+- Complete custom keys with quoted value snippets and value suggestions, while preserving existing values.
+- Disable unrelated word-based suggestions for workspace JSON/JSONC so parameterless component objects stay quiet. Preserve schema and project-aware completions.
+
 ## 0.11.0 — October 24, 2026
 
 - Complete custom block/item parameter keys, nested fields, and example values from saved script usage, TypeScript types, and existing project definitions; add type/source hovers and Go to Definition. Hints do not impose validation requirements.

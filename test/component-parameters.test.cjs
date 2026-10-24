@@ -53,6 +53,13 @@ test('geometry and texture reference contexts use the correct atlas and gate new
   assert.equal(kind(['minecraft:block','components','minecraft:material_instances','*','texture']), 'terrain_texture');
   assert.equal(kind(['minecraft:block','permutations',0,'components','minecraft:geometry','identifier']), 'geometry');
   assert.equal(kind(['minecraft:block','components','test:custom','texture']), undefined);
+  assert.equal(kind(['minecraft:block','components','minecraft:placement_filter','conditions',0,'block_filter',0]),'block');
+  assert.equal(kind(['minecraft:block','permutations',0,'components','minecraft:placement_filter','conditions',0,'block_filter',0,'name']),'block');
+  assert.equal(kind(['minecraft:block','components','minecraft:placement_filter','conditions',0,'block_filter',0,'tags']),undefined);
+  assert.equal(kind(['minecraft:block','components','minecraft:destructible_by_mining','item_specific_speeds',0,'item']),'item');
+  assert.equal(kind(['minecraft:block','components','minecraft:destructible_by_mining','item_specific_speeds',0,'item','name']),'item');
+  assert.equal(kind(['minecraft:block','components','minecraft:item_visual','material_instances','*','texture']),'terrain_texture');
+  assert.equal(kind(['minecraft:block','components','minecraft:embedded_visual','geometry','identifier']),'geometry');
   assert.deepEqual(content.builtinGeometries(doc, {config: {targetVersion: '1.26.50'}}), ['minecraft:geometry.full_block','minecraft:geometry.cross','minecraft:geometry.full_block_v1']);
   assert.ok(!content.builtinGeometries(doc, {config: {targetVersion: '1.21.90'}}).includes('minecraft:geometry.full_block_v1'));
   const item = document({'minecraft:item': {}});

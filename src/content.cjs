@@ -110,6 +110,12 @@ function referenceKind(keys, value, document) {
     if (component === 'minecraft:material_instances' && tail.length === 2 && key === 'texture') return 'terrain_texture';
     if (component === 'minecraft:destruction_particles' && tail.length === 1 && key === 'texture') return 'terrain_texture';
     if (component === 'minecraft:loot' && !tail.length) return 'loot_table';
+    if (component === 'minecraft:placement_filter' && tail[0] === 'conditions' && typeof tail[1] === 'number' && tail[2] === 'block_filter' && typeof tail[3] === 'number' && (tail.length === 4 || (tail.length === 5 && key === 'name'))) return 'block';
+    if (component === 'minecraft:destructible_by_mining' && tail[0] === 'item_specific_speeds' && typeof tail[1] === 'number' && tail[2] === 'item' && (tail.length === 3 || (tail.length === 4 && key === 'name'))) return 'item';
+    if (['minecraft:item_visual','minecraft:embedded_visual'].includes(component)) {
+      if (tail[0] === 'geometry' && (tail.length === 1 || (tail.length === 2 && key === 'identifier'))) return 'geometry';
+      if (tail[0] === 'material_instances' && tail.length === 3 && key === 'texture') return 'terrain_texture';
+    }
   }
   if (root === 'minecraft:item' && component === 'minecraft:icon' && (!tail.length || (tail.length === 1 && key === 'texture') || (tail.length === 2 && tail[0] === 'textures'))) return 'item_texture';
   if (document.side === 'resource') {

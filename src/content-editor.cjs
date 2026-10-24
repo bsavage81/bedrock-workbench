@@ -4,6 +4,8 @@ const content = require('./content.cjs');
 const reference = require('./reference.cjs');
 const commands = require('./commands.cjs');
 const parameters = require('./component-parameters.cjs');
+const {keyEdit} = require('./completion-key.cjs');
+const documentation = require('./documentation.cjs');
 function attach(vscode, context, getProject, output) {
   if (!vscode.languages.registerCompletionItemProvider) return;
   const diagnostics = vscode.languages.createDiagnosticCollection('bedrock-content');
@@ -59,6 +61,12 @@ function attach(vscode, context, getProject, output) {
     diagnostics.set(document.uri, issues.map(issue => diagnostic(document, issue)));
   }
   const selector = [{ language: 'json', scheme: 'file' }, { language: 'jsonc', scheme: 'file' }];
+  function completeKey(item, document, state, key, valueSnippet) {
+    const edit = keyEdit(state.data.text, state.node, key, valueSnippet);
+    if (edit.start !== undefined) item.range = new vscode.Range(document.positionAt(edit.start), document.positionAt(edit.end));
+    item.insertText = edit.snippet ? new vscode.SnippetString(edit.text) : edit.text;
+    if (edit.snippet) item.command = { command: 'editor.action.triggerSuggest', title: 'Suggest parameter values' };
+  }
   function parameterAt(document, position) {
     const data = documentData(document); if (!data) return;
     const state = parameters.context(data, document.offsetAt(position)); if (state) return { ...state, data };
@@ -70,6 +78,7 @@ function attach(vscode, context, getProject, output) {
     md.appendText(`Parameter hint: ${value.types.join(' | ') || 'unknown type'}. Inferred from script usage and existing project definitions; not a validation requirement.`);
     if (value.samples.length) md.appendText('\nExamples: ' + value.samples.map(sample => JSON.stringify(sample)).join(', '));
     for (const source of value.sources) md.appendText(`\n${source.origin === 'script' ? 'Script' : 'Example'}: ${path.relative(index.project.root, source.file)}:${source.line + 1}`);
+    md.appendMarkdown('\n\n'+documentation.componentLink('block',id));
     return md;
   }
   context.subscriptions.push(
@@ -84,11 +93,9 @@ function attach(vscode, context, getProject, output) {
           return values.filter(value => value.path.length === state.path.length + 1 && same(value.path.slice(0, -1), state.path) && value.path.at(-1) !== '*' && (!existing.has(value.path.at(-1)) || value.path.at(-1) === state.field)).map(value => {
             const key = value.path.at(-1), item = new vscode.CompletionItem(key, vscode.CompletionItemKind.Property);
             item.detail = `Custom parameter · ${value.types.join(' | ') || 'inferred'}`; item.documentation = parameterMarkdown(state.id, value, index);
-            if (state.node?.type === 'string') { item.range = new vscode.Range(document.positionAt(state.node.offset + 1), document.positionAt(state.node.offset + state.node.length - 1)); item.insertText = key; }
-            else {
-              const example = value.samples.length ? JSON.stringify(value.samples[0]) : value.types.includes('boolean') ? 'false' : value.types.some(type => ['number', 'integer'].includes(type)) ? '0' : value.types.includes('string') ? '""' : value.types.includes('array') ? '[]' : '{}';
-              item.insertText = new vscode.SnippetString(JSON.stringify(key) + ': ${1:' + example.replace(/[\\$}]/g, '\\$&') + '}');
-            }
+            const example = value.samples.length ? JSON.stringify(value.samples[0]) : value.types.includes('boolean') ? 'false' : value.types.some(type => ['number', 'integer'].includes(type)) ? '0' : value.types.includes('array') ? '[]' : value.types.includes('object') ? '{}' : '""';
+            const quoted = example.startsWith('"'), placeholder = (quoted ? example.slice(1,-1) : example).replace(/[\\$}]/g, '\\$&');
+            completeKey(item, document, state, key, (quoted ? '"' : '') + '${1:' + placeholder + '}' + (quoted ? '"' : ''));
             return item;
           });
         }
@@ -137,9 +144,11 @@ function attach(vscode, context, getProject, output) {
           const item = new vscode.CompletionItem(id, state.mode === 'key' ? vscode.CompletionItemKind.Property : vscode.CompletionItemKind.Reference);
           item.detail = `Project ${state.kind} custom component`;
           item.documentation = files.map(file => path.relative(index.project.root, file)).join('\n');
-          if (state.node?.type === 'string') {
+          if (state.mode === 'key') {
+            completeKey(item, document, state, id, '{\n\t$0\n}');
+          } else if (state.node?.type === 'string') {
             item.range = new vscode.Range(document.positionAt(state.node.offset + 1), document.positionAt(state.node.offset + state.node.length - 1)); item.insertText = id;
-          } else item.insertText = state.mode === 'key' ? new vscode.SnippetString(JSON.stringify(id) + ': {\n\t$0\n}') : JSON.stringify(id);
+          } else item.insertText = JSON.stringify(id);
           return item;
         });
       }
@@ -151,6 +160,7 @@ function attach(vscode, context, getProject, output) {
         if (!registrations?.length) return;
         const md = new vscode.MarkdownString(); md.appendText(`Custom ${state.kind} component: ${state.id}\n\n`);
         for (const value of registrations) md.appendText(`${path.relative(index.project.root, value.file)}:${value.line + 1}${value.callbacks.length ? '\nCallbacks: ' + value.callbacks.join(', ') : ''}\n`);
+        md.appendMarkdown('\n\n'+documentation.componentLink(state.kind,state.id));
         return new vscode.Hover(md);
       }
     }),

@@ -180,10 +180,20 @@
       "type": "object",
       "properties": {
         "origin": {
-          "$ref": "#/definitions/vector"
+          "$ref": "#/definitions/vector",
+          "description": "Lower corner of the box in model coordinates."
         },
         "size": {
-          "$ref": "#/definitions/vector"
+          "$ref": "#/definitions/vector",
+          "description": "Box dimensions in model units."
+        },
+        "min": {
+          "$ref": "#/definitions/vector",
+          "description": "Minimum corner in the newer box representation."
+        },
+        "max": {
+          "$ref": "#/definitions/vector",
+          "description": "Maximum corner in the newer box representation."
         }
       }
     },
@@ -194,19 +204,22 @@
           "type": "number",
           "minimum": 0,
           "maximum": 0.9,
-          "description": "Surface friction for entities moving across this block."
+          "description": "Surface friction for entities moving across this block.",
+          "markdownDescription": "Surface friction for entities moving across this block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_friction?view=minecraft-bedrock-stable)"
         },
         "minecraft:light_emission": {
           "type": "integer",
           "minimum": 0,
           "maximum": 15,
-          "description": "Light level emitted by the block."
+          "description": "Light level emitted by the block.",
+          "markdownDescription": "Light level emitted by the block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_light_emission?view=minecraft-bedrock-stable)"
         },
         "minecraft:light_dampening": {
           "type": "integer",
           "minimum": 0,
           "maximum": 15,
-          "description": "Amount of light blocked by the block."
+          "description": "Amount of light blocked by the block.",
+          "markdownDescription": "Amount of light blocked by the block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_light_dampening?view=minecraft-bedrock-stable)"
         },
         "minecraft:destructible_by_mining": {
           "anyOf": [
@@ -215,7 +228,9 @@
               "properties": {
                 "seconds_to_destroy": {
                   "type": "number",
-                  "minimum": 0
+                  "minimum": 0,
+                  "description": "Base mining time in seconds.",
+                  "markdownDescription": "Base mining time in seconds.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable)"
                 },
                 "item_specific_speeds": {
                   "type": "array",
@@ -231,24 +246,34 @@
                             "type": "object",
                             "properties": {
                               "tags": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Molang tag predicate; this field is an expression, not an identifier.",
+                                "markdownDescription": "Molang tag predicate; this field is an expression, not an identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable)"
                               },
                               "name": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Identifier matched by this descriptor.",
+                                "markdownDescription": "Identifier matched by this descriptor.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable)"
                               }
                             }
                           }
-                        ]
+                        ],
+                        "description": "Item identifier or item descriptor selecting the mining tool.",
+                        "markdownDescription": "Item identifier or item descriptor selecting the mining tool.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable)"
                       },
                       "destroy_speed": {
-                        "type": "number"
+                        "type": "number",
+                        "description": "Mining time applied for this item.",
+                        "markdownDescription": "Mining time applied for this item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable)"
                       }
                     },
                     "required": [
                       "item",
                       "destroy_speed"
                     ]
-                  }
+                  },
+                  "description": "Tool-specific mining speeds.",
+                  "markdownDescription": "Tool-specific mining speeds.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable)"
                 }
               }
             },
@@ -256,7 +281,8 @@
               "type": "boolean"
             }
           ],
-          "description": "Mining behavior, with optional per-item speeds."
+          "description": "Mining behavior, with optional per-item speeds.",
+          "markdownDescription": "Mining behavior, with optional per-item speeds.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable)"
         },
         "minecraft:destructible_by_explosion": {
           "anyOf": [
@@ -265,7 +291,9 @@
               "properties": {
                 "explosion_resistance": {
                   "type": "number",
-                  "minimum": 0
+                  "minimum": 0,
+                  "description": "Resistance to explosions.",
+                  "markdownDescription": "Resistance to explosions.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_explosion?view=minecraft-bedrock-stable)"
                 }
               }
             },
@@ -273,7 +301,8 @@
               "type": "boolean"
             }
           ],
-          "description": "Explosion resistance, or a boolean switch."
+          "description": "Explosion resistance, or a boolean switch.",
+          "markdownDescription": "Explosion resistance, or a boolean switch.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_explosion?view=minecraft-bedrock-stable)"
         },
         "minecraft:collision_box": {
           "anyOf": [
@@ -290,7 +319,8 @@
               }
             }
           ],
-          "description": "Collision shape; box arrays require a supporting format and engine."
+          "description": "Collision shape; box arrays require a supporting format and engine.",
+          "markdownDescription": "Collision shape; box arrays require a supporting format and engine.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
         },
         "minecraft:selection_box": {
           "anyOf": [
@@ -301,7 +331,8 @@
               "type": "boolean"
             }
           ],
-          "description": "Outline used when targeting the block."
+          "description": "Outline used when targeting the block.",
+          "markdownDescription": "Outline used when targeting the block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_selection_box?view=minecraft-bedrock-stable)"
         },
         "minecraft:geometry": {
           "anyOf": [
@@ -310,7 +341,8 @@
               "properties": {
                 "identifier": {
                   "type": "string",
-                  "description": "Geometry identifier from a resource pack."
+                  "description": "Geometry identifier from a resource pack.",
+                  "markdownDescription": "Geometry identifier from a resource pack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
                 },
                 "bone_visibility": {
                   "type": "object",
@@ -319,16 +351,24 @@
                       "boolean",
                       "string"
                     ]
-                  }
+                  },
+                  "description": "Bone names mapped to visibility booleans or Molang expressions.",
+                  "markdownDescription": "Bone names mapped to visibility booleans or Molang expressions.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
                 },
                 "culling": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Resource-pack block culling rule identifier.",
+                  "markdownDescription": "Resource-pack block culling rule identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
                 },
                 "culling_layer": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Layer used when comparing neighboring blocks for culling.",
+                  "markdownDescription": "Layer used when comparing neighboring blocks for culling.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
                 },
                 "culling_shape": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Voxel shape identifier; requires the Voxel Shapes experiment.",
+                  "markdownDescription": "Voxel shape identifier; requires the Voxel Shapes experiment.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
                 },
                 "uv_lock": {
                   "anyOf": [
@@ -341,7 +381,31 @@
                         "type": "string"
                       }
                     }
-                  ]
+                  ],
+                  "description": "Lock all bone UVs, or only the listed bone names.",
+                  "markdownDescription": "Lock all bone UVs, or only the listed bone names.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+                },
+                "n_way_visual_rotation": {
+                  "type": "object",
+                  "description": "Maps axes to block states driving visual-only rotation.",
+                  "properties": {
+                    "x": {
+                      "type": "string",
+                      "description": "Block state controlling rotation around x.",
+                      "markdownDescription": "Block state controlling rotation around x.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+                    },
+                    "y": {
+                      "type": "string",
+                      "description": "Block state controlling rotation around y.",
+                      "markdownDescription": "Block state controlling rotation around y.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+                    },
+                    "z": {
+                      "type": "string",
+                      "description": "Block state controlling rotation around z.",
+                      "markdownDescription": "Block state controlling rotation around z.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Maps axes to block states driving visual-only rotation.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
                 }
               },
               "required": [
@@ -350,10 +414,12 @@
             },
             {
               "type": "string",
-              "description": "Geometry identifier from a resource pack."
+              "description": "Geometry identifier from a resource pack.",
+              "markdownDescription": "Geometry identifier from a resource pack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
             }
           ],
-          "description": "Geometry and optional bone visibility/culling settings."
+          "description": "Geometry and optional bone visibility/culling settings.",
+          "markdownDescription": "Geometry and optional bone visibility/culling settings.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
         },
         "minecraft:material_instances": {
           "type": "object",
@@ -364,32 +430,45 @@
               },
               {
                 "type": "string",
-                "description": "Reference another named material instance."
+                "description": "Reference another named material instance.",
+                "markdownDescription": "Reference another named material instance.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
               }
             ]
           },
-          "description": "Maps geometry material slots or faces to textures and rendering settings."
+          "description": "Maps geometry material slots or faces to textures and rendering settings.",
+          "markdownDescription": "Maps geometry material slots or faces to textures and rendering settings.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
         },
         "minecraft:transformation": {
           "type": "object",
           "properties": {
             "translation": {
-              "$ref": "#/definitions/vector"
+              "$ref": "#/definitions/vector",
+              "description": "Displacement along x, y and z.",
+              "markdownDescription": "Displacement along x, y and z.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_transformation?view=minecraft-bedrock-stable)"
             },
             "rotation": {
-              "$ref": "#/definitions/vector"
+              "$ref": "#/definitions/vector",
+              "description": "Rotation around each axis, in degrees.",
+              "markdownDescription": "Rotation around each axis, in degrees.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_transformation?view=minecraft-bedrock-stable)"
             },
             "scale": {
-              "$ref": "#/definitions/vector"
+              "$ref": "#/definitions/vector",
+              "description": "Scale factors for x, y and z.",
+              "markdownDescription": "Scale factors for x, y and z.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_transformation?view=minecraft-bedrock-stable)"
             },
             "rotation_pivot": {
-              "$ref": "#/definitions/vector"
+              "$ref": "#/definitions/vector",
+              "description": "Pivot used for rotation.",
+              "markdownDescription": "Pivot used for rotation.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_transformation?view=minecraft-bedrock-stable)"
             },
             "scale_pivot": {
-              "$ref": "#/definitions/vector"
+              "$ref": "#/definitions/vector",
+              "description": "Pivot used for scaling.",
+              "markdownDescription": "Pivot used for scaling.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_transformation?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Local translation, rotation, and scaling vectors."
+          "description": "Local translation, rotation, and scaling vectors.",
+          "markdownDescription": "Local translation, rotation, and scaling vectors.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_transformation?view=minecraft-bedrock-stable)"
         },
         "minecraft:map_color": {
           "anyOf": [
@@ -403,15 +482,29 @@
               "type": "object",
               "properties": {
                 "color": {
-                  "$ref": "#/definitions/color"
+                  "$ref": "#/definitions/color",
+                  "description": "Map color, as a hexadecimal string or RGB triplet.",
+                  "markdownDescription": "Map color, as a hexadecimal string or RGB triplet.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_map_color?view=minecraft-bedrock-stable)"
                 },
                 "tint_method": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Biome tint applied to the rendered color.",
+                  "enum": [
+                    "none",
+                    "default_foliage",
+                    "birch_foliage",
+                    "evergreen_foliage",
+                    "dry_foliage",
+                    "grass",
+                    "water"
+                  ],
+                  "markdownDescription": "Biome tint applied to the rendered color.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_map_color?view=minecraft-bedrock-stable)"
                 }
               }
             }
           ],
-          "description": "Map color, retaining legacy color forms."
+          "description": "Map color, retaining legacy color forms.",
+          "markdownDescription": "Map color, retaining legacy color forms.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_map_color?view=minecraft-bedrock-stable)"
         },
         "minecraft:tick": {
           "type": "object",
@@ -423,40 +516,78 @@
               "items": {
                 "type": "integer",
                 "minimum": 0
-              }
+              },
+              "description": "Minimum and maximum interval, in ticks.",
+              "markdownDescription": "Minimum and maximum interval, in ticks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_tick?view=minecraft-bedrock-stable)"
             },
             "looping": {
-              "type": "boolean"
+              "type": "boolean",
+              "description": "Continue ticking after the first tick.",
+              "markdownDescription": "Continue ticking after the first tick.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_tick?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Tick interval used by script-driven block behavior."
+          "description": "Tick interval used by script-driven block behavior.",
+          "markdownDescription": "Tick interval used by script-driven block behavior.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_tick?view=minecraft-bedrock-stable)"
         },
         "minecraft:random_ticking": {
           "type": "object",
-          "description": "Enable random-tick behavior; legacy fields remain allowed."
+          "description": "Deprecated random tick event behavior; modern scripts use onRandomTick.",
+          "properties": {
+            "on_tick": {
+              "type": "object",
+              "description": "Legacy event trigger. Prefer script custom component callbacks for modern blocks.",
+              "properties": {
+                "event": {
+                  "type": "string",
+                  "description": "Event identifier to run.",
+                  "markdownDescription": "Event identifier to run.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)"
+                },
+                "target": {
+                  "type": "string",
+                  "description": "Event recipient, normally self.",
+                  "markdownDescription": "Event recipient, normally self.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)"
+                },
+                "condition": {
+                  "type": "string",
+                  "description": "Molang condition controlling whether the event runs.",
+                  "markdownDescription": "Molang condition controlling whether the event runs.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)"
+                }
+              },
+              "markdownDescription": "Legacy event trigger. Prefer script custom component callbacks for modern blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Deprecated random tick event behavior; modern scripts use onRandomTick.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)",
+          "doNotSuggest": true
         },
         "minecraft:loot": {
           "type": "string",
-          "description": "Loot-table path relative to the behavior pack."
+          "description": "Loot-table path relative to the behavior pack.",
+          "markdownDescription": "Loot-table path relative to the behavior pack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_loot?view=minecraft-bedrock-stable)"
         },
         "minecraft:display_name": {
           "type": "string",
-          "description": "Display text or a localization key."
+          "description": "Display text or a localization key.",
+          "markdownDescription": "Display text or a localization key.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_display_name?view=minecraft-bedrock-stable)"
         },
         "minecraft:crafting_table": {
           "type": "object",
           "properties": {
             "table_name": {
-              "type": "string"
+              "type": "string",
+              "description": "Crafting screen title or localization key.",
+              "markdownDescription": "Crafting screen title or localization key.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_crafting_table?view=minecraft-bedrock-stable)"
             },
             "crafting_tags": {
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "description": "Recipe tags accepted at this crafting station.",
+              "markdownDescription": "Recipe tags accepted at this crafting station.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_crafting_table?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Custom crafting station name and accepted recipe tags."
+          "description": "Custom crafting station name and accepted recipe tags.",
+          "markdownDescription": "Custom crafting station name and accepted recipe tags.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_crafting_table?view=minecraft-bedrock-stable)"
         },
         "minecraft:flammable": {
           "anyOf": [
@@ -464,10 +595,14 @@
               "type": "object",
               "properties": {
                 "catch_chance_modifier": {
-                  "type": "integer"
+                  "type": "integer",
+                  "description": "Chance modifier for catching fire; zero prevents spreading fire onto this block.",
+                  "markdownDescription": "Chance modifier for catching fire; zero prevents spreading fire onto this block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flammable?view=minecraft-bedrock-stable)"
                 },
                 "destroy_chance_modifier": {
-                  "type": "integer"
+                  "type": "integer",
+                  "description": "Chance modifier for destruction by fire; zero prevents burning away.",
+                  "markdownDescription": "Chance modifier for destruction by fire; zero prevents burning away.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flammable?view=minecraft-bedrock-stable)"
                 }
               }
             },
@@ -475,7 +610,8 @@
               "type": "boolean"
             }
           ],
-          "description": "Fire behavior and spread modifiers."
+          "description": "Fire behavior and spread modifiers.",
+          "markdownDescription": "Fire behavior and spread modifiers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flammable?view=minecraft-bedrock-stable)"
         },
         "minecraft:placement_filter": {
           "type": "object",
@@ -506,7 +642,9 @@
                           "type": "string"
                         }
                       ]
-                    }
+                    },
+                    "description": "Faces on which this block may be placed.",
+                    "markdownDescription": "Faces on which this block may be placed.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter?view=minecraft-bedrock-stable)"
                   },
                   "block_filter": {
                     "type": "array",
@@ -519,44 +657,70 @@
                           "type": "object",
                           "properties": {
                             "tags": {
-                              "type": "string"
+                              "type": "string",
+                              "description": "Molang tag predicate; this field is an expression, not an identifier.",
+                              "markdownDescription": "Molang tag predicate; this field is an expression, not an identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter?view=minecraft-bedrock-stable)"
                             },
                             "states": {
-                              "type": "object"
+                              "type": "object",
+                              "description": "Block-state names and required values.",
+                              "additionalProperties": {
+                                "type": [
+                                  "string",
+                                  "integer",
+                                  "boolean"
+                                ]
+                              },
+                              "markdownDescription": "Block-state names and required values.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter?view=minecraft-bedrock-stable)"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "Block identifier matched by this descriptor.",
+                              "markdownDescription": "Block identifier matched by this descriptor.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter?view=minecraft-bedrock-stable)"
                             }
                           }
                         }
                       ]
-                    }
+                    },
+                    "description": "Neighbor block identifiers or tag/state descriptors.",
+                    "markdownDescription": "Neighbor block identifiers or tag/state descriptors.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter?view=minecraft-bedrock-stable)"
                   }
                 }
-              }
+              },
+              "description": "Placement and survival conditions.",
+              "markdownDescription": "Placement and survival conditions.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Placement and survival requirements."
+          "description": "Placement and survival requirements.",
+          "markdownDescription": "Placement and survival requirements.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter?view=minecraft-bedrock-stable)"
         },
         "minecraft:entity_fall_on": {
           "type": "object",
           "properties": {
             "minimum_fall_distance": {
-              "type": "number"
+              "type": "number",
+              "description": "Fall distance needed to invoke the script callback.",
+              "markdownDescription": "Fall distance needed to invoke the script callback.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_entity_fall_on?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Fall distance threshold for script callbacks."
+          "description": "Fall distance threshold for script callbacks.",
+          "markdownDescription": "Fall distance threshold for script callbacks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_entity_fall_on?view=minecraft-bedrock-stable)"
         },
         "minecraft:custom_components": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Legacy custom-component ID list. Modern components use their ID directly as a component key."
+          "description": "Legacy custom-component ID list. Modern components use their ID directly as a component key.",
+          "markdownDescription": "Legacy custom-component ID list. Modern components use their ID directly as a component key.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_custom_components?view=minecraft-bedrock-stable)"
         },
         "minecraft:tags": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Tags associated with the block."
+          "description": "Tags associated with the block.",
+          "markdownDescription": "Tags associated with the block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/blockcomponentslist?view=minecraft-bedrock-stable)"
         },
         "minecraft:movable": {
           "type": "object",
@@ -575,13 +739,22 @@
                 {
                   "type": "string"
                 }
-              ]
+              ],
+              "description": "Piston movement response.",
+              "markdownDescription": "Piston movement response.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_movable?view=minecraft-bedrock-stable)"
             },
             "sticky": {
-              "type": "string"
+              "type": "string",
+              "description": "Whether adjacent blocks move with this block.",
+              "enum": [
+                "none",
+                "same"
+              ],
+              "markdownDescription": "Whether adjacent blocks move with this block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_movable?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Piston movement behavior."
+          "description": "Piston movement behavior.",
+          "markdownDescription": "Piston movement behavior.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_movable?view=minecraft-bedrock-stable)"
         },
         "minecraft:liquid_detection": {
           "type": "object",
@@ -592,26 +765,682 @@
                 "type": "object",
                 "properties": {
                   "liquid_type": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Liquid matched by this rule; currently water.",
+                    "enum": [
+                      "water"
+                    ],
+                    "markdownDescription": "Liquid matched by this rule; currently water.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
                   },
                   "can_contain_liquid": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "description": "Whether this block can contain the matched liquid.",
+                    "markdownDescription": "Whether this block can contain the matched liquid.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
                   },
                   "on_liquid_touches": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Reaction to incoming flowing liquid.",
+                    "enum": [
+                      "blocking",
+                      "broken",
+                      "popped",
+                      "no_reaction"
+                    ],
+                    "markdownDescription": "Reaction to incoming flowing liquid.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
                   },
                   "use_liquid_clipping": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "description": "Use the collision bounds to clip the visible liquid.",
+                    "markdownDescription": "Use the collision bounds to clip the visible liquid.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
+                  },
+                  "stops_liquid_flowing_from_direction": {
+                    "type": "array",
+                    "description": "Faces that stop liquid flow.",
+                    "items": {
+                      "type": "string",
+                      "description": "Blocked flow direction.",
+                      "enum": [
+                        "up",
+                        "down",
+                        "north",
+                        "south",
+                        "east",
+                        "west"
+                      ],
+                      "markdownDescription": "Blocked flow direction.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
+                    },
+                    "markdownDescription": "Faces that stop liquid flow.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
                   }
                 }
-              }
+              },
+              "description": "Liquid-specific interaction rules.",
+              "markdownDescription": "Liquid-specific interaction rules.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Rules for interactions with liquids."
+          "description": "Rules for interactions with liquids.",
+          "patternProperties": {
+            "^liquid_type$": {
+              "type": "string",
+              "description": "Liquid matched by this rule; currently water.",
+              "enum": [
+                "water"
+              ],
+              "markdownDescription": "Liquid matched by this rule; currently water.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
+            },
+            "^can_contain_liquid$": {
+              "type": "boolean",
+              "description": "Whether this block can contain the matched liquid.",
+              "markdownDescription": "Whether this block can contain the matched liquid.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
+            },
+            "^on_liquid_touches$": {
+              "type": "string",
+              "description": "Reaction to incoming flowing liquid.",
+              "enum": [
+                "blocking",
+                "broken",
+                "popped",
+                "no_reaction"
+              ],
+              "markdownDescription": "Reaction to incoming flowing liquid.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
+            },
+            "^use_liquid_clipping$": {
+              "type": "boolean",
+              "description": "Use the collision bounds to clip the visible liquid.",
+              "markdownDescription": "Use the collision bounds to clip the visible liquid.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
+            },
+            "^stops_liquid_flowing_from_direction$": {
+              "type": "array",
+              "description": "Faces that stop liquid flow.",
+              "items": {
+                "type": "string",
+                "description": "Blocked flow direction.",
+                "enum": [
+                  "up",
+                  "down",
+                  "north",
+                  "south",
+                  "east",
+                  "west"
+                ],
+                "markdownDescription": "Blocked flow direction.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
+              },
+              "markdownDescription": "Faces that stop liquid flow.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Rules for interactions with liquids.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:random_offset": {
+          "type": "object",
+          "description": "Position-seeded offset affecting rendering, selection and collision. Requires format 1.21.100 or newer. Multi-blocks must define this at the root from 1.26.20.",
+          "properties": {
+            "x": {
+              "type": "object",
+              "description": "Random displacement along this axis, in model units.",
+              "properties": {
+                "range": {
+                  "type": "object",
+                  "description": "Lower and upper limits for this axis.",
+                  "properties": {
+                    "min": {
+                      "type": "number",
+                      "description": "Minimum displacement.",
+                      "markdownDescription": "Minimum displacement.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                    },
+                    "max": {
+                      "type": "number",
+                      "description": "Maximum displacement.",
+                      "markdownDescription": "Maximum displacement.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Lower and upper limits for this axis.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                },
+                "steps": {
+                  "type": "integer",
+                  "description": "Number of discrete steps. Zero permits continuous offsets within the range.",
+                  "minimum": 0,
+                  "default": 0,
+                  "markdownDescription": "Number of discrete steps. Zero permits continuous offsets within the range.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                }
+              },
+              "markdownDescription": "Random displacement along this axis, in model units.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+            },
+            "y": {
+              "type": "object",
+              "description": "Random displacement along this axis, in model units.",
+              "properties": {
+                "range": {
+                  "type": "object",
+                  "description": "Lower and upper limits for this axis.",
+                  "properties": {
+                    "min": {
+                      "type": "number",
+                      "description": "Minimum displacement.",
+                      "markdownDescription": "Minimum displacement.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                    },
+                    "max": {
+                      "type": "number",
+                      "description": "Maximum displacement.",
+                      "markdownDescription": "Maximum displacement.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Lower and upper limits for this axis.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                },
+                "steps": {
+                  "type": "integer",
+                  "description": "Number of discrete steps. Zero permits continuous offsets within the range.",
+                  "minimum": 0,
+                  "default": 0,
+                  "markdownDescription": "Number of discrete steps. Zero permits continuous offsets within the range.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                }
+              },
+              "markdownDescription": "Random displacement along this axis, in model units.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+            },
+            "z": {
+              "type": "object",
+              "description": "Random displacement along this axis, in model units.",
+              "properties": {
+                "range": {
+                  "type": "object",
+                  "description": "Lower and upper limits for this axis.",
+                  "properties": {
+                    "min": {
+                      "type": "number",
+                      "description": "Minimum displacement.",
+                      "markdownDescription": "Minimum displacement.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                    },
+                    "max": {
+                      "type": "number",
+                      "description": "Maximum displacement.",
+                      "markdownDescription": "Maximum displacement.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Lower and upper limits for this axis.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                },
+                "steps": {
+                  "type": "integer",
+                  "description": "Number of discrete steps. Zero permits continuous offsets within the range.",
+                  "minimum": 0,
+                  "default": 0,
+                  "markdownDescription": "Number of discrete steps. Zero permits continuous offsets within the range.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+                }
+              },
+              "markdownDescription": "Random displacement along this axis, in model units.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Position-seeded offset affecting rendering, selection and collision. Requires format 1.21.100 or newer. Multi-blocks must define this at the root from 1.26.20.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:flower_pottable": {
+          "type": "object",
+          "description": "Allows this block to be placed in a flower pot. No parameters. Requires format 1.21.120; root components only from 1.26.20.",
+          "properties": {},
+          "markdownDescription": "Allows this block to be placed in a flower pot. No parameters. Requires format 1.21.120; root components only from 1.26.20.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flower_pottable?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:embedded_visual": {
+          "type": "object",
+          "description": "Geometry and materials used when embedded inside another block, such as a flower pot. Requires format 1.21.120.",
+          "properties": {
+            "geometry": {
+              "$ref": "#/definitions/blockGeometry",
+              "description": "Geometry of the embedded block.",
+              "markdownDescription": "Geometry of the embedded block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_embedded_visual?view=minecraft-bedrock-stable)"
+            },
+            "material_instances": {
+              "$ref": "#/definitions/blockMaterials",
+              "description": "Materials of the embedded block.",
+              "markdownDescription": "Materials of the embedded block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_embedded_visual?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Geometry and materials used when embedded inside another block, such as a flower pot. Requires format 1.21.120.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_embedded_visual?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:item_visual": {
+          "type": "object",
+          "description": "Geometry and materials for the inventory/held block item. Requires format 1.21.60.",
+          "properties": {
+            "geometry": {
+              "$ref": "#/definitions/blockGeometry",
+              "description": "Geometry for the block item.",
+              "markdownDescription": "Geometry for the block item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_item_visual?view=minecraft-bedrock-stable)"
+            },
+            "material_instances": {
+              "$ref": "#/definitions/blockMaterials",
+              "description": "Materials for the block item.",
+              "markdownDescription": "Materials for the block item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_item_visual?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Geometry and materials for the inventory/held block item. Requires format 1.21.60.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_item_visual?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:chest_obstruction": {
+          "type": "object",
+          "description": "Controls whether this block obstructs a chest beneath it.",
+          "properties": {
+            "obstruction_rule": {
+              "type": "string",
+              "description": "Always obstruct, never obstruct, or check the block shape.",
+              "enum": [
+                "always",
+                "never",
+                "shape"
+              ],
+              "markdownDescription": "Always obstruct, never obstruct, or check the block shape.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_chest_obstruction?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Controls whether this block obstructs a chest beneath it.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_chest_obstruction?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:connection_rule": {
+          "type": "object",
+          "description": "Controls connections from fences, walls, panes and similar neighboring blocks.",
+          "properties": {
+            "accepts_connections_from": {
+              "type": "string",
+              "description": "Neighbor classes permitted to connect.",
+              "enum": [
+                "all",
+                "only_fences",
+                "none"
+              ],
+              "markdownDescription": "Neighbor classes permitted to connect.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_connection_rule?view=minecraft-bedrock-stable)"
+            },
+            "enabled_directions": {
+              "type": "array",
+              "description": "Cardinal directions accepting connections.",
+              "items": {
+                "type": "string",
+                "description": "Connection direction.",
+                "enum": [
+                  "north",
+                  "south",
+                  "east",
+                  "west"
+                ],
+                "markdownDescription": "Connection direction.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_connection_rule?view=minecraft-bedrock-stable)"
+              },
+              "markdownDescription": "Cardinal directions accepting connections.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_connection_rule?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Controls connections from fences, walls, panes and similar neighboring blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_connection_rule?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:destruction_particles": {
+          "type": "object",
+          "description": "Particle appearance when this block breaks.",
+          "properties": {
+            "texture": {
+              "type": "string",
+              "description": "Terrain texture-atlas alias for the particles.",
+              "markdownDescription": "Terrain texture-atlas alias for the particles.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destruction_particles?view=minecraft-bedrock-stable)"
+            },
+            "particle_count": {
+              "type": "integer",
+              "description": "Number of particles to spawn; maximum 255.",
+              "minimum": 0,
+              "maximum": 255,
+              "markdownDescription": "Number of particles to spawn; maximum 255.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destruction_particles?view=minecraft-bedrock-stable)"
+            },
+            "tint_method": {
+              "type": "string",
+              "description": "Biome tint applied to the rendered color.",
+              "enum": [
+                "none",
+                "default_foliage",
+                "birch_foliage",
+                "evergreen_foliage",
+                "dry_foliage",
+                "grass",
+                "water"
+              ],
+              "markdownDescription": "Biome tint applied to the rendered color.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destruction_particles?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Particle appearance when this block breaks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destruction_particles?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:precipitation_interactions": {
+          "type": "object",
+          "description": "Controls rain obstruction and snow behavior. Snowlogging requires a supporting format and engine.",
+          "properties": {
+            "precipitation_behavior": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Rain/snow response. snowlogging is the current spelling from 1.26.30.",
+                  "enum": [
+                    "none",
+                    "obstruct_rain",
+                    "obstruct_rain_accumulate_snow",
+                    "snowlogging"
+                  ],
+                  "markdownDescription": "Rain/snow response. snowlogging is the current spelling from 1.26.30.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_precipitation_interactions?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^snow_log_no_collision$"
+                }
+              ],
+              "description": "Rain/snow response. snowlogging replaces snow_log_no_collision in 1.26.30.",
+              "markdownDescription": "Rain/snow response. snowlogging replaces snow_log_no_collision in 1.26.30.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_precipitation_interactions?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Controls rain obstruction and snow behavior. Snowlogging requires a supporting format and engine.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_precipitation_interactions?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:redstone_conductivity": {
+          "type": "object",
+          "description": "Redstone conduction and wire stair-step behavior.",
+          "properties": {
+            "allows_wire_to_step_down": {
+              "type": "boolean",
+              "description": "Allows wire to descend along this block.",
+              "markdownDescription": "Allows wire to descend along this block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_conductivity?view=minecraft-bedrock-stable)"
+            },
+            "redstone_conductor": {
+              "type": "boolean",
+              "description": "Allows the block to conduct redstone power.",
+              "markdownDescription": "Allows the block to conduct redstone power.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_conductivity?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Redstone conduction and wire stair-step behavior.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_conductivity?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:redstone_consumer": {
+          "type": "object",
+          "description": "Receives redstone updates for scripts; not supported in permutations. Stable from format 1.26.0.",
+          "properties": {
+            "min_power": {
+              "type": "integer",
+              "description": "Minimum incoming power that sends a script update.",
+              "minimum": 0,
+              "maximum": 15,
+              "markdownDescription": "Minimum incoming power that sends a script update.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_consumer?view=minecraft-bedrock-stable)"
+            },
+            "propagates_power": {
+              "type": "boolean",
+              "description": "Allows the incoming redstone signal to pass through.",
+              "markdownDescription": "Allows the incoming redstone signal to pass through.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_consumer?view=minecraft-bedrock-stable)"
+            }
+          },
+          "patternProperties": {
+            "^propogates_power$": {
+              "type": "boolean",
+              "description": "Legacy spelling before format 1.26.0.",
+              "markdownDescription": "Legacy spelling before format 1.26.0.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_consumer?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Receives redstone updates for scripts; not supported in permutations. Stable from format 1.26.0.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_consumer?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:redstone_producer": {
+          "type": "object",
+          "description": "Produces a redstone signal. Requires format 1.21.120.",
+          "properties": {
+            "power": {
+              "type": "integer",
+              "description": "Signal strength emitted by the block.",
+              "minimum": 0,
+              "maximum": 15,
+              "markdownDescription": "Signal strength emitted by the block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_producer?view=minecraft-bedrock-stable)"
+            },
+            "connected_faces": {
+              "type": "array",
+              "description": "Faces that provide power.",
+              "items": {
+                "type": "string",
+                "description": "Connected block face.",
+                "enum": [
+                  "up",
+                  "down",
+                  "north",
+                  "south",
+                  "east",
+                  "west"
+                ],
+                "markdownDescription": "Connected block face.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_producer?view=minecraft-bedrock-stable)"
+              },
+              "markdownDescription": "Faces that provide power.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_producer?view=minecraft-bedrock-stable)"
+            },
+            "strongly_powered_face": {
+              "type": "string",
+              "description": "Neighbor face receiving strong power.",
+              "enum": [
+                "up",
+                "down",
+                "north",
+                "south",
+                "east",
+                "west"
+              ],
+              "markdownDescription": "Neighbor face receiving strong power.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_producer?view=minecraft-bedrock-stable)"
+            },
+            "transform_relative": {
+              "type": "boolean",
+              "description": "Rotate powered faces with the block transformation.",
+              "markdownDescription": "Rotate powered faces with the block transformation.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_producer?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Produces a redstone signal. Requires format 1.21.120.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_producer?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:replaceable": {
+          "type": "object",
+          "description": "Allows another placed block to replace this block. No parameters. Stable from format 1.21.60.",
+          "properties": {},
+          "markdownDescription": "Allows another placed block to replace this block. No parameters. Stable from format 1.21.60.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_replaceable?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:support": {
+          "type": "object",
+          "description": "Support shape used by neighboring blocks.",
+          "properties": {
+            "shape": {
+              "type": "string",
+              "description": "Support shape classification.",
+              "enum": [
+                "fence",
+                "stair"
+              ],
+              "markdownDescription": "Support shape classification.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_support?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Support shape used by neighboring blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_support?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:block_entity": {
+          "type": "object",
+          "description": "Per-position metadata and optional inventory container.",
+          "properties": {
+            "dynamic_properties": {
+              "type": "boolean",
+              "description": "Enables script-accessible dynamic properties on block instances.",
+              "markdownDescription": "Enables script-accessible dynamic properties on block instances.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_entity?view=minecraft-bedrock-stable)"
+            },
+            "container": {
+              "type": "object",
+              "description": "Inventory container attached to this block.",
+              "properties": {
+                "slot_count": {
+                  "type": "integer",
+                  "description": "Number of inventory slots, from 1 to 54.",
+                  "minimum": 1,
+                  "maximum": 54,
+                  "markdownDescription": "Number of inventory slots, from 1 to 54.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_entity?view=minecraft-bedrock-stable)"
+                }
+              },
+              "markdownDescription": "Inventory container attached to this block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_entity?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Per-position metadata and optional inventory container.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_entity?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:instrument_sound": {
+          "type": "object",
+          "description": "Experimental note-block instrument override for the upper and lower faces.",
+          "properties": {
+            "up": {
+              "type": "string",
+              "description": "Note-block sound for the up face; note.none disables sound.",
+              "enum": [
+                "note.harp",
+                "note.bd",
+                "note.snare",
+                "note.hat",
+                "note.bassattack",
+                "note.flute",
+                "note.bell",
+                "note.guitar",
+                "note.chime",
+                "note.xylophone",
+                "note.iron_xylophone",
+                "note.cow_bell",
+                "note.didgeridoo",
+                "note.bit",
+                "note.banjo",
+                "note.pling",
+                "note.trumpet",
+                "note.trumpet_exposed",
+                "note.trumpet_weathered",
+                "note.trumpet_oxidized",
+                "note.zombie",
+                "note.skeleton",
+                "note.creeper",
+                "note.enderdragon",
+                "note.witherskeleton",
+                "note.piglin",
+                "note.none"
+              ],
+              "markdownDescription": "Note-block sound for the up face; note.none disables sound.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_instrument_sound?view=minecraft-bedrock-stable)"
+            },
+            "down": {
+              "type": "string",
+              "description": "Note-block sound for the down face; note.none disables sound.",
+              "enum": [
+                "note.harp",
+                "note.bd",
+                "note.snare",
+                "note.hat",
+                "note.bassattack",
+                "note.flute",
+                "note.bell",
+                "note.guitar",
+                "note.chime",
+                "note.xylophone",
+                "note.iron_xylophone",
+                "note.cow_bell",
+                "note.didgeridoo",
+                "note.bit",
+                "note.banjo",
+                "note.pling",
+                "note.trumpet",
+                "note.trumpet_exposed",
+                "note.trumpet_weathered",
+                "note.trumpet_oxidized",
+                "note.zombie",
+                "note.skeleton",
+                "note.creeper",
+                "note.enderdragon",
+                "note.witherskeleton",
+                "note.piglin",
+                "note.none"
+              ],
+              "markdownDescription": "Note-block sound for the down face; note.none disables sound.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_instrument_sound?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Experimental note-block instrument override for the upper and lower faces.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_instrument_sound?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:queued_ticking": {
+          "type": "object",
+          "description": "Deprecated scheduled event behavior; use minecraft:tick and scripts for modern blocks.",
+          "properties": {
+            "interval_range": {
+              "type": "array",
+              "description": "Minimum and maximum delay, in ticks.",
+              "items": {
+                "type": "integer",
+                "description": "Tick delay.",
+                "markdownDescription": "Tick delay.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_queued_ticking?view=minecraft-bedrock-stable)"
+              },
+              "minItems": 2,
+              "maxItems": 2,
+              "markdownDescription": "Minimum and maximum delay, in ticks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_queued_ticking?view=minecraft-bedrock-stable)"
+            },
+            "looping": {
+              "type": "boolean",
+              "description": "Repeat the scheduled trigger.",
+              "markdownDescription": "Repeat the scheduled trigger.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_queued_ticking?view=minecraft-bedrock-stable)"
+            },
+            "on_tick": {
+              "type": "object",
+              "description": "Legacy event trigger. Prefer script custom component callbacks for modern blocks.",
+              "properties": {
+                "event": {
+                  "type": "string",
+                  "description": "Event identifier to run.",
+                  "markdownDescription": "Event identifier to run.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)"
+                },
+                "target": {
+                  "type": "string",
+                  "description": "Event recipient, normally self.",
+                  "markdownDescription": "Event recipient, normally self.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)"
+                },
+                "condition": {
+                  "type": "string",
+                  "description": "Molang condition controlling whether the event runs.",
+                  "markdownDescription": "Molang condition controlling whether the event runs.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)"
+                }
+              },
+              "markdownDescription": "Legacy event trigger. Prefer script custom component callbacks for modern blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Deprecated scheduled event behavior; use minecraft:tick and scripts for modern blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_queued_ticking?view=minecraft-bedrock-stable)",
+          "doNotSuggest": true
+        },
+        "minecraft:unit_cube": {
+          "type": "object",
+          "description": "Legacy full-cube geometry marker. Prefer minecraft:geometry.full_block.",
+          "properties": {},
+          "markdownDescription": "Legacy full-cube geometry marker. Prefer minecraft:geometry.full_block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_unit_cube?view=minecraft-bedrock-stable)",
+          "doNotSuggest": true
+        },
+        "minecraft:breathability": {
+          "type": "string",
+          "description": "Legacy air/solid breathing classification.",
+          "enum": [
+            "air",
+            "solid"
+          ],
+          "markdownDescription": "Legacy air/solid breathing classification.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_breathability?view=minecraft-bedrock-stable)",
+          "doNotSuggest": true
+        },
+        "minecraft:bone_visibility": {
+          "type": "object",
+          "description": "Legacy bone visibility map. Use the geometry component for modern blocks.",
+          "additionalProperties": {
+            "type": [
+              "boolean",
+              "string"
+            ]
+          },
+          "markdownDescription": "Legacy bone visibility map. Use the geometry component for modern blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_bone_visibility?view=minecraft-bedrock-stable)",
+          "doNotSuggest": true
+        },
+        "minecraft:block_light_absorption": {
+          "type": "integer",
+          "description": "Legacy light absorption; use minecraft:light_dampening.",
+          "minimum": 0,
+          "maximum": 15,
+          "markdownDescription": "Legacy light absorption; use minecraft:light_dampening.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_light_absorption?view=minecraft-bedrock-stable)",
+          "doNotSuggest": true
+        },
+        "minecraft:block_light_emission": {
+          "type": "number",
+          "description": "Legacy emitted light; use minecraft:light_emission.",
+          "markdownDescription": "Legacy emitted light; use minecraft:light_emission.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_light_emission?view=minecraft-bedrock-stable)",
+          "doNotSuggest": true
+        },
+        "minecraft:destroy_time": {
+          "type": "number",
+          "description": "Legacy mining time; use minecraft:destructible_by_mining.",
+          "markdownDescription": "Legacy mining time; use minecraft:destructible_by_mining.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destroy_time?view=minecraft-bedrock-stable)",
+          "doNotSuggest": true
+        },
+        "minecraft:explosion_resistance": {
+          "type": "number",
+          "description": "Legacy explosion resistance; use minecraft:destructible_by_explosion.",
+          "markdownDescription": "Legacy explosion resistance; use minecraft:destructible_by_explosion.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_explosion_resistance?view=minecraft-bedrock-stable)",
+          "doNotSuggest": true
         }
       },
       "additionalProperties": true,
-      "description": "Built-in and script-registered custom block components. Custom parameter values are not inferred."
+      "description": "Built-in and script-registered block components. Custom parameter hints are advisory."
     },
     "material": {
       "type": "object",
@@ -624,38 +1453,158 @@
           "anyOf": [
             {
               "type": "string",
+              "description": "Texture transparency/culling mode.",
               "enum": [
                 "opaque",
                 "alpha_test",
-                "alpha_test_single_sided",
                 "blend",
                 "double_sided"
               ]
             },
             {
-              "type": "string"
+              "type": "string",
+              "pattern": "^alpha_test_single_sided$"
             }
-          ]
+          ],
+          "description": "How the material handles transparency and backface culling."
         },
         "ambient_occlusion": {
           "type": [
             "boolean",
             "number"
-          ]
+          ],
+          "description": "Ambient shading strength. Older formats accept booleans; modern formats use a numeric exponent."
         },
         "face_dimming": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Shade the surface according to its facing direction."
         },
         "isotropic": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Randomize the material UV orientation."
         },
         "tint_method": {
-          "type": "string"
+          "type": "string",
+          "description": "Biome tint applied to the rendered color.",
+          "enum": [
+            "none",
+            "default_foliage",
+            "birch_foliage",
+            "evergreen_foliage",
+            "dry_foliage",
+            "grass",
+            "water"
+          ]
         },
         "alpha_masked_tint": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Multiply biome tint by the texture alpha channel. Requires format 1.21.120, opaque rendering, and an enabled tint method."
         }
       }
+    },
+    "blockGeometry": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "description": "Geometry identifier from a resource pack.",
+              "markdownDescription": "Geometry identifier from a resource pack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+            },
+            "bone_visibility": {
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "boolean",
+                  "string"
+                ]
+              },
+              "description": "Bone names mapped to visibility booleans or Molang expressions.",
+              "markdownDescription": "Bone names mapped to visibility booleans or Molang expressions.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+            },
+            "culling": {
+              "type": "string",
+              "description": "Resource-pack block culling rule identifier.",
+              "markdownDescription": "Resource-pack block culling rule identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+            },
+            "culling_layer": {
+              "type": "string",
+              "description": "Layer used when comparing neighboring blocks for culling.",
+              "markdownDescription": "Layer used when comparing neighboring blocks for culling.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+            },
+            "culling_shape": {
+              "type": "string",
+              "description": "Voxel shape identifier; requires the Voxel Shapes experiment.",
+              "markdownDescription": "Voxel shape identifier; requires the Voxel Shapes experiment.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+            },
+            "uv_lock": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ],
+              "description": "Lock all bone UVs, or only the listed bone names.",
+              "markdownDescription": "Lock all bone UVs, or only the listed bone names.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+            },
+            "n_way_visual_rotation": {
+              "type": "object",
+              "description": "Maps axes to block states driving visual-only rotation.",
+              "properties": {
+                "x": {
+                  "type": "string",
+                  "description": "Block state controlling rotation around x.",
+                  "markdownDescription": "Block state controlling rotation around x.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+                },
+                "y": {
+                  "type": "string",
+                  "description": "Block state controlling rotation around y.",
+                  "markdownDescription": "Block state controlling rotation around y.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+                },
+                "z": {
+                  "type": "string",
+                  "description": "Block state controlling rotation around z.",
+                  "markdownDescription": "Block state controlling rotation around z.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+                }
+              },
+              "markdownDescription": "Maps axes to block states driving visual-only rotation.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+            }
+          },
+          "required": [
+            "identifier"
+          ]
+        },
+        {
+          "type": "string",
+          "description": "Geometry identifier from a resource pack.",
+          "markdownDescription": "Geometry identifier from a resource pack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+        }
+      ],
+      "description": "Geometry and optional bone visibility/culling settings.",
+      "markdownDescription": "Geometry and optional bone visibility/culling settings.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+    },
+    "blockMaterials": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/material"
+          },
+          {
+            "type": "string",
+            "description": "Reference another named material instance.",
+            "markdownDescription": "Reference another named material instance.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
+          }
+        ]
+      },
+      "description": "Maps geometry material slots or faces to textures and rendering settings.",
+      "markdownDescription": "Maps geometry material slots or faces to textures and rendering settings.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
     }
   }
 }

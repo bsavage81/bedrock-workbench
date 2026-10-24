@@ -287,7 +287,7 @@ async function run() {
   const customIds = path.join(root, 'BP/scripts/component-ids.ts'), customScript = path.join(root, 'BP/scripts/custom-components.ts');
   await fs.mkdir(path.dirname(customIds), { recursive: true });
   await fs.writeFile(customIds, "export const BLOCK_ID = 'test:host_block' as const;");
-  await fs.writeFile(customScript, "import {system} from '@minecraft/server'; import {BLOCK_ID} from './component-ids.js'; system.beforeEvents.startup.subscribe(({blockComponentRegistry: blocks, itemComponentRegistry}) => { blocks.registerCustomComponent(BLOCK_ID, {onTick(event, {params}) { if (typeof params.golden === 'boolean') {} if(typeof params.nested.label === 'string') {} }}); itemComponentRegistry.registerCustomComponent('test:host_item', {}); });");
+  await fs.writeFile(customScript, "import {system} from '@minecraft/server'; import {BLOCK_ID} from './component-ids.js'; system.beforeEvents.startup.subscribe(({blockComponentRegistry: blocks, itemComponentRegistry}) => { blocks.registerCustomComponent(BLOCK_ID, {onTick(event, {params}) { if (typeof params.golden === 'boolean') {} if(typeof params.nested.label === 'string') {} }}); blocks.registerCustomComponent('test:host_itemless', {onTick() {}}); itemComponentRegistry.registerCustomComponent('test:host_item', {}); });");
   const customUri = vscode.Uri.file(path.join(root, 'BP/blocks/custom-components.json'));
   await core.writeJson(customUri.fsPath, { format_version: '1.21.90', 'minecraft:block': { description: { identifier: 'test:host_custom' }, components: { '': {} } } });
   const customDoc = await vscode.workspace.openTextDocument(customUri); await vscode.window.showTextDocument(customDoc);
@@ -302,6 +302,34 @@ async function run() {
     edit.replace(customUri, new vscode.Range(customDoc.positionAt(0), customDoc.positionAt(customDoc.getText().length)), JSON.stringify({ format_version: '1.21.90', 'minecraft:block': { description: { identifier: 'test:host_custom' }, components, ...(permutations ? { permutations } : {}) } }));
     assert.ok(await vscode.workspace.applyEdit(edit));
   }
+  await setCustomBlock({'minecraft:random_offset':{x:{range:{min:-4,max:4},steps:0}},'minecraft:flower_pottable':{}});
+  for(const [needle,expected] of [['minecraft:random_offset','Position-seeded'],['minecraft:flower_pottable','flower pot'],['steps','Zero permits'],['min','Minimum displacement']]) {
+    const position=customDoc.positionAt(customDoc.getText().indexOf('"'+needle+'"')+2);
+    const hovers=await vscode.commands.executeCommand('vscode.executeHoverProvider',customUri,position);
+    assert.ok(hovers.some(h=>h.contents.some(c=>c.value?.includes(expected))), 'Missing authored block hover: '+needle);
+    assert.ok(hovers.some(h=>h.contents.some(c=>c.value?.includes('https://learn.microsoft.com/en-us/minecraft/creator/'))), 'Microsoft Learn hover link missing: '+needle);
+  }
+  await setCustomBlock({'minecraft:random_offset':{x:{range:{}}}});
+  const offsetHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',customUri,customDoc.positionAt(customDoc.getText().indexOf('{}')+1));
+  assert.ok(offsetHints.items.some(item=>item.label==='min')&&offsetHints.items.some(item=>item.label==='max'),'Nested offset range completion missing');
+  await setCustomBlock({'minecraft:flower_pottable':{}});
+  const pottedHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',customUri,customDoc.positionAt(customDoc.getText().indexOf('{}')+1));
+  assert.equal(pottedHints.items.length,0,'Parameterless flower_pottable offered invalid fields');
+  for(const [components,expected,excluded] of [
+    [{'minecraft:placement_filter':{conditions:[{block_filter:['']}] }},'minecraft:stone','minecraft:diamond'],
+    [{'minecraft:placement_filter':{conditions:[{block_filter:[{name:''}]}] }},'minecraft:stone','minecraft:diamond'],
+    [{'minecraft:destructible_by_mining':{item_specific_speeds:[{item:'',destroy_speed:1}]}},'minecraft:diamond','minecraft:stone']
+  ]) {
+    await setCustomBlock(components);
+    const hints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',customUri,customDoc.positionAt(customDoc.getText().indexOf('""')+1));
+    assert.ok(hints.items.some(item=>item.label===expected),'Identifier completion missing: '+expected);
+    assert.ok(!hints.items.some(item=>item.label===excluded),'Wrong identifier kind in block component: '+excluded);
+  }
+  await setCustomBlock({ 'test:host_itemless': {} });
+  // Locate the innermost empty object, rather than the document wrapper.
+  const emptyParameterPosition = customDoc.positionAt(customDoc.getText().indexOf('{}') + 1);
+  const emptyParameterHints = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, emptyParameterPosition);
+  assert.equal(emptyParameterHints.items.length, 0, 'Unrelated completion items leaked into a parameterless custom component: ' + emptyParameterHints.items.map(item => item.label).join(', '));
   await setCustomBlock({ 'test:host_block': { arbitrary_parameter: true } });
   const registeredPosition = customDoc.positionAt(customDoc.getText().indexOf('test:host_block') + 6);
   const componentHover = await vscode.commands.executeCommand('vscode.executeHoverProvider', customUri, registeredPosition);

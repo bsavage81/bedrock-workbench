@@ -73,3 +73,32 @@ Primary references consulted October 24, 2026:
 - https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable
 - https://github.com/Mojang/bedrock-samples/tree/v1.26.50.4 (block examples and documentation metadata)
 - https://babeljs.io/docs/babel-parser (parser API)
+
+## Block coverage and documentation links (0.12.0)
+
+Documentation source policy: use the official Microsoft Learn Minecraft Creator stable documentation (https://learn.microsoft.com/en-us/minecraft/creator/?view=minecraft-bedrock-stable) alongside compatible released Mojang samples. Learn is a primary source for requirements, field meanings, prerequisites, format changes, and experiment restrictions. Review conflicts and historical format behavior before strengthening validation; a current page alone must not invalidate supported older content.
+
+Every component documentation hover links to Microsoft Learn. src/documentation-links.json contains URL metadata from Microsoft's public navigation and page index; refresh it explicitly with tools/update-documentation-links.cjs. Only names and paths are retained, not documentation text or schema code. Known block/item/entity components, goals and triggers resolve to published component pages; unmapped names fall back to their Learn component list. Custom block/item components link to the official custom-components tutorial while retaining their local script provenance. Generated reference descriptions keep their Mojang release attribution separately from the Learn destination. Bundled schema adaptation adds Learn links to component/field descriptions too. Cache build 11 refreshes previously adapted hover text. Offline hovers use the bundled URL catalog; viewing linked web pages requires connectivity.
+
+tools/block-components.cjs supplements our authored rules with 46 total component definitions, including the two reported omissions: random_offset (x/y/z, range min/max, steps) and the parameterless flower_pottable. The samples metadata snapshot lacks these names, so their availability must not depend on that generated reference. Each authored component has a documentation link; nested structural fields have descriptions. The official-schema cache build advances to 10 to replace previously cached block rules.
+
+Added families include chest obstruction, connections, destruction particles, held/embedded visuals, precipitation, redstone consumption/production/conductivity, support, replaceability, block-entity metadata/containers, and note instruments. Historical component forms remain accepted, with deprecated/internal component names hidden from new-key suggestions. Old propogates_power and snow_log_no_collision spellings remain accepted without duplicate preferred completions. No third-party schemas are used.
+
+Block/item identifier suggestions are deliberately scoped: placement_filter condition block_filter strings and descriptor names use project/vanilla blocks; destructible_by_mining item_specific_speeds item strings and descriptor names use items. Tags remain Molang expressions. Item/embedded geometry and material fields reuse the appropriate geometry/terrain-atlas completion paths, including permutations. This is structural and authoring assistance, not exhaustive format/experiment/runtime validation. Format availability and root-only restrictions are documented in component hovers; conditional enforcement of all historical engine rules remains future work.
+
+Validation: 98 relevant Mojang v1.26.50.4 examples plus five SavageCraft blocks pass. VS Code host checks assert hovers for both reported components and nested offset fields; range-key completion; no fields inside flower_pottable; separate block/item lists; and continued custom parameter assistance.
+
+Additional primary references consulted October 24, 2026 (stable view):
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/blockcomponentslist
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flower_pottable
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_embedded_visual
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_item_visual
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_entity
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_instrument_sound
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_producer
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_consumer
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_precipitation_interactions
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection

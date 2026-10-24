@@ -4,6 +4,7 @@ const reference = require('./reference.cjs');
 const core = require('./core.cjs');
 const officialSchemas = require('./official-schemas.cjs');
 const ownedBlocks = require('../schemas/block.schema.json').definitions.components.properties;
+const documentation = require('./documentation.cjs');
 function attach(vscode, context, getProject, output) {
   if (!vscode.languages.registerCompletionItemProvider) return { refresh() {} };
   let index, activeKey, generation = 0;
@@ -23,13 +24,13 @@ function attach(vscode, context, getProject, output) {
     const components = index.components[kind];
     return { text, location, keys, c, kind, components };
   }
-  function markdown(value, kind) {
+  function markdown(value, kind, component) {
     const md = new vscode.MarkdownString();
     md.appendMarkdown(value.description || 'Mojang component documentation.');
     if (value.type) md.appendText(`\n\nType: ${value.type}`);
     if (value.default !== undefined) md.appendText(`\nDefault: ${JSON.stringify(value.default)}`);
-    const page = { block: 'Blocks', entity: 'Entities', item: 'Item' }[kind];
-    md.appendMarkdown(`\n\n[Mojang documentation (${index.tag})](https://github.com/Mojang/bedrock-samples/blob/${index.tag}/documentation/${page}.html)`);
+    md.appendText(`\n\nReference data: Mojang ${index.tag}.`);
+    md.appendMarkdown('\n\n'+documentation.componentLink(kind, component));
     md.isTrusted = false; return md;
   }
   function keyNode(document, data) {
@@ -51,7 +52,7 @@ function attach(vscode, context, getProject, output) {
         const previous = data.location.previousNode;
         return Object.entries(values).filter(([name]) => !existing.has(name) || name === data.keys.at(-1)).map(([name, value]) => {
           const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Property);
-          item.documentation = markdown(value, data.kind); item.detail = `Mojang ${index.tag}`;
+          item.documentation = markdown(value, data.kind, level === 1 ? name : data.keys[data.c + 1]); item.detail = `Mojang ${index.tag}`;
           // Replace only the content inside existing quotes; JSON service handles values.
           if (previous?.type === 'property' && previous.offset <= document.offsetAt(position)) {
             item.range = new vscode.Range(document.positionAt(previous.offset + 1), document.positionAt(previous.offset + previous.length - 1)); item.insertText = name;
@@ -102,6 +103,14 @@ function attach(vscode, context, getProject, output) {
     let official;
     async function associate(associations) {
       if (ticket !== generation) return;
+      // VS Code's word provider otherwise fills schema-free/custom parameter
+      // objects with unrelated identifiers from every open JSON document.
+      // Scope this to JSON in the Bedrock workspace, never user-wide settings.
+      const workspaceSettings = vscode.workspace.getConfiguration(undefined, vscode.Uri.file(project.root));
+      for (const language of ['[json]', '[jsonc]']) {
+        const local = workspaceSettings.inspect(language)?.workspaceFolderValue || workspaceSettings.inspect(language)?.workspaceValue || {};
+        if (local['editor.wordBasedSuggestions'] !== 'off') await workspaceSettings.update(language, { ...local, 'editor.wordBasedSuggestions': 'off' }, vscode.ConfigurationTarget.WorkspaceFolder);
+      }
       const settings = vscode.workspace.getConfiguration('json', vscode.Uri.file(project.root));
       const existing = settings.inspect('schemas')?.workspaceFolderValue || settings.inspect('schemas')?.workspaceValue || settings.inspect('schemas')?.globalValue || [];
       const next = [...existing.filter(entry => !entry.url?.includes('/.bedrock/reference/')), ...associations];

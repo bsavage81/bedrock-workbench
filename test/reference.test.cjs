@@ -26,7 +26,9 @@ test('Mojang documentation and schema references supply component and field desc
   const schema = componentSchema(index, 'item');
   const components = schema.properties['minecraft:item'].properties.components;
   assert.equal(components.properties['minecraft:food'].properties.nutrition.type, 'integer');
-  assert.match(components.properties['minecraft:food'].markdownDescription, /Mojang documentation \(v1.26.50.4\)/);
+  assert.match(components.properties['minecraft:food'].markdownDescription, /Reference data: Mojang v1.26.50.4/);
+  assert.match(components.properties['minecraft:food'].markdownDescription, /learn.microsoft.com.*minecraft_food\?view=minecraft-bedrock-stable/);
+  assert.match(components.properties['minecraft:food'].properties.nutrition.markdownDescription, /learn.microsoft.com.*minecraft_food/);
   assert.match(components.properties['minecraft:food'].properties.nutrition.markdownDescription, /Type: integer/);
   assert.equal(components.additionalProperties, true);
   assert.equal(componentSchema(index, 'item', { omit: ['minecraft:food'] }).properties['minecraft:item'].properties.components.properties['minecraft:food'], undefined);

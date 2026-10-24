@@ -35,7 +35,7 @@ const componentProperties = {
   'minecraft:liquid_detection': { ...object({ detection_rules: array(object({ liquid_type: string(), can_contain_liquid: { type: 'boolean' }, on_liquid_touches: string(), use_liquid_clipping: { type: 'boolean' } })) }), description: 'Rules for interactions with liquids.' }
 };
 const components = { type: 'object', properties: componentProperties, additionalProperties: true, description: 'Built-in and script-registered custom block components. Custom parameter values are not inferred.' };
-module.exports = {
+module.exports = require('./block-components.cjs')({
   $schema: 'http://json-schema.org/draft-07/schema#', title: 'Bedrock Workbench block',
   ...object({ format_version: string('Block format version; older versions remain accepted.'), 'minecraft:block': object({
     description: object({ identifier: { type: 'string', pattern: '^[a-z0-9_.-]+:[a-z0-9_./-]+$' },
@@ -46,4 +46,4 @@ module.exports = {
     components: ref('components'), permutations: array(object({ condition: string('Molang expression selecting this permutation.'), components: ref('components') }, ['condition', 'components']))
   }, ['description']) }, ['format_version', 'minecraft:block']),
   definitions: { vector, color, box, components, material: object({ texture: string('Texture-atlas identifier.'), render_method: choices(['opaque', 'alpha_test', 'alpha_test_single_sided', 'blend', 'double_sided']), ambient_occlusion: { type: ['boolean', 'number'] }, face_dimming: { type: 'boolean' }, isotropic: { type: 'boolean' }, tint_method: string(), alpha_masked_tint: { type: 'boolean' } }) }
-};
+});

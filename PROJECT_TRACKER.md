@@ -197,3 +197,13 @@ Exact supported patterns, exclusions and sources are documented in schemas/AUTHO
 - [x] Unit and native VS Code host verification for custom parameter keys, nested keys, boolean values, hovers, geometry, and material textures.
 
 Remaining: general function argument flow, external package types, unsaved script inference, and additional texture field contexts.
+
+## Completed in 0.12.0 — block audit and completion fixes
+
+- [x] Quoted custom key acceptance inserts a value snippet and opens value suggestions.
+- [x] Disable unrelated word-based JSON/JSONC completions in Bedrock workspaces; parameterless custom objects remain quiet.
+- [x] Expand authored block rules to 46 components, nested hovers, enum choices, geometry/material visual reuse, and block/item descriptor completions.
+- [x] 103 real block examples validated; unit and VS Code host checks passed.
+- Release packaging and local installation authorized October 24, 2026.
+
+- [x] Microsoft Learn is a primary requirements source. Component and nested-field documentation links use the official stable Learn pages, with bundled URL metadata and legacy-page coverage.
