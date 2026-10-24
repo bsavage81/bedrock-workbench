@@ -13,4 +13,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - run: npm run schemas:generate
+      - run: git diff --exit-code -- schemas
       - run: npm test

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.0 — October 23, 2026
+
+- Replace recipe, item/terrain atlas, and client sound-definition entry points with independently authored Workbench schemas.
+- Validate recipe variant fields and nested ingredient/result types, pattern/key shapes, counts, unlock forms, atlas paths, and sound playback settings while preserving documented legacy forms and unknown extensions.
+- Add reproducible schema generation, compatibility/invalid-case tests, native VS Code diagnostics and hover checks, and packaged-route verification.
+- Document sources, audited scope, and remaining version/semantic limits in schemas/AUTHORING.md.
+
 ## 0.8.1 — October 23, 2026
 
 - Remove the duplicate component hover provider; let VS Code's JSON schema hover own component and field documentation. Generated schemas retain versioned documentation links and type information.

@@ -161,3 +161,16 @@ Keep Mojang data as the primary source. Any future optional Blockception schema 
 - [ ] Statically discover script-registered custom commands and configurable runtime/external definitions.
 
 Preview currently uses compatible released reference data. Command assistance is not a complete command validator; dynamic identifiers and unsupported parameter types remain open. No Blockception implementation or schema data is included.
+
+## October 23: authored schema coverage 0.9.0
+
+- [x] Independently authored schemas for seven recipe variants, item/terrain texture atlases, and client sound definitions replace their official entry points.
+- [x] Preserve legacy version strings, string/object ingredients, tag ingredients, object/array unlock forms, tinted texture paths, nullable sound distances, and extension fields.
+- [x] Add valid/invalid regression cases, test real runtime routes with custom pack folders, and verify native JSON diagnostics/hovers.
+- [x] Reproducible original schema generator and CI check for stale generated JSON.
+- [x] Compatibility audit: all 1,895 relevant Mojang v1.26.50.4 sample documents and all 40 relevant SavageCraft documents passed. No add-on source files were changed by this audit.
+- [ ] Pattern/key consistency, recipe-kind exclusivity, engine-specific feature availability, and deeper semantic checks.
+- [ ] Material reduction/Education recipes, legacy flat sound layouts, and server sound definitions.
+- [ ] Expand original schemas into entity/block/item components and support original routes independently of the current 1.26.50 reference-package floor.
+
+Primary references, exact audited scope, and regeneration instructions are recorded in schemas/AUTHORING.md. Unknown extensions remain allowed; validation does not guarantee runtime behavior.

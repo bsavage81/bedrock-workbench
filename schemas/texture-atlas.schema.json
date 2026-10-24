@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bedrock Workbench texture atlas",
+  "type": "object",
+  "properties": {
+    "resource_pack_name": {
+      "type": "string",
+      "description": "Optional resource-pack label."
+    },
+    "texture_name": {
+      "type": "string",
+      "description": "Atlas name, normally atlas.items or atlas.terrain."
+    },
+    "padding": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Padding used when constructing the atlas."
+    },
+    "num_mip_levels": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "texture_data": {
+      "type": "object",
+      "description": "Named texture entries referenced by items and blocks.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "textures": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/texturePath"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/texturePath"
+                },
+                "minItems": 1
+              }
+            ]
+          }
+        },
+        "required": [
+          "textures"
+        ]
+      }
+    }
+  },
+  "required": [
+    "texture_data"
+  ],
+  "definitions": {
+    "texturePath": {
+      "anyOf": [
+        {
+          "type": "string",
+          "description": "Texture path relative to the resource pack, normally without its extension."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Texture image path."
+            },
+            "overlay_color": {
+              "type": "string",
+              "description": "Optional color overlay."
+            },
+            "tint_color": {
+              "type": "string",
+              "description": "Optional tint color."
+            }
+          },
+          "required": [
+            "path"
+          ]
+        }
+      ]
+    }
+  }
+}

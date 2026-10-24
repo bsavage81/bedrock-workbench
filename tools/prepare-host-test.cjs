@@ -15,6 +15,9 @@ const core = require('../src/core.cjs');
   const destination = path.join(root, 'fake-minecraft/com.mojang'); await fs.mkdir(destination, { recursive: true });
   config.build.destinations = { release: destination, preview: destination };
   await core.writeJson(path.join(root, 'bedrock-project.json'), config);
+  // Prepare bundled data before starting VS Code: thousands of cache-file
+  // events must not race the separate pack-file watcher regression checks.
+  await require('../src/official-schemas.cjs').prepare(await core.loadProject(root));
   await core.writeJson(path.join(root, '.bedrock/reference/components.json'), { intelligenceVersion: 1, vanilla: { item: ['minecraft:diamond'] }, commands: { command_enums: [], commands: [{ name: 'give', description: 'Give an item', overloads: [{ params: [{ name: 'player', type: { name: 'SELECTION' } }, { name: 'item', type: { name: 'ITEM' } }] }] }] }, tag: 'v1.26.50.4', engine: '1.26.50', target: config.targetVersion, updated: Date.now(), components: {
     block: { 'minecraft:friction': { type: 'number', description: 'Controls block friction.', fields: {} } }, entity: {}, item: {}
   } });

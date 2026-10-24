@@ -6,7 +6,15 @@ const { compareVersions } = require('./releases.cjs');
 const PACKAGE = path.dirname(require.resolve('@minecraft/bedrock-schemas/catalog.json'));
 const VERSION = require(path.join(PACKAGE, 'package.json')).version;
 const catalog = require('@minecraft/bedrock-schemas/catalog.json');
-const BUILD = 3;
+const BUILD = 4;
+// Independent Workbench replacements. Broader Mojang routes remain fallbacks.
+const OWNED = {
+  'bp/loot_tables/index.schema.json': require('../schemas/loot-table.schema.json'),
+  'bp/recipes/index.schema.json': require('../schemas/recipe.schema.json'),
+  'rp/textures/item_texture.schema.json': require('../schemas/texture-atlas.schema.json'),
+  'rp/textures/terrain_texture.schema.json': require('../schemas/texture-atlas.schema.json'),
+  'rp/sounds/index.schema.json': require('../schemas/sound-definitions.schema.json')
+};
 const preparing = new Map();
 function adapt(schema, relative) {
   function visit(node, key = '') {
@@ -103,8 +111,12 @@ async function prepare(project) {
         const destination = await core.local(project.root, path.relative(project.root, path.join(directory, file)));
         const schema = JSON.parse(await fs.readFile(path.join(PACKAGE, 'schemas', file), 'utf8'));
         const relative = file.replaceAll(path.sep, '/');
-        const owned = relative === 'bp/loot_tables/index.schema.json' ? require('../schemas/loot-table.schema.json') : undefined;
-        await core.writeJson(destination, owned || adapt(schema, relative));
+        const owned = OWNED[relative];
+        const next = owned || adapt(schema, relative);
+        const current = await core.readJson(destination).catch(() => null);
+        // Schema revisions usually replace only a few entry points. Avoid
+        // flooding file watchers by rewriting every unchanged cached file.
+        if (JSON.stringify(current) !== JSON.stringify(next)) await core.writeJson(destination, next);
       }
       await core.writeJson(await core.local(project.root, path.relative(project.root, path.join(directory, 'common/expression.schema.json'))), { anyOf: [{ type: 'string' }, { type: 'number' }], description: 'Molang expression: a string expression or numeric literal.' });
       await core.writeJson(marker, { build: BUILD, version: VERSION });

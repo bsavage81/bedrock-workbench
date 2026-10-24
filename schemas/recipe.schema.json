@@ -1,0 +1,545 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bedrock Workbench recipe",
+  "type": "object",
+  "properties": {
+    "format_version": {
+      "type": "string",
+      "description": "Recipe format version; older two-part versions remain valid."
+    },
+    "minecraft:recipe_shaped": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "object",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "description": "Unique recipe identifier."
+            }
+          },
+          "required": [
+            "identifier"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
+        },
+        "priority": {
+          "type": "integer",
+          "description": "Smaller values take precedence among competing recipes."
+        },
+        "unlock": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/unlock"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/unlock"
+              }
+            }
+          ],
+          "description": "Recipe-book discovery conditions; a context object or an ingredient/context array. Availability depends on format version."
+        },
+        "pattern": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 3
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "description": "Crafting rows. Spaces leave slots empty; other characters refer to key."
+        },
+        "key": {
+          "type": "object",
+          "propertyNames": {
+            "minLength": 1,
+            "maxLength": 1,
+            "pattern": "^[^ ]$"
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/ingredient"
+          },
+          "description": "Maps each non-space pattern symbol to an ingredient."
+        },
+        "result": {
+          "$ref": "#/definitions/results"
+        },
+        "assume_symmetry": {
+          "type": "boolean",
+          "description": "Allow mirrored patterns to use this recipe."
+        }
+      },
+      "required": [
+        "description",
+        "pattern",
+        "key",
+        "result"
+      ],
+      "description": "Workbench structural validation for shaped recipes. Unknown extension fields are allowed."
+    },
+    "minecraft:recipe_shapeless": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "object",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "description": "Unique recipe identifier."
+            }
+          },
+          "required": [
+            "identifier"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
+        },
+        "priority": {
+          "type": "integer",
+          "description": "Smaller values take precedence among competing recipes."
+        },
+        "unlock": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/unlock"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/unlock"
+              }
+            }
+          ],
+          "description": "Recipe-book discovery conditions; a context object or an ingredient/context array. Availability depends on format version."
+        },
+        "ingredients": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ingredient"
+          },
+          "minItems": 1,
+          "description": "Ingredients accepted in any arrangement."
+        },
+        "result": {
+          "$ref": "#/definitions/results"
+        }
+      },
+      "required": [
+        "description",
+        "ingredients",
+        "result"
+      ],
+      "description": "Workbench structural validation for shapeless recipes. Unknown extension fields are allowed."
+    },
+    "minecraft:recipe_furnace": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "object",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "description": "Unique recipe identifier."
+            }
+          },
+          "required": [
+            "identifier"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
+        },
+        "priority": {
+          "type": "integer",
+          "description": "Smaller values take precedence among competing recipes."
+        },
+        "unlock": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/unlock"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/unlock"
+              }
+            }
+          ],
+          "description": "Recipe-book discovery conditions; a context object or an ingredient/context array. Availability depends on format version."
+        },
+        "input": {
+          "$ref": "#/definitions/ingredient"
+        },
+        "output": {
+          "$ref": "#/definitions/result"
+        }
+      },
+      "required": [
+        "description",
+        "input",
+        "output"
+      ],
+      "description": "Workbench structural validation for furnace recipes. Unknown extension fields are allowed."
+    },
+    "minecraft:recipe_brewing_mix": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "object",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "description": "Unique recipe identifier."
+            }
+          },
+          "required": [
+            "identifier"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
+        },
+        "priority": {
+          "type": "integer",
+          "description": "Smaller values take precedence among competing recipes."
+        },
+        "unlock": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/unlock"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/unlock"
+              }
+            }
+          ],
+          "description": "Recipe-book discovery conditions; a context object or an ingredient/context array. Availability depends on format version."
+        },
+        "input": {
+          "$ref": "#/definitions/ingredient"
+        },
+        "reagent": {
+          "$ref": "#/definitions/ingredient"
+        },
+        "output": {
+          "$ref": "#/definitions/result"
+        }
+      },
+      "required": [
+        "description",
+        "input",
+        "reagent",
+        "output"
+      ],
+      "description": "Workbench structural validation for brewing mix recipes. Unknown extension fields are allowed."
+    },
+    "minecraft:recipe_brewing_container": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "object",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "description": "Unique recipe identifier."
+            }
+          },
+          "required": [
+            "identifier"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
+        },
+        "priority": {
+          "type": "integer",
+          "description": "Smaller values take precedence among competing recipes."
+        },
+        "unlock": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/unlock"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/unlock"
+              }
+            }
+          ],
+          "description": "Recipe-book discovery conditions; a context object or an ingredient/context array. Availability depends on format version."
+        },
+        "input": {
+          "$ref": "#/definitions/ingredient"
+        },
+        "reagent": {
+          "$ref": "#/definitions/ingredient"
+        },
+        "output": {
+          "$ref": "#/definitions/result"
+        }
+      },
+      "required": [
+        "description",
+        "input",
+        "reagent",
+        "output"
+      ],
+      "description": "Workbench structural validation for brewing container recipes. Unknown extension fields are allowed."
+    },
+    "minecraft:recipe_smithing_transform": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "object",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "description": "Unique recipe identifier."
+            }
+          },
+          "required": [
+            "identifier"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
+        },
+        "priority": {
+          "type": "integer",
+          "description": "Smaller values take precedence among competing recipes."
+        },
+        "unlock": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/unlock"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/unlock"
+              }
+            }
+          ],
+          "description": "Recipe-book discovery conditions; a context object or an ingredient/context array. Availability depends on format version."
+        },
+        "template": {
+          "$ref": "#/definitions/ingredient"
+        },
+        "base": {
+          "$ref": "#/definitions/ingredient"
+        },
+        "addition": {
+          "$ref": "#/definitions/ingredient"
+        },
+        "result": {
+          "$ref": "#/definitions/result"
+        }
+      },
+      "required": [
+        "description",
+        "base",
+        "addition",
+        "result"
+      ],
+      "description": "Workbench structural validation for smithing transform recipes. Unknown extension fields are allowed."
+    },
+    "minecraft:recipe_smithing_trim": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "object",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "description": "Unique recipe identifier."
+            }
+          },
+          "required": [
+            "identifier"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Stations that can use this recipe, such as crafting_table, stonecutter, or furnace."
+        },
+        "priority": {
+          "type": "integer",
+          "description": "Smaller values take precedence among competing recipes."
+        },
+        "unlock": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/unlock"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/unlock"
+              }
+            }
+          ],
+          "description": "Recipe-book discovery conditions; a context object or an ingredient/context array. Availability depends on format version."
+        },
+        "template": {
+          "$ref": "#/definitions/ingredient"
+        },
+        "base": {
+          "$ref": "#/definitions/ingredient"
+        },
+        "addition": {
+          "$ref": "#/definitions/ingredient"
+        }
+      },
+      "required": [
+        "description",
+        "template",
+        "base",
+        "addition"
+      ],
+      "description": "Workbench structural validation for smithing trim recipes. Unknown extension fields are allowed."
+    }
+  },
+  "required": [
+    "format_version"
+  ],
+  "patternProperties": {
+    "^minecraft:recipe_": {
+      "type": "object"
+    }
+  },
+  "definitions": {
+    "ingredient": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "string",
+              "description": "Input item identifier."
+            },
+            "tag": {
+              "type": "string",
+              "description": "An item tag matching eligible ingredients."
+            },
+            "data": {
+              "type": "integer",
+              "description": "Legacy auxiliary value."
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "anyOf": [
+            {
+              "required": [
+                "item"
+              ]
+            },
+            {
+              "required": [
+                "tag"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "string",
+          "description": "Item identifier, including a legacy auxiliary suffix where supported."
+        }
+      ]
+    },
+    "result": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "string",
+              "description": "Output item identifier."
+            },
+            "data": {
+              "type": "integer"
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "item"
+          ]
+        },
+        {
+          "type": "string",
+          "description": "Output item identifier."
+        }
+      ]
+    },
+    "unlock": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "type": "string"
+        },
+        "data": {
+          "type": "integer"
+        },
+        "context": {
+          "type": "string",
+          "description": "Recipe discovery context, such as AlwaysUnlocked."
+        }
+      }
+    },
+    "results": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/result"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/result"
+          },
+          "minItems": 1
+        }
+      ]
+    }
+  }
+}
