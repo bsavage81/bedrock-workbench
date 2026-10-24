@@ -17,6 +17,8 @@ test('loot functions preserve aliases/extensions and validate documented paramet
   assert.ok(!loot(lootDoc([{ function: 'set_count', count: 'wrong' }])));
   assert.ok(!loot(lootDoc([{ function: 'enchant_with_levels', levels: 30, treasure: 'wrong' }])));
   assert.ok(!loot(lootDoc([{}])));
+  assert.ok(loot(lootDoc([{ function: 'minecraft:enchant_randomly', treasure: true, conditions: [{ condition: 'random_chance', chance: 0.5 }] }])));
+  assert.ok(!loot(lootDoc([{ function: 'minecraft:enchant_randomly', conditions: [{ condition: 'random_chance', chance: 'wrong' }] }])));
 });
 const doc = (kind, payload, version = '1.20.10') => ({ format_version: version, ['minecraft:recipe_' + kind]: { description: { identifier: 'example:recipe' }, ...payload } });
 const validRecipes = [

@@ -112,18 +112,12 @@
                 "set_book_contents",
                 "set_banner_details",
                 "set_armor_trim",
-                "set_stew_effect",
+                "minecraft:set_stew_effect",
                 "set_ominous_bottle_amplifier",
                 "random_aux_value",
                 "random_block_state",
                 "exploration_map",
-                "fill_container",
-                "minecraft:set_count",
-                "minecraft:set_damage",
-                "minecraft:enchant_randomly",
-                "minecraft:set_stew_effect",
-                "minecraft:set_potion",
-                "minecraft:set_data_from_color_index"
+                "fill_container"
               ]
             },
             {
@@ -132,8 +126,13 @@
             }
           ],
           "description": "Loot modifier to apply to this item."
-        },
-        "conditions": {
+        }
+      },
+      "required": [
+        "function"
+      ],
+      "patternProperties": {
+        "^conditions$": {
           "type": "array",
           "description": "Requirements for this pool, entry, or function. Choose a condition starter.",
           "items": {
@@ -141,9 +140,6 @@
           }
         }
       },
-      "required": [
-        "function"
-      ],
       "defaultSnippets": [
         {
           "label": "set_count",
@@ -368,10 +364,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_count",
-                  "minecraft:set_count"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_count$"
               }
             },
             "required": [
@@ -394,10 +388,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_damage",
-                  "minecraft:set_damage"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_damage$"
               }
             },
             "required": [
@@ -420,10 +412,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_data",
-                  "minecraft:set_data"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_data$"
               }
             },
             "required": [
@@ -443,10 +433,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "enchant_randomly",
-                  "minecraft:enchant_randomly"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?enchant_randomly$"
               }
             },
             "required": [
@@ -466,10 +454,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "enchant_with_levels",
-                  "minecraft:enchant_with_levels"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?enchant_with_levels$"
               }
             },
             "required": [
@@ -492,10 +478,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "enchant_random_gear",
-                  "minecraft:enchant_random_gear"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?enchant_random_gear$"
               }
             },
             "required": [
@@ -515,10 +499,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "specific_enchants",
-                  "minecraft:specific_enchants"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?specific_enchants$"
               }
             },
             "required": [
@@ -569,10 +551,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "looting_enchant",
-                  "minecraft:looting_enchant"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?looting_enchant$"
               }
             },
             "required": [
@@ -595,10 +575,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "furnace_smelt",
-                  "minecraft:furnace_smelt"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?furnace_smelt$"
               }
             },
             "required": [
@@ -621,10 +599,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "explosion_decay",
-                  "minecraft:explosion_decay"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?explosion_decay$"
               }
             },
             "required": [
@@ -640,10 +616,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_actor_id",
-                  "minecraft:set_actor_id"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_actor_id$"
               }
             },
             "required": [
@@ -663,10 +637,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_data_from_color_index",
-                  "minecraft:set_data_from_color_index"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_data_from_color_index$"
               }
             },
             "required": [
@@ -682,10 +654,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_name",
-                  "minecraft:set_name"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_name$"
               }
             },
             "required": [
@@ -705,10 +675,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_lore",
-                  "minecraft:set_lore"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_lore$"
               }
             },
             "required": [
@@ -731,10 +699,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_potion",
-                  "minecraft:set_potion"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_potion$"
               }
             },
             "required": [
@@ -754,10 +720,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_book_contents",
-                  "minecraft:set_book_contents"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_book_contents$"
               }
             },
             "required": [
@@ -793,10 +757,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_banner_details",
-                  "minecraft:set_banner_details"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_banner_details$"
               }
             },
             "required": [
@@ -831,10 +793,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_armor_trim",
-                  "minecraft:set_armor_trim"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_armor_trim$"
               }
             },
             "required": [
@@ -857,10 +817,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_stew_effect",
-                  "minecraft:set_stew_effect"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_stew_effect$"
               }
             },
             "required": [
@@ -891,10 +849,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "set_ominous_bottle_amplifier",
-                  "minecraft:set_ominous_bottle_amplifier"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?set_ominous_bottle_amplifier$"
               }
             },
             "required": [
@@ -914,10 +870,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "random_aux_value",
-                  "minecraft:random_aux_value"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?random_aux_value$"
               }
             },
             "required": [
@@ -937,10 +891,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "random_block_state",
-                  "minecraft:random_block_state"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?random_block_state$"
               }
             },
             "required": [
@@ -956,10 +908,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "exploration_map",
-                  "minecraft:exploration_map"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?exploration_map$"
               }
             },
             "required": [
@@ -979,10 +929,8 @@
           "if": {
             "properties": {
               "function": {
-                "enum": [
-                  "fill_container",
-                  "minecraft:fill_container"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?fill_container$"
               }
             },
             "required": [
@@ -1186,10 +1134,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "random_chance",
-                  "minecraft:random_chance"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?random_chance$"
               }
             },
             "required": [
@@ -1209,10 +1155,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "random_chance_with_looting",
-                  "minecraft:random_chance_with_looting"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?random_chance_with_looting$"
               }
             },
             "required": [
@@ -1235,10 +1179,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "random_difficulty_chance",
-                  "minecraft:random_difficulty_chance"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?random_difficulty_chance$"
               }
             },
             "required": [
@@ -1270,10 +1212,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "random_regional_difficulty_chance",
-                  "minecraft:random_regional_difficulty_chance"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?random_regional_difficulty_chance$"
               }
             },
             "required": [
@@ -1293,10 +1233,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "killed_by_player",
-                  "minecraft:killed_by_player"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?killed_by_player$"
               }
             },
             "required": [
@@ -1312,10 +1250,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "killed_by_player_or_pets",
-                  "minecraft:killed_by_player_or_pets"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?killed_by_player_or_pets$"
               }
             },
             "required": [
@@ -1331,10 +1267,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "killed_by_entity",
-                  "minecraft:killed_by_entity"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?killed_by_entity$"
               }
             },
             "required": [
@@ -1354,10 +1288,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "damaged_by_entity",
-                  "minecraft:damaged_by_entity"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?damaged_by_entity$"
               }
             },
             "required": [
@@ -1377,10 +1309,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "entity_killed",
-                  "minecraft:entity_killed"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?entity_killed$"
               }
             },
             "required": [
@@ -1400,10 +1330,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "passenger_of_entity",
-                  "minecraft:passenger_of_entity"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?passenger_of_entity$"
               }
             },
             "required": [
@@ -1423,10 +1351,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "is_baby",
-                  "minecraft:is_baby"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?is_baby$"
               }
             },
             "required": [
@@ -1442,10 +1368,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "has_variant",
-                  "minecraft:has_variant"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?has_variant$"
               }
             },
             "required": [
@@ -1465,10 +1389,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "has_mark_variant",
-                  "minecraft:has_mark_variant"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?has_mark_variant$"
               }
             },
             "required": [
@@ -1488,10 +1410,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "bool_property",
-                  "minecraft:bool_property"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?bool_property$"
               }
             },
             "required": [
@@ -1517,10 +1437,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "biome_has_tag",
-                  "minecraft:biome_has_tag"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?biome_has_tag$"
               }
             },
             "required": [
@@ -1543,10 +1461,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "entity_properties",
-                  "minecraft:entity_properties"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?entity_properties$"
               }
             },
             "required": [
@@ -1575,10 +1491,8 @@
           "if": {
             "properties": {
               "condition": {
-                "enum": [
-                  "match_tool",
-                  "minecraft:match_tool"
-                ]
+                "type": "string",
+                "pattern": "^(minecraft:)?match_tool$"
               }
             },
             "required": [

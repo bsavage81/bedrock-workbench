@@ -6,7 +6,7 @@ const { compareVersions } = require('./releases.cjs');
 const PACKAGE = path.dirname(require.resolve('@minecraft/bedrock-schemas/catalog.json'));
 const VERSION = require(path.join(PACKAGE, 'package.json')).version;
 const catalog = require('@minecraft/bedrock-schemas/catalog.json');
-const BUILD = 7;
+const BUILD = 8;
 // Independent Workbench replacements. Broader Mojang routes remain fallbacks.
 const OWNED = {
   'bp/loot_tables/index.schema.json': require('../schemas/loot-table.schema.json'),

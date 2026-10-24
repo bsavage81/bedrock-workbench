@@ -176,8 +176,21 @@ async function run() {
   await until(async () => {
     const position = functionLootDoc.positionAt(functionLootDoc.getText().indexOf('"function":""') + '"function":"'.length);
     const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', functionLootUri, position);
-    return completion?.items.some(item => String(item.label).replaceAll('"', '') === 'enchant_with_levels');
+    const labels = completion?.items.map(item => String(item.label).replaceAll('"', '')) || [];
+    if (!labels.includes('enchant_with_levels')) return false;
+    const normalized = labels.filter(label => /^(minecraft:)?(?:enchant_|set_|furnace_|exploration_|explosion_|fill_|looting_|random_)/.test(label)).map(label => label.replace(/^minecraft:/, ''));
+    assert.equal(new Set(normalized).size, normalized.length, 'Loot function choices include duplicate namespaced aliases');
+    return true;
   }, 'Loot function names missing inside a quoted function value');
+  await setLootFunctions([{}]);
+  await until(async () => {
+    const position = functionLootDoc.positionAt(functionLootDoc.getText().indexOf('[{}]') + 2);
+    const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', functionLootUri, position);
+    const labels = completion?.items.map(item => String(item.label).replaceAll('"', '')) || [];
+    if (!labels.includes('function')) return false;
+    assert.ok(!labels.includes('conditions'), 'A blank function object should not suggest conditions');
+    return true;
+  }, 'Blank loot function object did not offer its discriminator');
   await setLootFunctions([{ function: 'enchant_with_levels', '': 0 }]);
   await until(async () => {
     const position = functionLootDoc.positionAt(functionLootDoc.getText().indexOf('"":0') + 1);
@@ -254,6 +267,18 @@ async function run() {
       await until(async () => automaticTriggers > before, `Empty ${kind} did not automatically trigger available suggestions`);
       assert.equal(require('../src/auto-suggest.cjs').emptyContext(conditionDoc.getText(), conditionDoc.offsetAt(editor.selection.active)), kind);
     }
+    await vscode.commands.executeCommand('hideSuggestWidget');
+    const nested = new vscode.WorkspaceEdit();
+    const nestedSource = '{"pools":[{"entries":[{"functions":[|]}]}]}';
+    nested.replace(conditionUri, new vscode.Range(conditionDoc.positionAt(0), conditionDoc.positionAt(conditionDoc.getText().length)), nestedSource.replace('|', ''));
+    assert.ok(await vscode.workspace.applyEdit(nested));
+    const nestedEditor = await vscode.window.showTextDocument(conditionDoc), nestedPosition = conditionDoc.positionAt(nestedSource.indexOf('|'));
+    nestedEditor.selection = new vscode.Selection(nestedPosition, nestedPosition);
+    await new Promise(resolve => setTimeout(resolve, 120));
+    const beforeNested = automaticTriggers;
+    await vscode.commands.executeCommand('type', { text: '[' });
+    await new Promise(resolve => setTimeout(resolve, 200));
+    assert.equal(automaticTriggers, beforeNested, 'An array nested directly inside another array triggered automatic suggestions');
   } finally {
     automaticContext.subscriptions.forEach(subscription => subscription.dispose());
     await editorSettings.update('suggestOnTriggerCharacters', previousTriggers, vscode.ConfigurationTarget.WorkspaceFolder);

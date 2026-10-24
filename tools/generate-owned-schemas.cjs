@@ -97,7 +97,7 @@ const functions = {
   exploration_map: ['Create a destination map.', { destination: string() }, { destination: 'buriedtreasure' }],
   fill_container: ['Fill a placed container from loot.', { loot_table: string() }, { loot_table: 'loot_tables/chests/custom.json' }]
 };
-const aliases = ['set_count', 'set_damage', 'enchant_randomly', 'set_stew_effect', 'set_potion', 'set_data_from_color_index'].map(name => 'minecraft:' + name);
+const canonicalFunction = name => name === 'set_stew_effect' ? 'minecraft:' + name : name;
 const toolRange = { anyOf: [{ type: 'number' }, object({ range_min: { type: 'number' }, range_max: { type: 'number' } })] };
 const conditions = {
   random_chance: ['Test a drop probability.', { chance: { type: 'number' } }, { chance: 0.5 }],
@@ -125,13 +125,18 @@ const conditions = {
 const lootCondition = {
   ...object({ condition: { anyOf: [{ type: 'string', enum: Object.keys(conditions) }, string('Condition identifier; additional engine conditions remain allowed.')], description: 'Requirement to test before selecting loot.' } }, ['condition']),
   defaultSnippets: Object.entries(conditions).map(([name, [description, , body]]) => ({ label: name, description, body: { condition: name, ...body } })),
-  allOf: Object.entries(conditions).map(([name, [description, properties]]) => ({ if: { properties: { condition: { enum: [name, 'minecraft:' + name] } }, required: ['condition'] }, then: { description, properties } }))
+  allOf: Object.entries(conditions).map(([name, [description, properties]]) => ({ if: { properties: { condition: { type: 'string', pattern: '^(minecraft:)?' + name + '$' } }, required: ['condition'] }, then: { description, properties } }))
 };
 const lootConditions = { type: 'array', description: 'Requirements for this pool, entry, or function. Choose a condition starter.', items: ref('lootCondition') };
 const lootFunction = {
-  ...object({ function: { anyOf: [{ type: 'string', enum: [...Object.keys(functions), ...aliases] }, string('Function identifier; additional engine functions remain allowed.')], description: 'Loot modifier to apply to this item.' }, conditions: lootConditions }, ['function']),
-  defaultSnippets: Object.entries(functions).map(([name, [description, , body]]) => ({ label: name, description, body: { function: name === 'set_stew_effect' ? 'minecraft:set_stew_effect' : name, ...body } })),
-  allOf: Object.entries(functions).map(([name, [description, properties]]) => ({ if: { properties: { function: { enum: [name, 'minecraft:' + name] } }, required: ['function'] }, then: { description, properties } }))
+  ...object({ function: { anyOf: [{ type: 'string', enum: Object.keys(functions).map(canonicalFunction) }, string('Function identifier; additional engine functions remain allowed.')], description: 'Loot modifier to apply to this item.' } }, ['function']),
+  // Conditions remain valid and receive their schema when explicitly present,
+  // but do not crowd the property list of a new, unselected function object.
+  patternProperties: { '^conditions$': lootConditions },
+  defaultSnippets: Object.entries(functions).map(([name, [description, , body]]) => ({ label: name, description, body: { function: canonicalFunction(name), ...body } })),
+  // Patterns discriminate aliases without leaking both spellings into native
+  // JSON value completion (enum values in an if schema are also suggested).
+  allOf: Object.entries(functions).map(([name, [description, properties]]) => ({ if: { properties: { function: { type: 'string', pattern: '^(minecraft:)?' + name + '$' } }, required: ['function'] }, then: { description, properties } }))
 };
 const lootFunctions = { type: 'array', description: 'Item modifiers. Add a function object or choose a starter.', items: ref('lootFunction') };
 const lootEntry = object({ type: string('Entry kind, such as item, loot_table, or empty.'), name: string(), weight: { type: 'number' }, quality: { type: 'number' }, functions: lootFunctions, conditions: lootConditions });

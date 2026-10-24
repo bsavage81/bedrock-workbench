@@ -12,6 +12,7 @@ function emptyContext(text, offset) {
   // Parsing prevents braces inside strings/comments from opening suggestions.
   const node = json.findNodeAtOffset(json.parseTree(text.replace(/^\uFEFF/, ' ')), offset, true);
   if (node?.type !== kind || node.offset !== opening) return;
+  if (kind === 'array' && node.parent?.type === 'array') return;
   if (kind === 'string' ? node.value !== '' : node.children?.length) return;
   return kind;
 }

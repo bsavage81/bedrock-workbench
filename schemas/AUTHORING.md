@@ -46,3 +46,5 @@ Primary references consulted October 23, 2026:
 - https://github.com/Mojang/bedrock-samples/tree/v1.26.50.4 (actual recipes, texture atlases, and sound definitions; no sample assets/schema implementations redistributed)
 
 Next candidates: deeper entity/block/item component checks. Metadata-derived documentation must retain its source/provenance separately from our authored validation rules. Do not treat the newest format as mandatory for older valid documents.
+
+Completion behavior in 0.9.5: discriminator patterns accept namespaced aliases without adding those aliases to the name dropdown. Each name has one preferred completion spelling. New function objects initially offer the function selector; explicit conditions remain validated through a pattern property, and selected functions may offer conditions where relevant. This preserves the documented syntax while reducing initial completion noise.

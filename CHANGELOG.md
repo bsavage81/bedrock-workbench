@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.5 — October 24, 2026
+
+- Show one preferred spelling per loot function/condition while keeping namespaced aliases valid.
+- Keep new function objects focused on the function selector; preserve conditions validation and completion when explicitly present or relevant to the selected function.
+- Suppress automatic suggestions for arrays inserted directly inside arrays.
+
 ## 0.9.4 — October 24, 2026
 
 - Automatically open available JSON suggestions after inserting empty arrays, objects, and quoted strings in pack files, including subsequent list entries and inserted property values.

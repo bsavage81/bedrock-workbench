@@ -7,7 +7,7 @@ test('empty arrays, objects and strings are recognized without mistaking text/co
   for (const [source, kind] of [['{"x":[|]}', 'array'], ['{"x":{ | }}', 'object'], ['{"x":"|"}', 'string'], ['{"|":0}', 'string'], ['{"x":[\n  |\n]}', 'array']]) {
     const { text, offset } = marked(source); assert.equal(emptyContext(text, offset), kind);
   }
-  for (const source of ['{"x":"[|]"}', '{"x":1, /* [|] */ "y":2}', '[ /* [|] */ ]', '{ /* {|} */ }', '{"x":[1,|]}', '{"x":{"y":1,|}}', '{"x":" | "}']) {
+  for (const source of ['{"x":"[|]"}', '{"x":1, /* [|] */ "y":2}', '[ /* [|] */ ]', '{ /* {|} */ }', '{"x":[[|]]}', '{"x":[1,[|]]}', '{"x":[1,|]}', '{"x":{"y":1,|}}', '{"x":" | "}']) {
     const { text, offset } = marked(source); assert.equal(emptyContext(text, offset), undefined);
   }
 });
