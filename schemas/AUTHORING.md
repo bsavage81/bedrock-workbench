@@ -1,6 +1,6 @@
 # Workbench schema direction
 
-Workbench schemas are authored independently from format documentation and tested behavior. Do not translate or copy Blockception schema files. Existing official Mojang schema coverage remains available while we replace individual routes with tested schemas we maintain.
+Workbench schemas are authored independently from format documentation and tested behavior. Existing official Mojang schema coverage remains available while we replace individual routes with tested schemas we maintain.
 
 First migrated route: `schemas/loot-table.schema.json`, used instead of the bundled Mojang loot-table entry point for compatible targets. It checks document/pool/entry structure and numeric ranges, permits unknown fields, and leaves condition/function payloads open. It is deliberately not a complete runtime validator.
 
