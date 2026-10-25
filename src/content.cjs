@@ -5,7 +5,7 @@ const core = require('./core.cjs');
 const scripts = require('./script-components.cjs');
 const { molangParser, MOLANG_QUERIES, MOLANG_MATH } = require('./vendor/molang.cjs');
 class ContentIndex {
-  constructor(project) { this.project = project; this.types = new Map(); this.documents = new Map(); this.issues = []; this.scriptSources = new Map(); this.customComponents = []; this.scriptsDirty = false; }
+  constructor(project) { this.project = project; this.types = new Map(); this.documents = new Map(); this.issues = []; this.scriptSources = new Map(); this.languages=new Map(); this.customComponents = []; this.scriptsDirty = false; }
   add(type, id, file) {
     if (typeof id !== 'string' || !id) return;
     if (!this.types.has(type)) this.types.set(type, new Map());
@@ -16,6 +16,7 @@ class ContentIndex {
     const normalize = value => process.platform === 'win32' ? path.resolve(value).toLowerCase() : path.resolve(value);
     const matches = candidate => normalize(candidate) === normalize(file) || core.inside(file, candidate);
     for (const candidate of this.documents.keys()) if (matches(candidate)) this.documents.delete(candidate);
+    for(const candidate of this.languages.keys())if(matches(candidate))this.languages.delete(candidate);
     for (const candidate of this.scriptSources.keys()) if (matches(candidate)) { this.scriptSources.delete(candidate); this.scriptsDirty = true; }
     this.issues = this.issues.filter(issue => !matches(issue.file));
     for (const values of this.types.values()) for (const [id, files] of values) {
@@ -52,6 +53,7 @@ async function indexFile(index, side, relative) {
     const project = index.project;
     const file = await core.local(project.root, path.relative(project.root, path.join(project.packs[side], relative)));
     const rel = relative.replaceAll(path.sep, '/');
+    if(side==='resource'&&/^(?:subpacks\/[^/]+\/)?texts\/[^/]+\.lang$/.test(rel)&&(await fs.stat(file)).size<=2*1024*1024){const lang=require('./localization.cjs').parse(await fs.readFile(file,'utf8'),file);index.languages.set(file,lang);for(const entry of lang.entries)index.add('language_key',entry.key,file);return;}
     if (side === 'behavior' && scripts.scriptFile(rel) && (await fs.stat(file)).size <= 2 * 1024 * 1024) {
       index.scriptSources.set(file, await fs.readFile(file, 'utf8')); index.scriptsDirty = true;
     }
@@ -116,9 +118,10 @@ function referenceKind(keys, value, document) {
     if (keys[2] === 'textures' && keys.length === 4) return 'texture';
     if (keys[2] === 'geometry' && keys.length === 4) return 'geometry';
     if (keys[2] === 'animations' && keys.length === 4) return value?.startsWith('controller.animation.') ? 'animation_controller' : 'animation';
-    if (keys[2] === 'render_controllers' && keys.length === 4) return 'render_controller';
+    if (keys[2] === 'render_controllers' && (keys.length === 4||keys.length===5&&typeof keys[3]==='number'&&key===value&&value?.startsWith('controller.render.'))) return 'render_controller';
   }
-  const depth = keys[1] === 'components' ? 2 : keys[1] === 'permutations' && typeof keys[2] === 'number' && keys[3] === 'components' ? 4 : 0;
+  if(root==='minecraft:entity'&&keys[1]==='description'&&keys[2]==='animations'&&keys.length===4)return value?.startsWith('controller.animation.')?'animation_controller':'animation';
+  const depth = root==='minecraft:entity'&&keys[1]==='component_groups'?3:keys[1] === 'components' ? 2 : keys[1] === 'permutations' && typeof keys[2] === 'number' && keys[3] === 'components' ? 4 : 0;
   const component = depth ? keys[depth] : undefined, tail = keys.slice(depth + 1);
   if (root === 'minecraft:block' && depth) {
     if (component === 'minecraft:geometry' && (!tail.length || (tail.length === 1 && key === 'identifier'))) return 'geometry';
@@ -131,6 +134,16 @@ function referenceKind(keys, value, document) {
       if (tail[0] === 'geometry' && (tail.length === 1 || (tail.length === 2 && key === 'identifier'))) return 'geometry';
       if (tail[0] === 'material_instances' && tail.length === 3 && key === 'texture') return 'terrain_texture';
     }
+  }
+  if(root==='minecraft:entity'&&depth){
+    if(['minecraft:loot','minecraft:equipment'].includes(component)&&key==='table')return 'loot_table';
+    if(component==='minecraft:breedable'&&['baby_type','mate_type'].includes(key))return 'entity';
+    if(component==='minecraft:spawn_entity'&&key==='spawn_entity')return 'entity';
+    if(component==='minecraft:transformation'&&key==='into')return 'entity';
+    if(['minecraft:breedable','minecraft:tameable','minecraft:ageable','minecraft:behavior.tempt'].includes(component)&&['breed_items','tame_items','feed_items','items','pause_growth_items','reset_growth_items','drop_items'].includes(tail[0])&&(typeof key==='number'||['item','name','result_item','transform_to_item'].includes(key)||tail.length===1))return 'item';
+    if(component==='minecraft:interact'&&key==='table'&&tail.includes('spawn_items'))return 'loot_table';
+    if(component==='minecraft:interact'&&key==='transform_to_item')return 'item';
+    if(component==='minecraft:interact'&&tail.includes('spawn_entities')&&(typeof key==='number'||key==='spawn_entities'))return 'entity';
   }
   if (root === 'minecraft:item' && depth) {
     if(component === 'minecraft:icon' && (!tail.length || (tail.length === 1 && key === 'texture') || (tail.length === 2 && tail[0] === 'textures'))) return 'item_texture';
@@ -236,7 +249,7 @@ function customComponentIssues(index, document) {
 function references(document) {
   const result = [];
   function walk(node) {
-    if (node.type === 'string' && !(node.parent?.type === 'property' && node.parent.children[0] === node)) {
+    if (node.type === 'string' && (!(node.parent?.type === 'property' && node.parent.children[0] === node)||document.side==='resource'&&json.getNodePath(node)[2]==='render_controllers')) {
       const keys = json.getNodePath(node), type = referenceKind(keys, node.value, document);
       if (type) result.push({ type, value: node.value, node, keys });
     }

@@ -58,7 +58,7 @@ function attach(vscode, context, getProject, output) {
     const data = documentData(document);
     if (!data) { diagnostics.delete(document.uri); return; }
     const compatibility=require('./component-compatibility.cjs').issues(data,getProject()).filter(issue=>!issue.native||!require('./diagnostic-policy.cjs').nativeOwnsSyntax(vscode,document.uri.fsPath));
-    const issues = [...compatibility,...require('./format-versions.cjs').issues(data,getProject()), ...content.molangIssues(data), ...(cached ? [...content.referenceIssues(cached, data), ...content.customComponentIssues(cached, data)] : [])];
+    const issues = [...(cached?require('./linked-entities.cjs').issues(cached,data):[]),...require('./entity-authoring.cjs').issues(data),...compatibility,...require('./format-versions.cjs').issues(data,getProject()), ...content.molangIssues(data), ...(cached ? [...content.referenceIssues(cached, data), ...content.customComponentIssues(cached, data)] : [])];
     diagnostics.set(document.uri, issues.map(issue => diagnostic(document, issue)));
   }
   const selector = [{ language: 'json', scheme: 'file' }, { language: 'jsonc', scheme: 'file' }];
@@ -277,6 +277,7 @@ function attach(vscode, context, getProject, output) {
       result.activeSignature = 0; result.activeParameter = state.signatures[0].parameter; return result;
     }
   }, ' '));
+  require('./entity-editor.cjs').attach(vscode,context,getProject,ensure);
   const watcher = vscode.workspace.createFileSystemWatcher('**/*');
   function change(uri) {
     // Config rediscovery briefly clears the active project. Keep using the

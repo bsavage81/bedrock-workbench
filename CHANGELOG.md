@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.18.0 — October 24, 2026
+
+- Expand original entity authoring to 84 curated components/AI goals, nested event responses, filters, groups and properties, with version-aware Learn hovers.
+- Add scoped event/group/property, alias and controller-state suggestions, navigation and informational reference checks. Connect known client/controller aliases and synced properties.
+- Parse pack language files by key and show English-first supplied translations in hovers, including identifiers and unsaved language edits; complete explicit translation/display-name fields.
+- Add Find References and F2 rename for known symbols and typed references, synchronizing standard translated-name keys across locales and static RawMessage references. Refuse collisions and ambiguous shared controller bindings.
+
 ## 0.17.0 — October 24, 2026
 
 - Add version-specific material ambient-occlusion types/ranges and field/value spellings for redstone, precipitation and entity feeding. Correct visual-rotation state names.

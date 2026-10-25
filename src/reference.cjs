@@ -107,7 +107,7 @@ function closest(name, names) {
   function distance(a, b) { let row = Array.from({ length: b.length + 1 }, (_, i) => i); for (let i = 1; i <= a.length; i++) { const next = [i]; for (let j = 1; j <= b.length; j++) next[j] = Math.min(next[j - 1] + 1, row[j] + 1, row[j - 1] + (a[i - 1] !== b[j - 1])); row = next; } return row[b.length]; }
   return names.map(value => ({ value, distance: distance(name, value) })).filter(v => v.distance <= 2).sort((a, b) => a.distance - b.distance).slice(0, 3).map(v => v.value);
 }
-function componentSchema(index, kind, { omit = [] } = {}) {
+function componentSchema(index, kind, { omit = [], supplement } = {}) {
   function valueSchema(value, component) {
     const result = { description: value.description || '' };
     result.markdownDescription = [value.description || '', value.type ? `Type: ${value.type}` : '', `Reference data: Mojang ${index.tag}.`, documentation.componentLink(kind, component)].filter(Boolean).join('\n\n');
@@ -119,8 +119,14 @@ function componentSchema(index, kind, { omit = [] } = {}) {
     return result;
   }
   const components = { type: 'object', additionalProperties: true, properties: Object.fromEntries(Object.entries(index.components[kind]).filter(([name]) => !omit.includes(name)).map(([name, value]) => [name, valueSchema(value,name)])) };
+  if(supplement){
+    const names=(node,seen=new Set())=>{if(!node||typeof node!=='object')return [];if(node.$ref?.startsWith('#/definitions/')){const name=node.$ref.slice(14);if(seen.has(name))return [];seen.add(name);return names(supplement.definitions?.[name],seen);}return [...Object.keys(node.properties||{}),...['anyOf','oneOf','allOf'].flatMap(key=>(node[key]||[]).flatMap(child=>names(child,new Set(seen))))];};
+    for(const id of omit){const owned=supplement.definitions?.components?.properties?.[id],known=new Set(names(owned)),fields=Object.entries(index.components[kind][id]?.fields||{}).filter(([field])=>!known.has(field));if(!fields.length)continue;
+      components.properties[id]={doNotSuggest:true,properties:Object.fromEntries(fields.map(([field,value])=>{const next=valueSchema(value,id);delete next.type;return [field,next];}))};
+    }
+  }
   return require('./format-versions.cjs').apply({ $schema: 'http://json-schema.org/draft-07/schema#', title: `Mojang ${index.tag} ${kind} reference`, type: 'object', properties: {
-    [`minecraft:${kind}`]: { type: 'object', properties: { components, component_groups: { type: 'object', additionalProperties: components }, permutations: { type: 'array', items: { type: 'object', properties: { components } } } } }
+    [`minecraft:${kind}`]: { type: 'object', properties: { components, ...(kind==='entity'?{component_groups: { type: 'object', additionalProperties: components }}:{}), ...(kind==='block'?{permutations: { type: 'array', items: { type: 'object', properties: { components } } }}:{}) } }
   } },kind,index.target);
 }
 module.exports = { buildIndex, chooseRelease, loadReference, closest, componentSchema };

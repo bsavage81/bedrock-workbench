@@ -4,7 +4,7 @@ const reference = require('./reference.cjs');
 const core = require('./core.cjs');
 const officialSchemas = require('./official-schemas.cjs');
 const ownedBlocks = require('../schemas/block.schema.json').definitions.components.properties;
-const ownedByKind = {block:ownedBlocks,item:require('../schemas/item.schema.json').definitions.components.properties};
+const ownedByKind = {entity:require('../schemas/entity.schema.json').definitions.components.properties,block:ownedBlocks,item:require('../schemas/item.schema.json').definitions.components.properties};
 const documentation = require('./documentation.cjs');
 function attach(vscode, context, getProject, output) {
   if (!vscode.languages.registerCompletionItemProvider) return { refresh() {} };
@@ -21,7 +21,7 @@ function attach(vscode, context, getProject, output) {
     const text = document.getText(), location = json.getLocation(text, document.offsetAt(position));
     const keys = location.path, c = kind==='entity'&&keys[1]==='component_groups'?2:keys.lastIndexOf('components');
     if (c < 0 || keys[0] !== `minecraft:${kind}`) return;
-    if (c !== 1 && !(kind==='entity'&&c===2&&keys[1]==='component_groups') && !(c === 3 && ((keys[1] === 'permutations' && typeof keys[2] === 'number') || (kind === 'entity' && keys[1] === 'component_groups')))) return;
+    if (c !== 1 && !(kind==='entity'&&c===2&&keys[1]==='component_groups') && !(c === 3 && ((kind==='block' && keys[1] === 'permutations' && typeof keys[2] === 'number') || (kind === 'entity' && keys[1] === 'component_groups')))) return;
     const components = index.components[kind];
     return { text, location, keys, c, kind, components };
   }
@@ -132,7 +132,7 @@ function attach(vscode, context, getProject, output) {
       const associations = [];
       for (const [folder, kind] of Object.entries({ blocks: 'block', items: 'item', entities: 'entity' })) {
         const file = await core.local(project.root, `.bedrock/reference/${kind}.schema.json`);
-        await core.writeJson(file, reference.componentSchema(index, kind, { omit: Object.keys(ownedByKind[kind]||{}) }));
+        await core.writeJson(file, reference.componentSchema(index, kind, { omit: Object.keys(ownedByKind[kind]||{}),supplement:kind==='entity'?require('../schemas/entity.schema.json'):undefined }));
         associations.push({ fileMatch: [path.join(project.packs.behavior, folder, '**/*.json').replaceAll(path.sep, '/')], url: vscode.Uri.file(file).toString() });
       }
       associations.push(...(official?.associations || []));

@@ -8,7 +8,7 @@ const VERSION = require(path.join(PACKAGE, 'package.json')).version;
 const catalog = require('@minecraft/bedrock-schemas/catalog.json');
 const documentation = require('./documentation.cjs');
 const documentationCatalog = require('./documentation-links.json');
-const BUILD = 16;
+const BUILD = 19;
 // Independent Workbench replacements. Broader Mojang routes remain fallbacks.
 const OWNED = {
   'bp/item_catalog/index.schema.json': require('../schemas/creative-catalog.schema.json'),
@@ -140,7 +140,7 @@ async function prepare(project) {
         const destination = await core.local(project.root, path.relative(project.root, path.join(directory, file)));
         const schema = JSON.parse(await fs.readFile(path.join(PACKAGE, 'schemas', file), 'utf8'));
         const relative = file.replaceAll(path.sep, '/');
-        const owned = relative==='bp/entities/index.schema.json'?undefined:OWNED[relative];
+        const owned = OWNED[relative];
         const kind=/^bp\/(blocks|items|entities)\/index.schema.json$/.exec(relative)?.[1];
         const next = kind ? require('./format-versions.cjs').apply(owned || adapt(schema, relative),{blocks:'block',items:'item',entities:'entity'}[kind],project.config.targetVersion) : owned || adapt(schema,relative);
         const current = await core.readJson(destination).catch(() => null);
@@ -149,7 +149,7 @@ async function prepare(project) {
         if (JSON.stringify(current) !== JSON.stringify(next)) await core.writeJson(destination, next);
       }
       await core.writeJson(await core.local(project.root, path.relative(project.root, path.join(directory, 'common/expression.schema.json'))), { anyOf: [{ type: 'string' }, { type: 'number' }], description: 'Molang expression: a string expression or numeric literal.' });
-      for(const [relative,schema]of Object.entries(OWNED)){if(relative==='bp/entities/index.schema.json'&&!legacyTarget)continue;const kind={blocks:'block',items:'item',entities:'entity'}[relative.split('/')[1]];await core.writeJson(await core.local(project.root,path.relative(project.root,path.join(directory,relative))),kind?require('./format-versions.cjs').apply(schema,kind,project.config.targetVersion):schema);}
+      for(const [relative,schema]of Object.entries(OWNED)){const kind={blocks:'block',items:'item',entities:'entity'}[relative.split('/')[1]];await core.writeJson(await core.local(project.root,path.relative(project.root,path.join(directory,relative))),kind?require('./format-versions.cjs').apply(schema,kind,project.config.targetVersion):schema);}
       await core.writeJson(marker, { build: BUILD, version: VERSION,target:project.config.targetVersion });
     }
     const mappings = routes().filter(route=>!legacyTarget||Object.hasOwn(OWNED,route.relative));

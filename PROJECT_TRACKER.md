@@ -249,3 +249,13 @@ Remaining: general function argument flow, external package types, unsaved scrip
 - [x] Experiment requirements with documented stable boundaries and vanilla/custom voxel-shape distinctions.
 - [x] Explicit Quick Fixes for safe renames, boolean conversions, supported project requirements and file format updates within the target ceiling.
 - [x] Preserve conflicts and event-based migrations for manual work; retain JSONC comments/unrelated values; omit source edits from saved reports.
+
+### Entity authoring and pack translations
+
+- [x] Original rules for 84 entity components/AI goals, nested events, component groups, filters and properties, with version-aware Learn hovers.
+- [x] Conservative self-event/group/property references; enum/boolean values; aliases and state navigation across linked clients/controllers.
+- [x] Language-key parsing, raw-message/display-name key suggestions and English-first multilingual hovers, including dirty language buffers.
+- [x] Scoped F2/reference support, known project-wide ID renames, standard translated-name synchronization and unambiguous linked property/alias updates.
+- [x] Reject collisions/shared binding ambiguity and keep dynamic/external references permissive.
+- [x] Audit 128 Mojang and 53 SavageCraft entity examples; inspect the 721-file project without modifying source entities.
+- [ ] Broaden component payload audits beyond the curated set and resolve dynamic script/timeline bindings only with reliable ownership evidence.

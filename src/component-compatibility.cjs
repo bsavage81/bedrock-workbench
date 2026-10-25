@@ -47,14 +47,15 @@ function issues(document,project){const result=[],format=json.findNodeAtLocation
  return result;
 }
 function apply(schema,kind,target,pattern){
- schema=structuredClone(schema);
- const body=original=>{const properties=Object.fromEntries(Object.entries(original).map(([id,value])=>[id,{...value,doNotSuggest:true}]));return ({properties:{['minecraft:'+kind]:{properties:{components:{properties},permutations:{items:{properties:{components:{properties}}}},component_groups:{additionalProperties:{properties}}}}}});};
+ schema=structuredClone(schema);const present=new Set();let ageableFeed=false;function collect(node){if(!node||typeof node!=='object')return;for(const key of Object.keys(node.properties||{}))if(key.startsWith('minecraft:')){present.add(key);if(key==='minecraft:ageable'&&node.properties[key].properties?.feed_items)ageableFeed=true;}for(const value of Object.values(node))if(Array.isArray(value))value.forEach(collect);else if(value&&typeof value==='object')collect(value);}collect(schema);
+ const body=original=>{const properties=Object.fromEntries(Object.entries(original).map(([id,value])=>[id,{...value,doNotSuggest:true}]));return ({properties:{['minecraft:'+kind]:{properties:{components:{properties},...(kind==='block'?{permutations:{items:{properties:{components:{properties}}}}}:{}),...(kind==='entity'?{component_groups:{additionalProperties:{properties}}}:{})}}}});};
  const gate=(min,current,legacy)=>{(schema.allOf||=[]).push({if:{required:['format_version'],properties:{format_version:{type:'string',pattern:pattern(min)}}},then:body(current),else:body(legacy)});};
  const link=(description,id)=>({description,markdownDescription:description+'\n\n'+docs.componentLink(kind,id)});
  function strip(node){if(!node||typeof node!=='object')return;
   for(const [id,value]of Object.entries(node.properties||{})){
    if(kind==='block'&&id==='minecraft:redstone_consumer'){if(value.properties)delete value.properties.propagates_power;if(value.patternProperties)delete value.patternProperties['^propogates_power'+'$'];}
    if(kind==='block'&&id==='minecraft:precipitation_interactions'&&value.properties)delete value.properties.precipitation_behavior;
+   if(kind==='entity'&&id==='minecraft:ageable'&&value.properties?.feed_items){const prune=node=>{if(!node||typeof node!=='object')return;if(node.properties){delete node.properties.transform_to_item;delete node.properties.result_item;}for(const child of Object.values(node))if(Array.isArray(child))child.forEach(prune);else if(child&&typeof child==='object')prune(child);};prune(value.properties.feed_items);}
    if(kind==='item'&&id==='minecraft:chargeable')value.doNotSuggest=true;
   }
   for(const value of Object.values(node))if(Array.isArray(value))value.forEach(strip);else if(value&&typeof value==='object')strip(value);
@@ -64,14 +65,15 @@ function apply(schema,kind,target,pattern){
   if(schema.definitions?.material?.properties)delete schema.definitions.material.properties.ambient_occlusion;
   // Inline copies created by minimum-version rules also need the old union removed.
   function stripAmbient(node){if(!node||typeof node!=='object')return;if(node.properties&&Object.hasOwn(node.properties,'ambient_occlusion'))delete node.properties.ambient_occlusion;for(const value of Object.values(node))if(Array.isArray(value))value.forEach(stripAmbient);else if(value&&typeof value==='object')stripAmbient(value);}stripAmbient(schema);
-  const materials=field=>({'minecraft:material_instances':{patternProperties:{['^.*'+'$']:{properties:{ambient_occlusion:field}}}},...Object.fromEntries(['minecraft:item_visual','minecraft:embedded_visual'].map(id=>[id,{properties:{material_instances:{patternProperties:{['^.*'+'$']:{properties:{ambient_occlusion:field}}}}}}]))});
-  gate('1.26.20',materials({type:'number',minimum:0,maximum:10,...link('Ambient occlusion exponent, from 0 to 10. Boolean forms were removed in format 1.26.20.','minecraft:material_instances')}),materials({type:['boolean','number'],...link('Legacy ambient occlusion, accepting boolean or numeric values before format 1.26.20.','minecraft:material_instances')}));
+  const materialFields=field=>({'minecraft:material_instances':{patternProperties:{['^.*'+'$']:{properties:{ambient_occlusion:field}}}},...Object.fromEntries(['minecraft:item_visual','minecraft:embedded_visual'].map(id=>[id,{properties:{material_instances:{patternProperties:{['^.*'+'$']:{properties:{ambient_occlusion:field}}}}}}]))});
+  const materials=field=>Object.fromEntries(Object.entries(materialFields(field)).filter(([id])=>present.has(id)));
+  if(present.has('minecraft:material_instances')||present.has('minecraft:item_visual')||present.has('minecraft:embedded_visual'))gate('1.26.20',materials({type:'number',minimum:0,maximum:10,...link('Ambient occlusion exponent, from 0 to 10. Boolean forms were removed in format 1.26.20.','minecraft:material_instances')}),materials({type:['boolean','number'],...link('Legacy ambient occlusion, accepting boolean or numeric values before format 1.26.20.','minecraft:material_instances')}));
   const renamed=(current,old)=>({'minecraft:redstone_consumer':{properties:{[current]:{type:'boolean',...link('Whether the redstone signal can pass through this block.','minecraft:redstone_consumer')},[old]:{doNotSuggest:true}}}});
-  gate('1.26.0',renamed('propagates_power','propogates_power'),renamed('propogates_power','propagates_power'));
+  if(present.has('minecraft:redstone_consumer'))gate('1.26.0',renamed('propagates_power','propogates_power'),renamed('propogates_power','propagates_power'));
   const rain=name=>({'minecraft:precipitation_interactions':{properties:{precipitation_behavior:{anyOf:[{type:'string',enum:['none','obstruct_rain','obstruct_rain_accumulate_snow',name]},{type:'string'}],...link('Rain and snow interaction. The snowlogging spelling begins in format 1.26.30.','minecraft:precipitation_interactions')}}}});
-  gate('1.26.30',rain('snowlogging'),rain('snow_log_no_collision'));
+  if(present.has('minecraft:precipitation_interactions'))gate('1.26.30',rain('snowlogging'),rain('snow_log_no_collision'));
  }
- if(kind==='entity'){
+ if(kind==='entity'&&present.has('minecraft:ageable')&&ageableFeed){
   const feed=(current,old)=>({'minecraft:ageable':{properties:{feed_items:{items:{properties:{[current]:{type:'string',...link('Item created after feeding this ingredient. Renamed to result_item in format 1.21.130.','minecraft:ageable')},[old]:{doNotSuggest:true}}}}}}});
   gate('1.21.130',feed('result_item','transform_to_item'),feed('transform_to_item','result_item'));
  }
