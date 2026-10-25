@@ -124,6 +124,7 @@ async function run() {
   const molangCompletions = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', animationUri, molangPosition);
   assert.ok(molangCompletions.items.some(item => item.label === 'query.anim_time' && item.detail === 'Mojang Molang reference'), 'Molang completion missing');
   assert.ok(commands.includes('bedrock.vanillaSource'),'Vanilla reference source command missing');
+  assert.ok(commands.includes('bedrock.createProject'),'New-project wizard command missing');
   const referenceFixtureFile=path.join(root,'.bedrock/reference/components.json'),referenceFixture=await core.readJson(referenceFixtureFile);
   referenceFixture.vanillaReferences={item:['minecraft:horsearmoriron']};await core.writeJson(referenceFixtureFile,referenceFixture);
   await core.writeJson(path.join(root,'BP/recipes/vanilla-validation.json'),{format_version:'1.26.50','minecraft:recipe_shapeless':{description:{identifier:'test:vanilla_validation'},tags:['crafting_table'],ingredients:[{item:'minecraft:diamnod'},{item:'minecraft:horsearmoriron'}],result:'minecraft:diamond'}});

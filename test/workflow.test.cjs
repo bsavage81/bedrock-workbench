@@ -9,6 +9,42 @@ const { unzipSync } = require('fflate');
 const { PNG } = require('pngjs');
 const core = require('../src/core.cjs');
 
+async function projectWizard(t,options={}){
+ await fs.mkdir(path.resolve('.test-temp'),{recursive:true});const parent=await fs.mkdtemp(path.join(path.resolve('.test-temp'),'wizard-'));t.after(()=>fs.rm(parent,{recursive:true,force:true}));const root=path.join(parent,'Wizard Pack'),calls=[],prompts=[],warnings=[];
+ const snapshot={formatVersion:1,updated:Date.now(),revision:123,latestRelease:'1.26.50',definitions:[{id:'betaApis',label:'Beta APIs'},{id:'voxelShapes',label:'Voxel Shapes',since:'1.26.10'},{id:'removedExample',label:'Removed example',until:'1.26.30'},{id:'previewExample',label:'Preview example',previewOnly:true}],removed:[],events:[]};
+ const vscode={workspace:{isTrusted:options.trusted!==false,workspaceFolders:[{uri:{fsPath:parent}}]},ProgressLocation:{Notification:1},Uri:{file:fsPath=>({scheme:'file',fsPath})},commands:{executeCommand:async(...args)=>calls.push(args)},window:{
+  withProgress:async(_,task)=>task(),
+  showInputBox:async settings=>{prompts.push(settings);if(options.cancelAt&&settings.title.includes(options.cancelAt))return;const value=settings.title.includes('Project name')?'Wizard Pack':settings.title.includes('engine version')?'1.26.50':settings.title.includes('runtime version')?'2.1.0':'2.1.0';assert.equal(settings.validateInput?.(value),undefined);return value;},
+  showOpenDialog:async()=>options.cancelAt==='folder'?undefined:[{scheme:'file',fsPath:parent}],
+  showQuickPick:async(items,settings)=>{prompts.push({items,...settings});if(options.cancelAt&&settings.title.includes(options.cancelAt))return;if(settings.canPickMany)return items.filter(item=>item.experimentId==='voxelShapes');const id=settings.title.includes('installation')?'release':settings.title.includes('Pack icon')?'default':settings.title.includes('Scripting')?options.scripting||'none':settings.title.includes('lookup unavailable')?'manual':undefined;return id?items.find(item=>item.id===id):items.find(item=>item.beta===!!options.beta);},
+  showInformationMessage:async(message,settings,...actions)=>{assert.equal(await core.exists(root),false,'No target files before review confirmation');prompts.push({message,...settings});return options.cancelAt==='review'?undefined:actions[options.skipInstall?actions.length-1:0];},
+  showWarningMessage:async message=>warnings.push(message)
+ }};
+ const deps={currentRelease:async()=>{if(options.offline)throw Error('Offline');return {version:'1.26.50'};},fetchExperiments:async()=>{if(options.offline)throw Error('Offline');return snapshot;},selectScript:async()=>{if(options.offline)throw Error('Offline');return options.beta?{runtime:'2.2.0-beta',version:'2.2.0-beta.1.26.50-stable',peers:{}}:{runtime:'2.1.0',version:'2.1.0',peers:{}};},installTypings:async(project,plan)=>{calls.push(['install',project.root,plan]);if(options.installError)throw Error('npm unavailable');}};
+ const result=await require('../src/project-wizard.cjs').run(vscode,deps);return {result,parent,root,calls,prompts,warnings};
+}
+
+test('new-project wizard creates and opens a project and excludes retired or mismatched experiments',async t=>{
+ const h=await projectWizard(t);assert.equal(h.result.config.name,'Wizard Pack');assert.equal(h.result.config.experimentalGameplay.voxelShapes,true);assert.equal(h.result.config.experimentalGameplay.betaApis,false);assert.equal(h.calls[0][0],'vscode.openFolder');assert.equal(h.calls[0][1].fsPath,h.root);assert.equal(h.calls[0][2].forceNewWindow,true);
+ const choices=h.prompts.find(p=>p.canPickMany).items;assert.ok(!choices.some(item=>['removedExample','previewExample','betaApis'].includes(item.experimentId)));assert.ok(h.prompts.some(p=>p.modal&&p.detail.includes(h.root)&&p.detail.includes('1.0.0')));
+ const catalog=await core.readJson(path.join(h.root,'.bedrock/experiments/catalog.json'));assert.equal(catalog.revision,123);assert.ok((await require('../src/experiment-updates.cjs').readState(h.root)).reviewed.includes('voxelShapes'));
+ const pkg=require('../package.json');assert.equal(pkg.contributes.commands.find(c=>c.command==='bedrock.initialize').title,'Bedrock: Initialize Existing Project');assert.ok(pkg.contributes.commands.some(c=>c.command==='bedrock.createProject'));
+});
+
+test('new-project wizard supports beta scripts and preserves a created project when optional typings fail',async t=>{
+ const h=await projectWizard(t,{scripting:'typescript',beta:true,installError:true});assert.equal(h.result.config.experimentalGameplay.betaApis,true);assert.equal(h.calls[0][0],'install');assert.equal(h.calls[0][2][0].selected.runtime,'2.2.0-beta');assert.equal(h.calls[1][0],'vscode.openFolder');assert.ok(h.warnings.some(message=>message.includes('typings installation')));assert.ok(await core.exists(path.join(h.root,'BP/scripts/main.ts')));
+});
+
+test('new-project wizard cancellation leaves the selected parent untouched',async t=>{
+ for(const cancelAt of ['Project name','folder','Minecraft installation','Pack icon','Scripting','Script API channel','World experiment requirements','review']){
+  const h=await projectWizard(t,{cancelAt,scripting:'typescript'});assert.equal(h.result,undefined,cancelAt);assert.deepEqual(await fs.readdir(h.parent),[],cancelAt);assert.deepEqual(h.calls,[],cancelAt);
+ }
+});
+
+test('new-project wizard permits explicit engine/API choices offline without assuming current versions',async t=>{
+ const h=await projectWizard(t,{offline:true,scripting:'javascript',skipInstall:true});assert.equal(h.result.config.targetVersion,'1.26.50');assert.ok(h.prompts.find(p=>p.title?.includes('engine version')).prompt.includes('Could not check'));assert.equal((await core.readJson(path.join(h.root,'BP/manifest.json'))).dependencies[1].version,'2.1.0');assert.equal(h.calls[0][0],'vscode.openFolder');
+});
+
 async function harness(t, autoDeploy = false, releaseScenario = {}) {
   const base = path.resolve('.test-temp'); await fs.mkdir(base, { recursive: true });
   const root = await fs.mkdtemp(path.join(base, 'workflow-'));

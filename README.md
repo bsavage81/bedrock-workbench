@@ -15,7 +15,7 @@ This is completion assistance rather than a full command validator. Runtime-gene
 ## Start
 
 1. Install the local `.vsix` using VS Code's **Extensions: Install from VSIX** command.
-2. Open the project folder containing `bedrock-project.json`. For an existing standard add-on with `BP` and `RP`, run **Bedrock: Initialize Project** once.
+2. Run **Bedrock: Create New Project** to create a new add-on, or open an existing project containing `bedrock-project.json`. For an existing standard add-on with `BP` and `RP`, run **Bedrock: Initialize Existing Project** once.
 3. Open the Bedrock activity-bar sidebar. Choose **Build beta** to compile without deploying.
 4. Choose the Minecraft **release** or **preview** target. Use **Minecraft folder** to override discovery with that installation's `com.mojang` folder.
 5. Choose **Deploy beta** for a manual deployment, or turn **Auto deploy** on. Saved changes and external changes, including added or deleted files, trigger deployment after a short delay. The project must be trusted.
@@ -25,6 +25,14 @@ This is completion assistance rather than a full command validator. Runtime-gene
 Use VS Code's standard Explorer to browse and edit project files. The Bedrock sidebar keeps the project name and build status at the top, followed by collapsible **Settings**, **Pack icons**, **Beta development**, **Stable releases**, and **Project tools** sections. Beta and stable tasks start expanded; the other sections start collapsed. VS Code retains your expansion choices as the sidebar refreshes. Select the project name at the top to open its settings.
 
 Choose **BP pack icon** and **RP pack icon** in the sidebar to select PNG images from any local folder. Each selection is validated and copied into the appropriate source pack as `pack_icon.png`. The sidebar shows thumbnails, and the project name uses the BP icon with RP as a fallback. Thumbnails refresh when image contents change, even at the same filename. Canceling keeps the existing icon; an invalid image cannot overwrite it. With Auto deploy enabled, changing the source icon triggers the normal beta build.
+
+## Create a new project
+
+**Bedrock: Create New Project** asks for a name, parent folder, Minecraft Release or Preview target, engine version, PNG icon, JavaScript/TypeScript or no scripting, stable or beta Script APIs, and world experiment requirements. The same icon starts both packs; each can be changed later from the sidebar. The wizard checks current engine/API versions and experiment availability, with explicit version entry and bundled experiment choices when offline.
+
+Review the final settings before creating anything. The wizard creates a new subfolder under the selected parent and refuses to replace an existing folder. Canceling before creation leaves the parent unchanged. It generates standard BP/RP content folders, linked format-2 manifests, pack icons, starter language files, project settings, a README and ignore rules. Scripted projects additionally receive a starter script, package.json and TypeScript/JavaScript editor settings. TypeScript compiles to the manifest's JavaScript entry point. Matching API typings can be installed during creation or later with **Bedrock: Install Script API Typings**.
+
+New projects start at 1.0.0 with independent beta/stable identities. Auto deployment starts off. Selected experiments are recorded as requirements; enable those switches in Minecraft world settings too. Creating from an existing workspace opens the new project in another VS Code window, preserving the current workspace.
 
 ## Profiles and versions
 

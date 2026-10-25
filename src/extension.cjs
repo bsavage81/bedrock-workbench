@@ -420,6 +420,7 @@ function activate(context) {
     await core.initialize(folders[0].uri.fsPath); await discover();
     await vscode.window.showTextDocument(vscode.Uri.file(path.join(root, 'bedrock-project.json')));
   });
+  register('createProject', () => require('./project-wizard.cjs').run(vscode));
   register('build', () => run('build'));
   async function runValidation() {
     await requireProject(); validationDiagnostics.clear(); status = 'Validating saved files…'; refresh();

@@ -2,7 +2,7 @@
   "name": "bedrock-workbench",
   "displayName": "Bedrock Workbench",
   "description": "Build, deploy and export Minecraft Bedrock add-ons with separate beta and stable profiles.",
-  "version": "0.22.1",
+  "version": "0.23.0",
   "publisher": "bsavage81",
   "license": "UNLICENSED",
   "engines": {
@@ -49,8 +49,12 @@
   "contributes": {
     "commands": [
       {
+        "command": "bedrock.createProject",
+        "title": "Bedrock: Create New Project"
+      },
+      {
         "command": "bedrock.initialize",
-        "title": "Bedrock: Initialize Project"
+        "title": "Bedrock: Initialize Existing Project"
       },
       {
         "command": "bedrock.build",
@@ -173,7 +177,7 @@
     "viewsWelcome": [
       {
         "view": "bedrock.project",
-        "contents": "Open a folder containing bedrock-project.json, or initialize an existing BP/RP project.\n[Initialize Project](command:bedrock.initialize)"
+        "contents": "Start a new add-on or set up an existing BP/RP project.\n[Create New Project](command:bedrock.createProject)\n[Initialize Existing Project](command:bedrock.initialize)"
       }
     ],
     "jsonValidation": [

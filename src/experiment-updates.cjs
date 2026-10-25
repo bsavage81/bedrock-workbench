@@ -125,7 +125,17 @@ async function load(config, root, { force = false, fetchImpl = globalThis.fetch 
   let cached;
   try { cached = await core.readJson(file); } catch (error) { if (error.code !== 'ENOENT') throw error; }
   if (!force && cached?.formatVersion === 1 && Date.now() - cached.updated < 86400000) return { ...cached, offline: false };
-  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const snapshot = await fetchSnapshot({ fetchImpl });
+    await core.writeJson(file, snapshot); return { ...snapshot, offline: false };
+  } catch (error) {
+    if (cached?.formatVersion === 1) return { ...cached, offline: true, error: error.message };
+    throw error;
+  }
+}
+// The project wizard needs current choices without creating project files.
+async function fetchSnapshot({ fetchImpl = globalThis.fetch, timeoutMs = 15000 } = {}) {
+  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const response = await fetchImpl(API, { signal: controller.signal, headers: { Accept: 'application/json', 'User-Agent': 'Bedrock-Workbench/0.6 (VS Code experiment catalog)' } });
     if (!response.ok) throw new Error(`Experiment reference returned HTTP ${response.status}`);
@@ -134,11 +144,7 @@ async function load(config, root, { force = false, fetchImpl = globalThis.fetch 
     const data = JSON.parse(Buffer.concat(buffers).toString('utf8'));
     const revision = data.query?.pages?.[0]?.revisions?.[0];
     if (!Number.isInteger(revision?.revid) || revision.revid < 1 || !Number.isFinite(Date.parse(revision.timestamp))) throw new Error('Experiment reference revision is missing');
-    const snapshot = parseWiki(revision?.slots?.main?.content, revision);
-    await core.writeJson(file, snapshot); return { ...snapshot, offline: false };
-  } catch (error) {
-    if (cached?.formatVersion === 1) return { ...cached, offline: true, error: error.message };
-    throw error;
+    return parseWiki(revision?.slots?.main?.content, revision);
   } finally { clearTimeout(timer); }
 }
-module.exports = { SOURCE, API, parseWiki, resolve, load, readState, saveState };
+module.exports = { SOURCE, API, parseWiki, resolve, load, readState, saveState, fetchSnapshot };

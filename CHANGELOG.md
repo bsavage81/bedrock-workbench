@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.23.0 — October 25, 2026
+
+- Add a Create New Project wizard for project name/location, Release/Preview target, pack icon, experiments and JavaScript/TypeScript with stable or beta Script APIs. Generate BP/RP folders, linked manifests, distinct beta/stable identities and optional matching typings. Rename the existing setup command to Initialize Existing Project.
+
 ## 0.22.1 — October 25, 2026
 
 - Keep language keys visible when custom theme colors have not resolved by supplying explicit light/dark fallback colors.

@@ -259,3 +259,12 @@ Remaining: general function argument flow, external package types, unsaved scrip
 - [x] Reject collisions/shared binding ambiguity and keep dynamic/external references permissive.
 - [x] Audit 128 Mojang and 53 SavageCraft entity examples; inspect the 721-file project without modifying source entities.
 - [ ] Broaden component payload audits beyond the curated set and resolve dynamic script/timeline bindings only with reliable ownership evidence.
+
+### New project setup
+
+- [x] Separate Create New Project and Initialize Existing Project commands and welcome actions.
+- [x] New-project name/location, shared starter icon, Release/Preview target and JavaScript/TypeScript/no-script choices.
+- [x] Target-matched stable/beta Script API dependency selection, optional typings installation and explicit offline version entry.
+- [x] Filter experiment choices by lifecycle and channel; record requirements and keep Minecraft world settings separate.
+- [x] Generate BP/RP folders, linked manifests, stable/beta UUID profiles, icons, language files and starter code with version 1.0.0.
+- [x] Review before writing, cancellation without creating files, exclusive destination ownership and preservation of existing folders.

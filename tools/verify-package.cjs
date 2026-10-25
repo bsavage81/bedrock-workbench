@@ -18,6 +18,16 @@ const { unzipSync } = require('fflate');
   assert.ok(groupSchema.properties['minecraft:crafting_items_catalog']);
   assert.ok(require(path.join(unpacked,'extension/src/creative-groups.cjs')).vanilla.includes('minecraft:itemGroup.name.sword'));
   const core = require(path.join(unpacked, 'extension/src/core.cjs'));
+  const packagedCreator=require(path.join(unpacked,'extension/src/new-project.cjs'));
+  assert.equal(typeof require(path.join(unpacked,'extension/src/project-wizard.cjs')).run,'function');
+  const wizardParent=await fs.mkdtemp(path.join(base,'packaged-wizard-'));
+  try{
+    const created=await packagedCreator.create({root:path.join(wizardParent,'Starter Pack'),name:'Starter Pack',target:'release',targetVersion:'1.26.50'});
+    const output=await core.compile(created.root,'beta');
+    assert.ok(await core.exists(path.join(output.directory,'behavior/manifest.json')));
+    assert.ok(await core.exists(path.join(output.directory,'resource/pack_icon.png')));
+    console.log('Packaged new-project generator creates a buildable starter project.');
+  }finally{await fs.rm(wizardParent,{recursive:true,force:true});}
   const sample = path.resolve('projects/SavageCraft v2');
   const sourceProject = await core.loadProject(sample);
   const isolatedSample = await fs.mkdtemp(path.join(base, 'package-sample-'));

@@ -8,6 +8,46 @@ const { unzipSync } = require('fflate');
 const core = require('../src/core.cjs');
 const tempRoot = path.resolve(__dirname, '../.test-temp');
 
+test('new projects create linked manifests, isolated profiles, folders and buildable icons',async t=>{
+ await fs.mkdir(tempRoot,{recursive:true});const parent=await fs.mkdtemp(path.join(tempRoot,'new-project-'));t.after(()=>fs.rm(parent,{recursive:true,force:true}));
+ const create=require('../src/new-project.cjs'),root=path.join(parent,'New Pack');
+ const project=await create.create({root,name:'New Pack',target:'release',targetVersion:'1.26.50',experiments:{upcomingCreatorFeatures:true}});
+ assert.equal(project.config.name,'New Pack');assert.equal(project.config.profiles.stable.title,'New Pack');assert.equal(project.config.profiles.beta.title,'New Pack Beta');assert.deepEqual(project.config.version,[1,0,0]);assert.equal(project.config.build.autoDeploy,false);
+ const bp=await core.readJson(path.join(root,'BP/manifest.json')),rp=await core.readJson(path.join(root,'RP/manifest.json'));
+ assert.equal(bp.dependencies[0].uuid,rp.header.uuid);assert.deepEqual(bp.header.min_engine_version,[1,26,50]);assert.equal(bp.modules.length,1);
+ const ids=['beta','stable'].flatMap(profile=>Object.values(project.config.profiles[profile].identities).flatMap(identity=>[identity.header,...identity.modules]));assert.equal(new Set(ids).size,ids.length);
+ for(const folder of ['BP/entities','BP/functions','RP/models/entity','RP/texts','RP/textures/items'])assert.ok((await fs.stat(path.join(root,folder))).isDirectory());
+ assert.equal(await core.exists(path.join(root,'BP/scripts')),false);assert.equal(await core.exists(path.join(root,'package.json')),false);assert.equal(project.config.experimentalGameplay.betaApis,false);
+ const beta=await core.compile(root,'beta'),stable=await core.compile(root,'stable');
+ const betaIcon=PNG.sync.read(await fs.readFile(path.join(beta.directory,'behavior/pack_icon.png'))),stableIcon=PNG.sync.read(await fs.readFile(path.join(stable.directory,'behavior/pack_icon.png')));assert.equal(betaIcon.data[0],betaIcon.data[1]);assert.notEqual(stableIcon.data[0],stableIcon.data[1]);
+ assert.notEqual((await core.readJson(path.join(beta.directory,'behavior/manifest.json'))).header.uuid,(await core.readJson(path.join(stable.directory,'behavior/manifest.json'))).header.uuid);
+});
+
+test('new scripted projects compile TypeScript and JavaScript with matching stable/beta dependencies',async t=>{
+ await fs.mkdir(tempRoot,{recursive:true});const parent=await fs.mkdtemp(path.join(tempRoot,'new-script-project-'));t.after(()=>fs.rm(parent,{recursive:true,force:true}));const creator=require('../src/new-project.cjs');
+ const icon=new PNG({width:1,height:1});icon.data.set([10,90,200,255]);const bytes=PNG.sync.write(icon),iconFile=path.join(parent,'brand.png');await fs.writeFile(iconFile,bytes);
+ for(const [language,target,beta,scriptApi]of [['typescript','release',false,{runtime:'2.1.0',version:'2.1.0-rc.1.26.50-stable'}],['javascript','preview',true,{runtime:'2.2.0-beta',version:'2.2.0-beta.1.26.50-preview.20'}]]){
+  const root=path.join(parent,language),project=await creator.create({root,name:'My '+language,target,targetVersion:'1.26.50',scripting:language,experiments:{betaApis:beta},scriptApi,icon:iconFile});
+  const manifest=await core.readJson(path.join(root,'BP/manifest.json'));assert.equal(manifest.modules[1].entry,'scripts/main.js');assert.equal(manifest.modules[1].language,'javascript');assert.equal(manifest.dependencies[1].version,scriptApi.runtime);assert.equal(project.config.experimentalGameplay.betaApis,beta);
+  assert.deepEqual(await fs.readFile(path.join(root,'RP/pack_icon.png')),bytes);assert.equal((await core.readJson(path.join(root,'package.json'))).devDependencies['@minecraft/server'],scriptApi.version);
+  const build=await core.compile(root);assert.ok(await core.exists(path.join(build.directory,'behavior/scripts/main.js')));assert.ok(!await core.exists(path.join(build.directory,'behavior/scripts/main.ts')));
+ }
+});
+
+test('new project creation refuses existing folders and invalid inputs without overwriting files',async t=>{
+ await fs.mkdir(tempRoot,{recursive:true});const parent=await fs.mkdtemp(path.join(tempRoot,'new-project-safety-'));t.after(()=>fs.rm(parent,{recursive:true,force:true}));const creator=require('../src/new-project.cjs'),root=path.join(parent,'existing');await fs.mkdir(root);await fs.writeFile(path.join(root,'keep.txt'),'Preserve me');
+ const options={root,name:'New',targetVersion:'1.26.50'};await assert.rejects(creator.create(options),/already exists/);assert.equal(await fs.readFile(path.join(root,'keep.txt'),'utf8'),'Preserve me');
+ const invalid=path.join(parent,'bad.png');await fs.writeFile(invalid,'not an image');const fresh=path.join(parent,'fresh');await assert.rejects(creator.create({...options,root:fresh,icon:invalid}),/valid PNG/);assert.equal(await core.exists(fresh),false);
+ await assert.rejects(creator.create({...options,root:fresh,scripting:'typescript',experiments:{betaApis:true},scriptApi:{runtime:'2.1.0',version:'2.1.0'}}),/stable or beta/);assert.equal(await core.exists(fresh),false);
+ assert.equal(creator.folderName('CON'),'Project_CON');assert.equal(creator.folderName('Fish: Pack?'),'Fish_ Pack_');assert.ok(creator.validateName('\n'));
+});
+
+test('new project script versions use the selected engine, channel and API stability',async()=>{
+ const creator=require('../src/new-project.cjs'),versions=['2.1.0','2.1.0-rc.1.26.50-stable','2.2.0-beta.1.26.50-stable','2.3.0-beta.1.26.60-preview.20'],fetchImpl=async()=>({ok:true,json:async()=>({name:'@minecraft/server',versions:Object.fromEntries(versions.map(version=>[version,{}]))})});
+ const config={target:'release',targetVersion:'1.26.50',experimentalGameplay:{betaApis:false}};assert.equal((await creator.selectScript(config,{fetchImpl})).runtime,'2.1.0');
+ config.experimentalGameplay.betaApis=true;assert.equal((await creator.selectScript(config,{fetchImpl})).runtime,'2.2.0-beta');config.target='preview';config.targetVersion='1.26.60';assert.equal((await creator.selectScript(config,{fetchImpl})).runtime,'2.3.0-beta');
+});
+
 async function fixture(t) {
   await fs.mkdir(tempRoot, { recursive: true });
   const root = await fs.mkdtemp(path.join(tempRoot, 'bedrock-test-'));
