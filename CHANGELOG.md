@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.20.0 — October 25, 2026
+
+- Extend inline translation previews to vanilla namespaced item/block references, including block items and legacy language keys from Mojang serialization metadata. Continue showing vanilla text references and respecting project translation overrides.
+- Complete offspring property_inheritance keys from the current entity declarations, inserting an object value and preserving mutation settings. Exclude keys already present and connect property hover/navigation/rename.
+- Add complete parameter hovers and suggestions for random_swim, swim_wander, swim_idle and flocking. Fill missing damage-sensor and seat-position descriptions and audit named parameter hover coverage.
+- Add avoid_mob_type entity_types entry hovers/completions for distance, speeds, visibility, cooldown and priority, plus the documented avoidance-goal fields.
+- Add nested filter completions and Learn hovers: test-specific subjects/operators/domains/values, vanilla/project families, typed asset references and declared property values.
+- Correct movement.sway from a numeric attribute to its documented movement-control fields, defaults, suggestions and parameter hovers.
+- Add move_to_block field rules, enum suggestions, vanilla/project target-block references and arrival/stay event hints. Preserve object/array trigger forms and vector/object target offsets.
+- Suggest file-declared events for event values, including empty/unquoted values and foreign-target hints. Correct quoted-value completion filtering while keeping foreign-target events outside local rename/validation ownership.
+- Explain the 1.26.10 pushable split in component/field hovers and warn when the legacy component is used in affected entity formats.
+- Add the missing move_towards_restriction AI goal, with Learn-linked hovers and priority, speed and control-flag completions.
+- Preserve full component descriptions when Mojang metadata contains duplicate cross-references with numeric IDs, including behavior.open_door. Filter numeric placeholders from cached hover text and refresh older reference indexes.
+
 ## 0.19.0 — October 25, 2026
 
 - Complete translation-capable fields from both target-matched vanilla and project language files, showing translated text in the suggestions. Prefer project overrides and keep vanilla keys read-only during renames.

@@ -45,14 +45,14 @@ test('selected vanilla folders are indexed read-only and matched to channel, ver
   async function write(relative,data){const file=path.join(folder,relative);await fs.mkdir(path.dirname(file),{recursive:true});await fs.writeFile(file,JSON.stringify(data));return file;}
   const packFile=await write('Content/data/resource_packs/vanilla/models/entity/test.geo.json',{'minecraft:geometry':[{description:{identifier:'geometry.installed'}}]});
   await write('Content/data/resource_packs/vanilla/textures/terrain_texture.json',{texture_data:{installed:{textures:'textures/blocks/installed'}}});
-  await write('Content/data/behavior_packs/vanilla/blocks/test.json',{'minecraft:block':{description:{identifier:'minecraft:installed'}}});
+  await write('Content/data/behavior_packs/vanilla/blocks/test.json',{'minecraft:block':{description:{identifier:'minecraft:installed'},components:{'minecraft:display_name':'tile.installed.name'}}});
   await write('Content/data/resource_packs/unrelated/models/entity/test.json',{'geometry.not_vanilla':{}});
   const languageFile=path.join(folder,'Content/data/resource_packs/vanilla/texts/en_US.lang');await fs.mkdir(path.dirname(languageFile),{recursive:true});await fs.writeFile(languageFile,'item.installed.name=Installed\n');
   const before=await fs.readFile(packFile);
   const project={root,config:{target:'release',targetVersion:'1.26.50'},vanillaSource:{folder,version:'1.26.50'}};
   const result=await vanilla.local(project);
   assert.deepEqual(result.languages[0].values,[['item.installed.name','Installed',0]]);assert.equal(result.packs,2);assert.deepEqual(result.vanilla.geometry,['geometry.installed']);
-  assert.deepEqual(result.vanilla.block,['minecraft:installed']);
+  assert.deepEqual(result.vanilla.block,['minecraft:installed']);assert.deepEqual(result.vanillaNames.block['minecraft:installed'],['tile.installed.name']);
   assert.deepEqual(result.vanilla.texture,['textures/blocks/installed']);
   assert.deepEqual(await fs.readFile(packFile),before);
   const merged=vanilla.merge({vanilla:{block:['minecraft:stone']}},result);

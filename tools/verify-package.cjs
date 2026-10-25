@@ -65,7 +65,7 @@ const { unzipSync } = require('fflate');
     const packagedBlock=new(require('ajv'))({strict:false}).compile(formats.apply(require(path.join(unpacked,'extension/schemas/block.schema.json')),'block','1.26.50'));
     assert.equal(packagedBlock({format_version:'1.26.50','minecraft:block':{description:{identifier:'test:packaged'},components:{'minecraft:material_instances':{'*':{ambient_occlusion:false}}}}}),false);
     const entitySchema=require(path.join(unpacked,'extension/schemas/entity.schema.json'));
-    assert.equal(Object.keys(entitySchema.definitions.components.properties).length,84);
+    assert.equal(Object.keys(entitySchema.definitions.components.properties).length,89);
     assert.equal(typeof require(path.join(unpacked,'extension/src/entity-editor.cjs')).attach,'function');
     assert.equal(typeof require(path.join(unpacked,'extension/src/project-symbols.cjs')).plan,'function');
     const localized=require(path.join(unpacked,'extension/src/localization.cjs')).parse('ui.test=English text','en_US.lang');

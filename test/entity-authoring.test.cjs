@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs/promises'),path=require('node:path'),json=require('jsonc-parser');const content=require('../src/content.cjs'),entity=require('../src/entity-authoring.cjs'),symbols=require('../src/project-symbols.cjs'),lang=require('../src/localization.cjs');
 const doc=data=>({file:'entity.json',side:'behavior',relative:'entities/test.json',data,text:JSON.stringify(data),tree:json.parseTree(JSON.stringify(data))});
 test('owned entity schema validates meaningful nested forms and rejects broken payloads',()=>{
- const schema=require('../schemas/entity.schema.json'),validate=new(require('ajv'))({strict:false}).compile(schema);assert.equal(Object.keys(schema.definitions.components.properties).length,84);
+ const schema=require('../schemas/entity.schema.json'),validate=new(require('ajv'))({strict:false}).compile(schema);assert.equal(Object.keys(schema.definitions.components.properties).length,89);
  const good={format_version:'1.26.50','minecraft:entity':{description:{identifier:'test:fish',properties:{'test:mode':{type:'enum',values:['idle','swim'],default:'idle'}}},components:{'minecraft:health':{value:{range_min:3,range_max:5},max:5},'minecraft:behavior.tempt':{priority:1,items:[{tags:"q.any_tag('test:food')"},'minecraft:fish']},'test:unknown':{arbitrary:[true]}},component_groups:{wet:{'minecraft:timer':{time:[1,3],time_down_event:{event:'test:done',target:'self'}}}},events:{'test:done':{sequence:[{add:{component_groups:['wet']}}]}}}};assert.ok(validate(good),JSON.stringify(validate.errors));
  const bad=structuredClone(good);bad['minecraft:entity'].components['minecraft:health'].max='bad';assert.equal(validate(bad),false);bad['minecraft:entity'].components['minecraft:health'].max=5;bad['minecraft:entity'].events['test:done'].sequence='bad';assert.equal(validate(bad),false);
  for(const value of Object.values(schema.definitions.components.properties))if(value.description)assert.match(value.markdownDescription,/learn.microsoft.com/);
@@ -53,4 +53,46 @@ test('entity metadata supplements uncurated fields without duplicating authored 
 test('version-aware component schemas keep entity groups and block permutations in their supported document kinds',()=>{
  const versions=require('../src/format-versions.cjs');
  for(const kind of ['entity','block','item']){const schema=versions.apply(require('../schemas/'+kind+'.schema.json'),kind,'1.26.50');function check(node){if(!node||typeof node!=='object')return;const root=node.properties?.['minecraft:'+kind];if(root?.properties){if(kind!=='block')assert.equal(root.properties.permutations,undefined);if(kind!=='entity')assert.equal(root.properties.component_groups,undefined);}for(const value of Object.values(node))if(Array.isArray(value))value.forEach(check);else if(value&&typeof value==='object')check(value);}check(schema);}
+});
+
+test('event completion contexts cover quoted, empty and unfinished values without claiming foreign targets',()=>{
+ for(const target of [undefined,'self','other'])for(const value of ['savage:talk7','']){
+  const document=doc({'minecraft:entity':{component_groups:{talk:{'minecraft:environment_sensor':{triggers:[{event:value,...(target?{target}:{})}]}}},events:{'savage:talk7':{},'savage:talk8':{}}}});
+  const start=document.text.indexOf('"event":')+8,offset=start+1,state=entity.completionContext(document,offset);assert.equal(state?.kind,'entity_event');assert.equal(state.mode,'value');assert.deepEqual(entity.symbols(document).filter(s=>s.kind===state.kind).map(s=>s.id),['savage:talk7','savage:talk8']);
+  if(target==='other')assert.ok(!entity.uses(document).some(s=>s.kind==='entity_event'));
+ }
+ const text='{"minecraft:entity":{"components":{"minecraft:timer":{"time_down_event":{"event": } }},"events":{"savage:talk7":{}}}}';const document={text,tree:json.parseTree(text),file:'test.json'};assert.equal(entity.completionContext(document,text.indexOf('"event":')+9)?.kind,'entity_event');
+ const keyOffset=text.indexOf('"event":')+2;assert.notEqual(entity.completionContext(document,keyOffset)?.kind,'entity_event');
+});
+
+test('move_to_block validates documented shapes and links block selectors and self-target events',()=>{
+ const schema=require('../schemas/entity.schema.json'),validate=new(require('ajv'))({strict:false}).compile(schema);
+ const goal={target_blocks:['minecraft:seagrass','minecraft:kelp'],target_selection_method:'nearest',stay_duration:1200,priority:0,search_range:32,on_reach:{event:'savage:set_egg_drifting_f',target:'self'},goal_radius:0};
+ const document=doc({format_version:'1.26.50','minecraft:entity':{description:{identifier:'test:mob'},components:{'minecraft:behavior.move_to_block':goal},events:{'savage:set_egg_drifting_f':{}}}});assert.ok(validate(document.data),JSON.stringify(validate.errors));
+ const refs=content.references({...document,side:'behavior',relative:'entities/test.json'});assert.deepEqual(refs.filter(r=>r.type==='block').map(r=>r.value),['minecraft:seagrass','minecraft:kelp']);assert.ok(entity.uses(document).some(r=>r.kind==='entity_event'&&r.id==='savage:set_egg_drifting_f'));assert.deepEqual(entity.issues(document),[]);
+ const alternate=structuredClone(document.data),g=alternate['minecraft:entity'].components['minecraft:behavior.move_to_block'];g.on_reach=[{event:'savage:set_egg_drifting_f',target:'self'}];g.on_stay_completed={event:'savage:set_egg_drifting_f'};g.target_offset={x:0,y:1,z:0};assert.ok(validate(alternate),JSON.stringify(validate.errors));g.target_selection_method='invalid';assert.equal(validate(alternate),false);g.target_selection_method='random';g.goal_radius='invalid';assert.equal(validate(alternate),false);
+ const definition=schema.definitions.components.properties['minecraft:behavior.move_to_block'];for(const field of Object.values(definition.properties))if(field.description)assert.match(field.markdownDescription,/minecraftbehavior_move_to_block/);
+});
+
+test('movement.sway exposes movement-control fields with numeric defaults and correct hover links',()=>{
+ const schema=require('../schemas/entity.schema.json'),definition=schema.definitions.components.properties['minecraft:movement.sway'];
+ assert.deepEqual(Object.keys(definition.properties),['max_turn','sway_amplitude','sway_frequency']);assert.deepEqual(Object.values(definition.properties).map(p=>p.default),[30,0.05,0.5]);for(const field of Object.values(definition.properties)){assert.equal(field.type,'number');assert.ok(field.description);assert.match(field.markdownDescription,/minecraftcomponent_movement\.sway/);}
+ const validate=new(require('ajv'))({strict:false}).compile(schema);for(const components of [{components:{'minecraft:movement.sway':{sway_amplitude:0}}},{component_groups:{swim:{'minecraft:movement.sway':{max_turn:30,sway_amplitude:0.05,sway_frequency:0.5}}}}])assert.ok(validate({format_version:'1.26.50','minecraft:entity':{description:{identifier:'test:fish'},...components}}),JSON.stringify(validate.errors));assert.equal(validate({format_version:'1.26.50','minecraft:entity':{components:{'minecraft:movement.sway':{sway_amplitude:'bad'}}}}),false);
+});
+
+test('avoid_mob_type entity_types fields have goal-specific descriptions and numeric rules',()=>{
+ const schema=require('../schemas/entity.schema.json'),definition=schema.definitions.components.properties['minecraft:behavior.avoid_mob_type'],entry=definition.properties.entity_types.anyOf[0];
+ for(const name of ['max_dist','walk_speed_multiplier','sprint_speed_multiplier']){assert.equal(entry.properties[name].type,'number');assert.match(entry.properties[name].markdownDescription,/minecraftbehavior_avoid_mob_type/);assert.ok(entry.properties[name].description.length>20);}
+ assert.match(definition.properties.entity_types.markdownDescription,/avoid/);assert.ok(!Object.hasOwn(definition.properties,'speed_multiplier'));
+ const validate=new(require('ajv'))({strict:false}).compile(schema),avoid={entity_types:[{filters:{any_of:[{test:'is_family',subject:'other',value:'player'},{test:'is_family',subject:'other',value:'axolotl'}]},max_dist:6,walk_speed_multiplier:1.6,sprint_speed_multiplier:2.1}]};const data={format_version:'1.26.50','minecraft:entity':{components:{'minecraft:behavior.avoid_mob_type':avoid}}};assert.ok(validate(data),JSON.stringify(validate.errors));avoid.entity_types[0].max_dist='bad';assert.equal(validate(data),false);
+});
+
+test('offspring property inheritance uses file declarations without confusing mutation parameters',()=>{
+ for(const grouped of [false,true]){
+  const offspring={'minecraft:offspring':{property_inheritance:{'savage:size':{mutation_chance:0.03125,mutation_values:[1,2,3]}}}},document=doc({'minecraft:entity':{description:{properties:{'savage:size':{type:'int',range:[1,3],default:2},'savage:color':{type:'enum',values:['red','blue'],default:'red'}}},...(grouped?{component_groups:{breeding:offspring}}:{components:offspring})}});
+  const offset=document.text.indexOf('"savage:size"',document.text.indexOf('property_inheritance'))+3,state=entity.completionContext(document,offset);assert.equal(state.kind,'entity_property');assert.equal(state.mode,'key');assert.equal(state.inheritance,true);assert.ok(entity.uses(document).some(s=>s.kind==='entity_property'&&s.id==='savage:size'));
+  const mutation=document.text.indexOf('mutation_chance')+3;assert.equal(entity.completionContext(document,mutation),undefined);
+  const index=new content.ContentIndex({});index.documents.set(document.file,document);const changes=symbols.plan(index,{kind:'entity_property',id:'savage:size',scope:'entity',local:true,file:document.file},'savage:weight');assert.equal(changes.filter(c=>c.text==='"savage:weight"').length,2);
+ }
+ const document=doc({'minecraft:entity':{description:{properties:{'savage:size':{type:'int'}}},components:{'minecraft:offspring':{property_inheritance:{}}}}});const offset=document.text.indexOf('{}')+1;assert.equal(entity.completionContext(document,offset)?.inheritance,true);
 });

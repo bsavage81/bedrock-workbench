@@ -1,0 +1,4833 @@
+{
+  "source": "https://github.com/Mojang/bedrock-samples/tree/v1.26.50.4",
+  "engine": "1.26.50",
+  "tests": {
+    "actor_has_item_with_enchantment_in_slot": {
+      "description": "Tests that an actor has an item equipped with a given enchantment.",
+      "fields": {
+        "domain": {
+          "description": "(Optional) The equipment location to test",
+          "type": "String",
+          "default": "any",
+          "options": [
+            "any",
+            "armor",
+            "body",
+            "feet",
+            "hand",
+            "head",
+            "inventory",
+            "leg",
+            "main_hand",
+            "torso"
+          ]
+        },
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) A string value.",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "actor_health": {
+      "description": "Tests the health of the subject.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "all_slots_empty": {
+      "description": "Returns true when the designated equipment location for the subject entity is completely empty.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) The equipment location to test",
+          "type": "String",
+          "default": "any",
+          "options": [
+            "any",
+            "armor",
+            "body",
+            "feet",
+            "hand",
+            "head",
+            "inventory",
+            "leg",
+            "main_hand",
+            "torso"
+          ]
+        }
+      }
+    },
+    "any_slot_empty": {
+      "description": "Returns true when the designated equipment location for the subject entity has any empty slot.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) The equipment location to test",
+          "type": "String",
+          "default": "any",
+          "options": [
+            "any",
+            "armor",
+            "body",
+            "feet",
+            "hand",
+            "head",
+            "inventory",
+            "leg",
+            "main_hand",
+            "torso"
+          ]
+        }
+      }
+    },
+    "bool_property": {
+      "description": "Returns true when the bool actor property matches the value provided.",
+      "fields": {
+        "domain": {
+          "description": "(Required) The property name to look for",
+          "type": "String",
+          "options": []
+        },
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "clock_time": {
+      "description": "Compares the current time with a float value in the range (0.0, 1.0).\r0.0= Noon\r0.25= Sunset\r0.5= Midnight\r0.75= Sunrise",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) A floating point value.",
+          "type": "Decimal",
+          "options": []
+        }
+      }
+    },
+    "distance_to_nearest_player": {
+      "description": "Compares the distance to the nearest Player with a float value.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) A floating point value.",
+          "type": "Decimal",
+          "options": []
+        }
+      }
+    },
+    "enum_property": {
+      "description": "Returns true when the enum actor property matches the value provided.",
+      "fields": {
+        "domain": {
+          "description": "(Required) The property name to look for",
+          "type": "String",
+          "options": []
+        },
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) A string value.",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "float_property": {
+      "description": "Returns true when the float actor property matches the value provided.",
+      "fields": {
+        "domain": {
+          "description": "(Required) The property name to look for",
+          "type": "String",
+          "options": []
+        },
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) A floating point value.",
+          "type": "Decimal",
+          "options": []
+        }
+      }
+    },
+    "has_ability": {
+      "description": "Returns true when the subject entity has the named ability.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Ability type to test",
+          "type": "String",
+          "options": [
+            "flySpeed",
+            "flying",
+            "instabuild",
+            "invulnerable",
+            "lightning",
+            "mayfly",
+            "mute",
+            "noclip",
+            "verticalFlySpeed",
+            "walkSpeed",
+            "worldbuilder"
+          ]
+        }
+      }
+    },
+    "has_biome_tag": {
+      "description": "Tests whether the biome the subject is in has the specified tag.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The tag to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "has_component": {
+      "description": "Returns true when the subject entity contains the named component.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The component name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "has_container_open": {
+      "description": "Returns true when the subject Player entity has opened a container.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "has_damage": {
+      "description": "Returns true when the subject entity receives the named damage type.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Damage type to test",
+          "type": "String",
+          "options": [
+            "anvil",
+            "attack",
+            "block_explosion",
+            "contact",
+            "drowning",
+            "entity_explosion",
+            "fall",
+            "falling_block",
+            "fatal",
+            "fire",
+            "fire_tick",
+            "fly_into_wall",
+            "lava",
+            "magic",
+            "none",
+            "override",
+            "piston",
+            "projectile",
+            "self_destruct",
+            "sonic_boom",
+            "stalactite",
+            "stalagmite",
+            "starve",
+            "suffocation",
+            "thorns",
+            "void",
+            "wither"
+          ]
+        }
+      }
+    },
+    "has_damaged_equipment": {
+      "description": "Tests for the presence of a damaged named item in the designated slot of the subject entity.",
+      "fields": {
+        "domain": {
+          "description": "(Optional) The equipment location to test",
+          "type": "String",
+          "default": "any",
+          "options": [
+            "any",
+            "armor",
+            "body",
+            "feet",
+            "hand",
+            "head",
+            "inventory",
+            "leg",
+            "main_hand",
+            "torso"
+          ]
+        },
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The item name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "has_equipment": {
+      "description": "Tests for the presence of a named item in the designated slot of the subject entity.",
+      "fields": {
+        "domain": {
+          "description": "(Optional) The equipment location to test",
+          "type": "String",
+          "default": "any",
+          "options": [
+            "any",
+            "armor",
+            "body",
+            "feet",
+            "hand",
+            "head",
+            "inventory",
+            "leg",
+            "main_hand",
+            "torso"
+          ]
+        },
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The item name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "has_equipment_tag": {
+      "description": "Tests for the presence of an item with the named tag in the designated slot of the subject entity.",
+      "fields": {
+        "domain": {
+          "description": "(Optional) The equipment location to test",
+          "type": "String",
+          "default": "any",
+          "options": [
+            "any",
+            "armor",
+            "body",
+            "feet",
+            "hand",
+            "head",
+            "inventory",
+            "leg",
+            "main_hand",
+            "torso"
+          ]
+        },
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The item name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "has_item_with_component": {
+      "description": "Returns true when the subject entity is holding a item with the specified component.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The component name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "has_mob_effect": {
+      "description": "Tests whether the Subject has the specified mob effect.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) A string value.",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "has_nametag": {
+      "description": "Tests if the subject has been given a custom name.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "has_property": {
+      "description": "Tests for the presence of a property of the subject entity.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The property name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "has_ranged_weapon": {
+      "description": "Returns true when the subject entity is holding a ranged weapon like a bow or crossbow.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "has_same_equipment_in_slot_as": {
+      "description": "Returns whether the subject entity has the same item equipped in the specified slot as calling entity. Only supports specified slots: \"main_hand\", \"head\", \"torso\", \"leg\", \"feet\", and \"body\".",
+      "fields": {
+        "domain": {
+          "description": "(Optional) The equipment location to test",
+          "type": "String",
+          "default": "any",
+          "options": [
+            "any",
+            "armor",
+            "body",
+            "feet",
+            "hand",
+            "head",
+            "inventory",
+            "leg",
+            "main_hand",
+            "torso"
+          ]
+        },
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) true or false.",
+          "type": "Boolean",
+          "options": []
+        }
+      }
+    },
+    "has_silk_touch": {
+      "description": "Tests if the subject is holding an item with silk touch.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "has_tag": {
+      "description": "Returns true if the subject entity has the tag provided.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) A string value.",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "has_target": {
+      "description": "Returns true if the subject entity has a valid target.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "has_trade_supply": {
+      "description": "Tests whether the target has any trade supply left. Will return false if the target cannot be traded with.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "home_distance": {
+      "description": "Tests the distance between the subject and its home. Returns false if the subject has no home or if their home is in a different dimension.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) A floating point value.",
+          "type": "Decimal",
+          "options": []
+        }
+      }
+    },
+    "hourly_clock_time": {
+      "description": "Compares the current 24 hour time with an int value in the range[0, 24000]",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "in_block": {
+      "description": "Returns true when the subject entity is inside a specified Block type.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) A string value.",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "in_caravan": {
+      "description": "Returns true if the subject entity is in a caravan.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "in_clouds": {
+      "description": "Returns true when the subject entity is in the clouds.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "in_contact_with_water": {
+      "description": "Returns true when the subject entity in contact with any water: water, rain, splash water bottle.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "in_lava": {
+      "description": "Returns true when the subject entity is in lava.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "in_nether": {
+      "description": "Returns true when the subject entity is in Nether.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "in_overworld": {
+      "description": "Returns true when the subject entity is in Overworld.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "in_water": {
+      "description": "Returns true when the subject entity is in water.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "in_water_or_rain": {
+      "description": "Returns true when the subject entity is in water or rain.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "inactivity_timer": {
+      "description": "Tests if the specified duration in seconds of inactivity for despawning has been reached.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "int_property": {
+      "description": "Returns true when the int actor property matches the value provided.",
+      "fields": {
+        "domain": {
+          "description": "(Required) The property name to look for",
+          "type": "String",
+          "options": []
+        },
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "is_altitude": {
+      "description": "Tests the current altitude against a provided value. 0= bedrock elevation.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The altitude value to compare with",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "is_avoiding_mobs": {
+      "description": "Returns true if the subject entity is fleeing from other mobs.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_baby": {
+      "description": "Returns true when the subject entity is a baby.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_biome": {
+      "description": "Tests whether the Subject is currently in the named biome.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Biome type to test",
+          "type": "String",
+          "options": [
+            "beach",
+            "desert",
+            "extreme_hills",
+            "flat",
+            "forest",
+            "ice",
+            "jungle",
+            "mesa",
+            "mushroom_island",
+            "ocean",
+            "plain",
+            "river",
+            "savanna",
+            "stone_beach",
+            "swamp",
+            "taiga",
+            "the_end",
+            "the_nether"
+          ]
+        }
+      }
+    },
+    "is_block": {
+      "description": "Returns true when the block has the given name.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Family name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "is_bound_to_creaking_heart": {
+      "description": "Tests that the Creaking Heart that spawned the subject Creaking still exists.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_brightness": {
+      "description": "Tests the current brightness against a provided value in the range (0.0f, 1.0f).",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The brightness value to compare with.",
+          "type": "Decimal",
+          "options": []
+        }
+      }
+    },
+    "is_climbing": {
+      "description": "Returns true if the subject entity is climbing.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_color": {
+      "description": "Returns true if the subject entity is the named color.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Palette Color to test",
+          "type": "String",
+          "options": [
+            "black",
+            "blue",
+            "brown",
+            "cyan",
+            "gray",
+            "green",
+            "light_blue",
+            "light_green",
+            "magenta",
+            "orange",
+            "pink",
+            "purple",
+            "red",
+            "silver",
+            "white",
+            "yellow"
+          ]
+        }
+      }
+    },
+    "is_controlling_passenger_family": {
+      "description": "Returns true when the subject entity's controlling passenger is a member of the named family.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Family name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "is_daytime": {
+      "description": "Returns true during the daylight hours.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_difficulty": {
+      "description": "Tests the current difficulty level of the game.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The game's difficulty level to test",
+          "type": "String",
+          "options": [
+            "easy",
+            "hard",
+            "normal",
+            "peaceful"
+          ]
+        }
+      }
+    },
+    "is_family": {
+      "description": "Returns true when the subject entity is a member of the named family.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Family name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "is_game_rule": {
+      "description": "Tests whether a named game rule is active.",
+      "fields": {
+        "domain": {
+          "description": "(Required) The Game Rule to test.",
+          "type": "String",
+          "options": []
+        },
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_humid": {
+      "description": "Tests whether the Subject is in an area with humidity",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_immobile": {
+      "description": "Returns true if the subject entity is immobile. An entity is immobile if it lacks AI goals, has just changed dimensions or if it is a mob and has no health.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_in_same_vehicle": {
+      "description": "Returns whether the subject entity is in the same vehicle as the calling entity.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) true or false.",
+          "type": "Boolean",
+          "options": []
+        }
+      }
+    },
+    "is_in_village": {
+      "description": "Tests whether the Subject is inside the bounds of a village.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_leashed": {
+      "description": "Returns true if the subject entity is leashed.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_leashed_to": {
+      "description": "Returns true if the subject entity leashed to the calling entity.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_mark_variant": {
+      "description": "Returns true if the subject entity is the mark variant number provided.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "is_missing_health": {
+      "description": "Tests if the subject is not at full health.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_moving": {
+      "description": "Returns true if the subject entity is moving.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_navigating": {
+      "description": "Tests if the subject is currently pathfinding. Requires a \"minecraft:navigation\" component.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_owner": {
+      "description": "Returns true if the subject entity is the owner of the calling entity.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_panicking": {
+      "description": "Tests if the subject is panicking.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_persistent": {
+      "description": "Tests if the subject's persistence matches the bool value passed in.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_raider": {
+      "description": "Tests if the subject is a raider.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_riding": {
+      "description": "Returns true if the subject entity is riding on another entity.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_riding_self": {
+      "description": "Returns true if the subject entity is riding the calling entity.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_sitting": {
+      "description": "Tests if the subject is sitting.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_skin_id": {
+      "description": "Returns true if the subject entity is the skin id number provided.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "is_sleeping": {
+      "description": "Tests whether the Subject is sleeping.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_sneak_held": {
+      "description": "Returns true if the subject entity has the sneak input held.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_sneaking": {
+      "description": "Returns true if the subject entity is sneaking.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_snow_covered": {
+      "description": "Tests whether the Subject is in an area with snow cover",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_sprinting": {
+      "description": "Tests if the subject is sprinting.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_tamed": {
+      "description": "Tests whether the Subject is tamed.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_target": {
+      "description": "Returns true if the subject entity is the target of the calling entity.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_temperature_type": {
+      "description": "Tests whether the current temperature is a given type.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Biome temperature catagory to test",
+          "type": "String",
+          "options": [
+            "cold",
+            "mild",
+            "ocean",
+            "warm"
+          ]
+        }
+      }
+    },
+    "is_temperature_value": {
+      "description": "Tests the current temperature against a provided value in the range (0.0, 1.0) where 0.0f is the coldest temp and 1.0f is the hottest.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Biome temperature value to compare with.",
+          "type": "Decimal",
+          "options": []
+        }
+      }
+    },
+    "is_underground": {
+      "description": "Returns true when the subject entity is underground. An entity is considered underground if there are non-solid blocks above it.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_underwater": {
+      "description": "Returns true when the subject entity is under water. An entity is considered underwater if it is completely submerged in water blocks.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_variant": {
+      "description": "Returns true if the subject entity is the variant number provided.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "is_vehicle_family": {
+      "description": "Returns true when the subject entity's vehicle is a member of the named family.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Family name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "is_visible": {
+      "description": "Returns true if the subject entity is visible.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "is_waterlogged": {
+      "description": "Tests if the subject block is submerged in water.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) true or false.",
+          "type": "Boolean",
+          "options": []
+        }
+      }
+    },
+    "is_weather": {
+      "description": "DEPRECATED",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Family name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "light_level": {
+      "description": "Tests is the mob is outside of the specified light level range (0, 16).",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "moon_intensity": {
+      "description": "Compares the current moon intensity with a float value in the range (0.0, 1.0)",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) A floating point value.",
+          "type": "Decimal",
+          "options": []
+        }
+      }
+    },
+    "moon_phase": {
+      "description": "Compares the current moon phase with an integer value in the range (0, 7).",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "on_fire": {
+      "description": "Tests if the subject is on fire.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "on_ground": {
+      "description": "Returns true when the subject entity is on ground.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "on_hot_block": {
+      "description": "Tests if the subject is on a hot block.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "on_ladder": {
+      "description": "Returns true when the subject entity is on a ladder.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "owner_distance": {
+      "description": "Tests the distance between the subject and its owner. Returns false if there is no owner.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) A floating point value.",
+          "type": "Decimal",
+          "options": []
+        }
+      }
+    },
+    "random_chance": {
+      "description": "Returns true if the random chance rolls 0 out of a specified max range.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "redstone_strength_at_position": {
+      "description": "Tests the redstone strength at the subject's position.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "rider_count": {
+      "description": "Returns the number of riders on this entity.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) An integer value.",
+          "type": "Integer",
+          "options": []
+        }
+      }
+    },
+    "surface_mob": {
+      "description": "Tests if the subject is a surface mob.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "taking_fire_damage": {
+      "description": "Tests if the subject is taking fire damage. Requires the damage_sensor component",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "target_distance": {
+      "description": "Tests the distance between the calling entity and its target.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) A floating point value.",
+          "type": "Decimal",
+          "options": []
+        }
+      }
+    },
+    "trusts": {
+      "description": "Returns true if the subject is trusted by entity.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "was_last_hurt_by": {
+      "description": "Tests if the subject is the last player who attacked the entity in the last 400 seconds, or the last mob to do so in the last 60 seconds.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Optional) true or false.",
+          "type": "Boolean",
+          "default": "true",
+          "options": []
+        }
+      }
+    },
+    "weather": {
+      "description": "Tests the current weather in the dimension against a provided weather value.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Family name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "weather_at_position": {
+      "description": "Tests the current weather, at the actor's position, against a provided weather value.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) The Family name to look for",
+          "type": "String",
+          "options": []
+        }
+      }
+    },
+    "y_rotation": {
+      "description": "Returns the Y rotation of this entity.",
+      "fields": {
+        "operator": {
+          "description": "(Optional) The comparison to apply with 'value'.",
+          "type": "String",
+          "default": "equals",
+          "options": [
+            "!=",
+            "<",
+            "<=",
+            "<>",
+            "=",
+            "==",
+            ">",
+            ">=",
+            "equals",
+            "not"
+          ]
+        },
+        "subject": {
+          "description": "(Optional) The subject of this filter test.",
+          "type": "String",
+          "default": "self",
+          "options": [
+            "block",
+            "damager",
+            "other",
+            "parent",
+            "player",
+            "self",
+            "target"
+          ]
+        },
+        "value": {
+          "description": "(Required) A floating point value.",
+          "type": "Decimal",
+          "options": []
+        }
+      }
+    }
+  },
+  "families": [
+    "actor",
+    "adult_piglin",
+    "allay",
+    "animal",
+    "aquatic",
+    "armadillo",
+    "armor_stand",
+    "armorer",
+    "arrow",
+    "arthropod",
+    "artisan",
+    "axolotl",
+    "baby_piglin",
+    "baby_turtle",
+    "baby_undead",
+    "baby_zombie_pigman",
+    "bat",
+    "bee",
+    "blacksmith",
+    "blaze",
+    "boat",
+    "bogged",
+    "breeze",
+    "breeze_wind_charge_projectile",
+    "butcher",
+    "camel",
+    "camel_husk",
+    "cartographer",
+    "cat",
+    "cavespider",
+    "chicken",
+    "cleric",
+    "cod",
+    "copper_golem",
+    "cow",
+    "creaking",
+    "creeper",
+    "cushion",
+    "dolphin",
+    "donkey",
+    "dragon",
+    "dragon_fireball",
+    "drowned",
+    "egg",
+    "ender_pearl",
+    "enderman",
+    "endermite",
+    "evocation_illager",
+    "farmer",
+    "fireball",
+    "fireworks_rocket",
+    "fish",
+    "fisherman",
+    "fishing_hook",
+    "fletcher",
+    "fox",
+    "frog",
+    "ghast",
+    "goat",
+    "guardian",
+    "guardian_elder",
+    "happy_ghast",
+    "hoglin",
+    "hoglin_adult",
+    "hoglin_baby",
+    "hoglin_huntable",
+    "horse",
+    "husk",
+    "husk_rider",
+    "illager",
+    "inanimate",
+    "irongolem",
+    "leatherworker",
+    "librarian",
+    "lightning",
+    "lingering_potion",
+    "llama",
+    "llama_spit",
+    "magmacube",
+    "minecart",
+    "mob",
+    "monster",
+    "mule",
+    "mushroomcow",
+    "nautilus",
+    "nitwit",
+    "npc",
+    "ocelot",
+    "pacified",
+    "panda",
+    "panda_aggressive",
+    "parched",
+    "parrot_tame",
+    "parrot_wild",
+    "peasant",
+    "phantom",
+    "pig",
+    "piglin",
+    "piglin_brute",
+    "piglin_hunter",
+    "pillager",
+    "player",
+    "polarbear",
+    "priest",
+    "projectile",
+    "pufferfish",
+    "rabbit",
+    "ravager",
+    "salmon",
+    "sheep",
+    "shepherd",
+    "shulker",
+    "shulker_bullet",
+    "silverfish",
+    "skeleton",
+    "skeletonhorse",
+    "slime",
+    "small_fireball",
+    "sniffer",
+    "snowball",
+    "snowgolem",
+    "spider",
+    "splash_potion",
+    "squid",
+    "stone_mason",
+    "stray",
+    "strider",
+    "strider_adult",
+    "strider_baby",
+    "sulfur_cube",
+    "tadpole",
+    "thrown_trident",
+    "tnt",
+    "toolsmith",
+    "trader_llama",
+    "tripodcamera",
+    "tropicalfish",
+    "turtle",
+    "undead",
+    "unskilled",
+    "vex",
+    "villager",
+    "vindicator",
+    "wandering_trader",
+    "wandering_trader_despawning",
+    "warden",
+    "weaponsmith",
+    "wind_charge",
+    "wind_charge_projectile",
+    "witch",
+    "wither",
+    "wither_skull",
+    "wither_skull_dangerous",
+    "wolf",
+    "xp_bottle",
+    "zoglin",
+    "zoglin_adult",
+    "zoglin_baby",
+    "zombie",
+    "zombie_nautilus",
+    "zombie_pigman",
+    "zombie_rider",
+    "zombie_villager",
+    "zombiehorse"
+  ]
+}

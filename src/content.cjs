@@ -136,6 +136,7 @@ function referenceKind(keys, value, document) {
     }
   }
   if(root==='minecraft:entity'&&depth){
+    if(component==='minecraft:behavior.move_to_block'&&tail[0]==='target_blocks'&&(tail.length===1||tail.length===2&&typeof key==='number'))return 'block';
     if(['minecraft:loot','minecraft:equipment'].includes(component)&&key==='table')return 'loot_table';
     if(component==='minecraft:breedable'&&['baby_type','mate_type'].includes(key))return 'entity';
     if(component==='minecraft:spawn_entity'&&key==='spawn_entity')return 'entity';

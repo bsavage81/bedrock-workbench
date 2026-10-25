@@ -5,6 +5,8 @@ const { buildIndex, chooseRelease, closest, componentSchema } = require('../src/
 function archive() {
   const json = value => strToU8(JSON.stringify(value));
   return zipSync({
+    'metadata/vanilladata_modules/mojang-items.json':json({data_items:[{command_name:'minecraft:cod',serialization_id:'item.fish'}]}),
+    'metadata/vanilladata_modules/mojang-blocks.json':json({data_items:[{name:'minecraft:stone',serialization_id:'tile.stone.stone'}]}),
     'behavior_pack/items/apple.json':json({'minecraft:item':{description:{identifier:'minecraft:apple'}}}),
     'behavior_pack/blocks/stone.json':json({'minecraft:block':{description:{identifier:'minecraft:stone'}}}),
     'behavior_pack/loot_tables/blocks/stone.json':json({pools:[]}),
@@ -22,7 +24,7 @@ function archive() {
 }
 test('Mojang documentation and schema references supply component and field descriptions without beta content', () => {
   const index = buildIndex(archive(), 'v1.26.50.4');
-  assert.equal(index.intelligenceVersion, 7);assert.deepEqual(index.languages[0].values,[['item.apple.name','Apple',0]]);
+  assert.deepEqual(index.vanillaNames.item['minecraft:cod'],['item.fish.name','item.fish']);assert.deepEqual(index.vanillaNames.block['minecraft:stone'],['tile.stone.stone.name','tile.stone.stone']);assert.equal(index.intelligenceVersion, 10);assert.deepEqual(index.languages[0].values,[['item.apple.name','Apple',0]]);
   assert.deepEqual(index.vanilla.terrain_texture, ['stone']);
   assert.deepEqual(index.vanilla.item_texture, ['apple']);
   assert.ok(index.vanilla.item.includes('minecraft:apple'));
@@ -68,4 +70,45 @@ test('offline cache stays usable only when its engine does not exceed the target
   assert.equal((await loadReference(root, '1.26.52', { fetchImpl })).tag, index.tag);
   await assert.rejects(loadReference(root, '1.26.40', { fetchImpl }), /offline/);
   await assert.rejects(loadReference(root, '1.26.52', { force: true, fetchImpl }), /offline/);
+});
+
+test('duplicate hidden metadata references cannot overwrite component prose or fields',()=>{
+ const {unzipSync}=require('fflate'),files=unzipSync(archive());
+ const declared={name:'minecraft:behavior.open_door',show_in_index:true,description:['Allows the mob to open doors.'],nodes:[{name:'close_door_after',type:'Boolean',description:['Closes the door after passing through.']}]};
+ const placeholder={name:declared.name,show_in_index:false,description:['-906200433']};
+ for(const nodes of [[declared,placeholder],[placeholder,declared]]){
+  files['metadata/doc_modules/entities.json']=strToU8(JSON.stringify({name:'Server Entity Documentation',nodes:[{name:'AI Goals',nodes}]}));
+  const index=buildIndex(zipSync(files),'v1.26.50.4'),value=index.components.entity[declared.name];assert.equal(value.description,'Allows the mob to open doors.');assert.equal(value.fields.close_door_after.type,'Boolean');
+  const schema=componentSchema(index,'entity');assert.ok(!JSON.stringify(schema).includes('-906200433'));assert.ok(JSON.stringify(schema).includes('minecraftbehavior_open_door'));
+ }
+});
+test('description rendering discards numeric IDs in stale caches without losing real prose',()=>{
+ const {descriptionText}=require('../src/reference.cjs');for(const value of [-906200433,'-906200433',' 123456 ',null,{}])assert.equal(descriptionText(value),'');assert.equal(descriptionText(['First paragraph.','-906200433','Second paragraph.']),'First paragraph.\n\nSecond paragraph.');
+ const index=buildIndex(archive(),'v1.26.50.4');index.components.entity['minecraft:health'].description='-906200433';assert.ok(!JSON.stringify(componentSchema(index,'entity')).includes('-906200433'));
+});
+
+test('trade_interest retains its description and timing fields after a numeric cross-reference',()=>{
+ const {unzipSync}=require('fflate'),files=unzipSync(archive());
+ const fields=['within_radius','interest_time','remove_item_time','carried_item_switch_time','cooldown'];
+ files['metadata/doc_modules/entities.json']=strToU8(JSON.stringify({name:'Server Entity Documentation',nodes:[{name:'AI Goals',nodes:[{name:'minecraft:behavior.trade_interest',show_in_index:true,description:['Allows the mob to look at a player that is holding a tradable item.'],nodes:fields.map(name=>({name,type:'Decimal',description:['Trade interest '+name.replaceAll('_',' ')+'.']}))},{name:'minecraft:behavior.trade_interest',show_in_index:false,description:['-574851053']}]}]}));
+ const index=buildIndex(zipSync(files),'v1.26.50.4'),goal=index.components.entity['minecraft:behavior.trade_interest'];
+ assert.equal(goal.description,'Allows the mob to look at a player that is holding a tradable item.');assert.deepEqual(Object.keys(goal.fields),fields);assert.ok(fields.every(name=>goal.fields[name].description));assert.ok(!JSON.stringify(componentSchema(index,'entity')).includes('-574851053'));
+});
+
+test('restrict_open_door preserves its real description when a hidden reference has a positive ID',()=>{
+ const {unzipSync}=require('fflate'),files=unzipSync(archive());
+ files['metadata/doc_modules/entities.json']=strToU8(JSON.stringify({name:'Server Entity Documentation',nodes:[{name:'AI Goals',nodes:[{name:'minecraft:behavior.restrict_open_door',show_in_index:true,description:['Allows the mob to stay indoors during night time.']},{name:'minecraft:behavior.restrict_open_door',show_in_index:false,description:['715583988']}]}]}));
+ const index=buildIndex(zipSync(files),'v1.26.50.4');assert.equal(index.components.entity['minecraft:behavior.restrict_open_door'].description,'Allows the mob to stay indoors during night time.');assert.ok(!JSON.stringify(componentSchema(index,'entity')).includes('715583988'));
+});
+
+test('pushable_by_block keeps its prose and minimum format after numeric cross-reference import',()=>{
+ const {unzipSync}=require('fflate'),files=unzipSync(archive());
+ files['metadata/doc_modules/entities.json']=strToU8(JSON.stringify({name:'Server Entity Documentation',nodes:[{name:'Components',nodes:[{name:'minecraft:pushable_by_block',show_in_index:true,description:['Allows block mechanisms to push this entity.']},{name:'minecraft:pushable_by_block',show_in_index:false,description:['-2087846040']}]}]}));
+ const index=buildIndex(zipSync(files),'v1.26.50.4'),schema=componentSchema(index,'entity');assert.equal(index.components.entity['minecraft:pushable_by_block'].description,'Allows block mechanisms to push this entity.');assert.ok(!JSON.stringify(schema).includes('-2087846040'));assert.ok(JSON.stringify(schema).includes('1.26.10'));assert.ok(JSON.stringify(schema).includes('minecraftcomponent_pushable_by_block'));
+});
+
+test('pushable_by_entity keeps its description and minimum version after numeric cross-reference import',()=>{
+ const {unzipSync}=require('fflate'),files=unzipSync(archive());
+ files['metadata/doc_modules/entities.json']=strToU8(JSON.stringify({name:'Server Entity Documentation',nodes:[{name:'Components',nodes:[{name:'minecraft:pushable_by_entity',show_in_index:true,description:['Other entities can push this entity.']},{name:'minecraft:pushable_by_entity',show_in_index:false,description:['-1023158512']}]}]}));
+ const index=buildIndex(zipSync(files),'v1.26.50.4'),schema=componentSchema(index,'entity');assert.equal(index.components.entity['minecraft:pushable_by_entity'].description,'Other entities can push this entity.');assert.ok(!JSON.stringify(schema).includes('-1023158512'));assert.ok(JSON.stringify(schema).includes('1.26.10'));assert.ok(JSON.stringify(schema).includes('minecraftcomponent_pushable_by_entity'));
 });

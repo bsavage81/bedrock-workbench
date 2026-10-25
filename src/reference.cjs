@@ -10,6 +10,17 @@ function chooseRelease(list, target) {
   return list.filter(r => !r.draft && !r.prerelease && engine(r.tag_name) && compareVersions(engine(r.tag_name), target) <= 0)
     .sort((a, b) => compareVersions(engine(b.tag_name), engine(a.tag_name)))[0];
 }
+function descriptionText(value) {
+  const parts=Array.isArray(value)?value:[value];
+  return parts.filter(part=>typeof part==='string'&&part.trim()&&!/^[+-]?\d+$/.test(part.trim())).join('\n\n');
+}
+function cleanDescriptions(index) {
+  for(const components of Object.values(index?.components||{}))for(const value of Object.values(components)){
+    value.description=descriptionText(value.description);
+    for(const field of Object.values(value.fields||{}))field.description=descriptionText(field.description);
+  }
+  return index;
+}
 function buildIndex(bytes, tag) {
   const vanilla=require('./vanilla.cjs').collector();
   let expanded = 0;
@@ -23,12 +34,13 @@ function buildIndex(bytes, tag) {
   } });
   const read = name => files[name] && JSON.parse(Buffer.from(files[name]).toString('utf8'));
   const result = { tag, engine: engine(tag), source: `https://github.com/Mojang/bedrock-samples/tree/${tag}`, components: { block: {}, entity: {}, item: {} } };
-  const text = value => Array.isArray(value) ? value.join('\n\n') : value || '';
-  result.intelligenceVersion = 7;
-  result.vanilla = {};result.formatVersions={};result.languages=[];
+  const text = descriptionText;
+  result.intelligenceVersion = 10;
+  result.vanilla = {};result.formatVersions={};result.languages=[];result.vanillaNames={item:{},block:{}};
   for (const [file, kind] of Object.entries({ items: 'item', blocks: 'block', entities: 'entity', effects: 'effect', enchantments: 'enchantment', biomes: 'biome', dimensions: 'dimension' })) {
     result.vanilla[kind] = [...new Set((read(`metadata/vanilladata_modules/mojang-${file}.json`)?.data_items || []).map(value => value.command_name || value.name).filter(value => typeof value === 'string'))];
   }
+  for(const [file,kind]of [['items','item'],['blocks','block']])for(const value of read('metadata/vanilladata_modules/mojang-'+file+'.json')?.data_items||[]){const id=value.command_name||value.name,key=value.serialization_id;if(typeof id==='string'&&typeof key==='string')result.vanillaNames[kind][id]=[key+'.name',key];}
   result.commands = read('metadata/command_modules/mojang-commands.json') || { commands: [], command_enums: [] };
   for (const kind of ['terrain_texture', 'item_texture']) {
     const bytes = files[`resource_pack/textures/${kind}.json`];
@@ -41,21 +53,29 @@ function buildIndex(bytes, tag) {
     if(!errors.length){const side=match[1]==='behavior_pack'?'behavior':'resource';vanilla.file(side,match[2],data);if(require('./format-versions.cjs').version(data?.format_version)){const family=side+':'+match[2].split('/')[0];const values=result.formatVersions[family]||=[];if(!values.includes(data.format_version))values.push(data.format_version);}}
   }
   for(const [kind,ids]of Object.entries(vanilla.finish()))result.vanilla[kind]=[...new Set([...(result.vanilla[kind]||[]),...ids])];
-  result.vanillaReferences=vanilla.references();
+  result.vanillaReferences=vanilla.references();for(const kind of ['item','block'])for(const [id,keys]of Object.entries(vanilla.names()[kind]))result.vanillaNames[kind][id]=[...new Set([...keys,...(result.vanillaNames[kind][id]||[])])];
   function documented(node) {
     return { description: text(node.description), type: node.type, default: node.default,
       fields: Object.fromEntries((node.nodes || []).filter(n => n.name && !n.name.includes(' ')).map(n => [n.name, { description: text(n.description), type: n.type, default: n.default }])) };
   }
   function walk(node, kind, active = false) {
     active ||= kind === 'block' ? node.name === 'Block Components' : ['Components', 'AI Goals', 'Attributes', 'Properties', 'Triggers'].includes(node.name);
-    if (active && /^minecraft:/.test(node.name || '')) result.components[kind][node.name] = documented(node);
+    if (active && /^minecraft:/.test(node.name || '')) {
+      const previous=result.components[kind][node.name], next=documented(node);
+      // Hidden duplicate nodes are cross-references, sometimes containing an
+      // internal numeric ID instead of prose. Never replace a full declaration.
+      if(!previous)result.components[kind][node.name]=next;
+      else if(node.show_in_index!==false){
+        result.components[kind][node.name]={...previous,...next,description:next.description||previous.description,fields:{...previous.fields,...next.fields}};
+      }
+    }
     for (const child of node.nodes || []) walk(child, kind, active);
   }
   const blocks = read('metadata/doc_modules/blocks.json');
   if (blocks) walk(blocks, 'block');
   const entities = read('metadata/doc_modules/entities.json');
   function findServer(n) { if (n.name === 'Server Entity Documentation') walk(n, 'entity'); else for (const c of n.nodes || []) findServer(c); }
-  if (entities) findServer(entities);
+  if (entities) {findServer(entities);result.filters=require('./filters.cjs').extract(entities);}
   const catalogs = Object.keys(files).filter(n => /^metadata\/json_schemas\/server\/item\/\d+\.\d+\.\d+\/Item Components.json$/.test(n))
     .filter(n => compareVersions(n.split('/')[4], result.engine) <= 0).sort((a, b) => compareVersions(a.split('/')[4], b.split('/')[4]));
   function resolve(schema, file, depth = 0) {
@@ -68,16 +88,16 @@ function buildIndex(bytes, tag) {
   }
   for (const file of catalogs) for (const [name, raw] of Object.entries(read(file).properties || {})) {
     const schema = resolve(raw, file);
-    result.components.item[name] = { description: schema.description || '', type: schema.type,
-      fields: Object.fromEntries(Object.entries(schema.properties || {}).map(([key, value]) => { const field = resolve(value, file); return [key, { description: field.description || '', type: field.type, default: field.default }]; })) };
+    result.components.item[name] = { description: text(schema.description), type: schema.type,
+      fields: Object.fromEntries(Object.entries(schema.properties || {}).map(([key, value]) => { const field = resolve(value, file); return [key, { description: text(field.description), type: field.type, default: field.default }]; })) };
   }
   if (!Object.values(result.components).every(c => Object.keys(c).length)) throw new Error('Mojang reference archive is missing component documentation');
   return result;
 }
 async function loadReference(root, target, { force = false, fetchImpl = globalThis.fetch } = {}) {
   const file = await core.local(root, '.bedrock/reference/components.json');
-  const cached = await fs.readFile(file, 'utf8').then(JSON.parse).catch(() => null);
-  if (!force && cached?.intelligenceVersion === 7 && cached?.target === target && cached.tag && Date.now() - cached.updated < 86400000) return cached;
+  const cached = await fs.readFile(file, 'utf8').then(JSON.parse).then(cleanDescriptions).catch(() => null);
+  if (!force && cached?.intelligenceVersion === 10 && cached?.target === target && cached.tag && Date.now() - cached.updated < 86400000) return cached;
   const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
   async function get(url, limit) {
     const response = await fetchImpl(url, { signal: controller.signal, headers: { 'User-Agent': 'Bedrock-Workbench', Accept: 'application/vnd.github+json' } });
@@ -91,7 +111,7 @@ async function loadReference(root, target, { force = false, fetchImpl = globalTh
     const list = JSON.parse((await get(API, 4 * 1024 * 1024)).toString());
     const release = chooseRelease(list, target);
     if (!release) throw new Error(`No released Mojang samples found at or below engine ${target}`);
-    if (!force && cached?.intelligenceVersion === 7 && cached?.tag === release.tag_name) { cached.target = target; cached.updated = Date.now(); await core.writeJson(file, cached); return cached; }
+    if (!force && cached?.intelligenceVersion === 10 && cached?.tag === release.tag_name) { cached.target = target; cached.updated = Date.now(); await core.writeJson(file, cached); return cached; }
     const asset = release.assets?.find(a => a.name === `bedrock-samples-${release.tag_name}-min.zip`);
     const expected = `https://github.com/Mojang/bedrock-samples/releases/download/${release.tag_name}/${asset?.name}`;
     if (!asset || asset.browser_download_url !== expected) throw new Error('Mojang release is missing its text reference archive');
@@ -110,8 +130,8 @@ function closest(name, names) {
 }
 function componentSchema(index, kind, { omit = [], supplement } = {}) {
   function valueSchema(value, component) {
-    const result = { description: value.description || '' };
-    result.markdownDescription = [value.description || '', value.type ? `Type: ${value.type}` : '', `Reference data: Mojang ${index.tag}.`, documentation.componentLink(kind, component)].filter(Boolean).join('\n\n');
+    const result = { description: descriptionText(value.description) };
+    result.markdownDescription = [descriptionText(value.description), value.type ? `Type: ${value.type}` : '', `Reference data: Mojang ${index.tag}.`, documentation.componentLink(kind, component)].filter(Boolean).join('\n\n');
     // HTML type labels with alternatives or legacy names are intentionally
     // advisory. Only unambiguous primitive types become validation rules.
     const type = { String: 'string', string: 'string', Boolean: 'boolean', boolean: 'boolean', Integer: 'integer', integer: 'integer', number: 'number', object: 'object', array: 'array' }[value.type];
@@ -130,4 +150,4 @@ function componentSchema(index, kind, { omit = [], supplement } = {}) {
     [`minecraft:${kind}`]: { type: 'object', properties: { components, ...(kind==='entity'?{component_groups: { type: 'object', additionalProperties: components }}:{}), ...(kind==='block'?{permutations: { type: 'array', items: { type: 'object', properties: { components } } }}:{}) } }
   } },kind,index.target);
 }
-module.exports = { buildIndex, chooseRelease, loadReference, closest, componentSchema };
+module.exports = { descriptionText, buildIndex, chooseRelease, loadReference, closest, componentSchema };

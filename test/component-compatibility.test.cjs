@@ -39,3 +39,13 @@ test('rename fixes retain surrounding JSONC comments and unrelated values',()=>{
  const text='// Header\n{"format_version":"1.26.50","minecraft:block":{"components":{"minecraft:redstone_consumer":{"propogates_power":false},"test:other":{"keep":"literal"}}}}';const document={file:'test.json',text,tree:json.parseTree(text),side:'behavior',relative:'blocks/test.json'};
  const fix=compatibility.issues(document,project).find(i=>i.fixes?.length).fixes[0],edit=fix.edits[0],next=text.slice(0,edit.offset)+edit.text+text.slice(edit.offset+edit.length);assert.ok(next.startsWith('// Header'));assert.equal(json.parse(next)['minecraft:block'].components['test:other'].keep,'literal');assert.equal(json.parse(next)['minecraft:block'].components['minecraft:redstone_consumer'].propagates_power,false);assert.ok(edit.length<text.length);
 });
+
+test('pushable retirement is gated by the file format in root components and groups',()=>{
+ const legacy={'minecraft:pushable':{is_pushable:true,is_pushable_by_piston:true}};
+ for(const format of ['1.26.0','1.26.9','1.26.10','1.26.50']){
+  const document=doc('entity',legacy,format,{component_groups:{pushed:legacy}}),issues=compatibility.issues(document,project).filter(i=>i.message.includes('minecraft:pushable is no longer parsed'));
+  assert.equal(issues.length,['1.26.10','1.26.50'].includes(format)?2:0,format);
+  for(const issue of issues){assert.equal(issue.severity,'warning');assert.match(issue.message,/minecraft:pushable_by_block/);assert.match(issue.message,/minecraft:pushable_by_entity/);assert.match(issue.source,/minecraftcomponent_pushable/);assert.ok(!issue.fixes?.length,'Do not silently convert false values or overwrite replacements');}
+ }
+ const schema=require('../schemas/entity.schema.json').definitions.components.properties['minecraft:pushable'];for(const field of [schema,...Object.values(schema.properties)]){assert.match(field.markdownDescription,/1\.26\.10/);assert.match(field.markdownDescription,/minecraft:pushable_by_/);assert.match(field.markdownDescription,/learn.microsoft.com/);}
+});

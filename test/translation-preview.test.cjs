@@ -46,3 +46,12 @@ test('manifest, UI label and death message translation fields stay scoped',()=>{
  for(const localize of [true,false]){const tree=json.parseTree(JSON.stringify({label:{type:'label',localize,text:''}}));assert.equal(lang.isTextField(['label','text'],{relative:'ui/test.json',side:'resource',tree}),localize);}
  assert.equal(lang.isTextField(['rawtext',0,'text']),false);
 });
+
+test('vanilla namespaced items and blocks resolve their supplied names and legacy serialization keys',()=>{
+ const index=fixture();index.reference.vanilla={item:['minecraft:bamboo','minecraft:cod','minecraft:stone'],block:['minecraft:bamboo','minecraft:stone','minecraft:oak_planks']};index.reference.vanillaNames={item:{'minecraft:cod':['item.fish.name']},block:{'minecraft:stone':['tile.stone.stone.name']}};index.reference.languages.push(lang.vanillaDocument('tile.bamboo.name=Bamboo\nitem.fish.name=Raw Cod\ntile.stone.stone.name=Stone\ntile.planks.oak.name=Oak Planks\naction.interact.trade=Trade\n','resource_pack/texts/en_US.lang'));
+ for(const [id,kind,expected]of [['minecraft:bamboo','item','Bamboo'],['minecraft:cod','item','Raw Cod'],['minecraft:stone','block','Stone'],['minecraft:oak_planks','block','Oak Planks']])assert.equal(lang.resolve(index,id,kind)[0].entries[0].value,expected,id);
+ assert.equal(lang.resolve(index,'minecraft:cod')[0].entries[0].value,'Raw Cod');assert.equal(lang.resolve(index,'action.interact.trade')[0].entries[0].value,'Trade');assert.equal(lang.resolve(index,'%action.interact.trade')[0].entries[0].value,'Trade');assert.deepEqual(lang.resolve(index,'minecraft:made_up'),[]);
+ const data={'minecraft:entity':{components:{'minecraft:behavior.tempt':{items:['minecraft:bamboo','minecraft:cod']},'minecraft:behavior.move_to_block':{target_blocks:['minecraft:stone']},'minecraft:interact':{interactions:[{interact_text:'action.interact.trade'}]}}}};const doc=document(index,data),before=doc.getText();assert.deepEqual(decorations.previews(index,doc).map(p=>p.text),['  → Bamboo','  → Raw Cod','  → Stone','  → Trade']);assert.equal(doc.getText(),before);
+ const file=[...index.languages.keys()][0];index.languages.set(file,lang.parse('tile.bamboo.name=Pack Bamboo',file));assert.equal(lang.resolve(index,'minecraft:bamboo','item')[0].entries[0].value,'Pack Bamboo');
+ assert.deepEqual(decorations.previews(index,document(index,"const message = {translate: 'action.interact.trade'};",'BP/scripts/main.ts')).map(p=>p.text),['  → Trade']);
+});

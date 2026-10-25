@@ -7,10 +7,12 @@ function symbols(document){const result=[];const add=(kind,node,scope='entity')=
 }
 function reference(node,document){const keys=json.getNodePath(node),key=keys.at(-1),root=keys[0],isKey=node.parent?.type==='property'&&node.parent.children[0]===node;
  if(root==='minecraft:entity'){
+  if(isKey&&keys.at(-2)==='property_inheritance'&&keys.at(-3)==='minecraft:offspring'&&['components','component_groups'].includes(keys[1]))return {kind:'entity_property',scope:'entity',inheritance:true};
   if(keys[1]==='events'&&keys.at(-2)==='component_groups'&&['add','remove'].includes(keys.at(-3))&&typeof key==='number')return {kind:'entity_group',scope:'entity'};
   if(!isKey&&['domain','value'].includes(key)){const filter=json.findNodeAtLocation(document.tree,keys.slice(0,-1));const test=json.findNodeAtLocation(filter,['test'])?.value,subject=json.findNodeAtLocation(filter,['subject'])?.value;if((subject===undefined||subject==='self')&&(key==='domain'&&['bool_property','int_property','float_property','enum_property'].includes(test)||key==='value'&&test==='has_property'))return {kind:'entity_property',scope:'entity',optional:test==='has_property'};}
   if(keys[1]==='events'&&keys.at(-2)==='set_property'&&isKey)return {kind:'entity_property',scope:'entity'};
   if(!isKey&&key==='event'&&['components','component_groups','events'].includes(keys[1])){const target=json.findNodeAtLocation(document.tree,[...keys.slice(0,-1),'target'])?.value;if(target===undefined||target==='self')return {kind:'entity_event',scope:'entity'};}
+  if(!isKey&&keys.includes('minecraft:behavior.move_to_block')&&(['on_reach','on_stay_completed'].includes(key)||typeof key==='number'&&['on_reach','on_stay_completed'].includes(keys.at(-2))))return {kind:'entity_event',scope:'entity'};
   if(!isKey&&keys[1]==='events'&&key==='trigger')return {kind:'entity_event',scope:'entity'};
   if(!isKey&&['components','component_groups'].includes(keys[1])&&['grow_up','time_down_event','tame_event','on_rider_enter_event','on_rider_exit_event'].includes(key))return {kind:'entity_event',scope:'entity'};
  }
@@ -26,7 +28,11 @@ function issues(document){const declared=symbols(document),result=[];for(const u
  return result;
 }
 function at(document,offset){const declarations=symbols(document),references=uses(document);return [...declarations,...references].find(s=>offset>=s.node.offset&&offset<=s.node.offset+s.node.length);}
-function completionContext(document,offset){const location=json.getLocation(document.text,offset),node=json.findNodeAtOffset(document.tree,offset,true),keys=location.path;const ref=node?.type==='string'?reference(node,document):undefined;if(ref)return {...ref,node,location,mode:location.isAtPropertyKey?'key':'value'};
+function completionContext(document,offset){const location=json.getLocation(document.text,offset),node=json.findNodeAtOffset(document.tree,offset,true),keys=location.path;// Event-value suggestions are advisory even for foreign targets; only self-target
+ // references participate in local diagnostics and rename ownership.
+ if(keys[0]==='minecraft:entity'&&keys.at(-1)==='event'&&!location.isAtPropertyKey)return {kind:'entity_event',scope:'entity',node,location,mode:'value'};
+ if(keys[0]==='minecraft:entity'&&keys.at(-2)==='property_inheritance'&&keys.at(-3)==='minecraft:offspring'&&['components','component_groups'].includes(keys[1])&&location.isAtPropertyKey)return {kind:'entity_property',scope:'entity',inheritance:true,node,location,mode:'key'};
+ const ref=node?.type==='string'?reference(node,document):undefined;if(ref)return {...ref,node,location,mode:location.isAtPropertyKey?'key':'value'};
  if(keys[0]==='minecraft:entity'&&keys.includes('set_property')&&location.isAtPropertyKey)return {kind:'entity_property',scope:'entity',node,location,mode:'key'};
  if(keys[0]==='animation_controllers'&&keys.includes('transitions')&&location.isAtPropertyKey)return {kind:'controller_state',scope:keys[1],node,location,mode:'key'};
  if(keys[0]==='minecraft:entity'&&keys.at(-2)==='set_property'&&!location.isAtPropertyKey){const def=symbols(document).find(s=>s.kind==='entity_property'&&s.id===keys.at(-1));if(def)return {kind:'property_value',definition:json.getNodeValue(def.value),node,location,mode:'value'};}

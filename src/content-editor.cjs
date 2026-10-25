@@ -278,6 +278,7 @@ function attach(vscode, context, getProject, output) {
     }
   }, ' '));
   require('./entity-editor.cjs').attach(vscode,context,getProject,ensure);
+  require('./filter-editor.cjs').attach(vscode,context,getProject,ensure);
   const watcher = vscode.workspace.createFileSystemWatcher('**/*');
   function change(uri) {
     // Config rediscovery briefly clears the active project. Keep using the

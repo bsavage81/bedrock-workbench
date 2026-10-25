@@ -4,12 +4,14 @@ const json=require('jsonc-parser');
 const core=require('./core.cjs');
 const {compareVersions}=require('./releases.cjs');
 function collector() {
-  const values=new Map(),referenced=new Map();
+  const values=new Map(),referenced=new Map(),nameKeys={item:{},block:{}};
   const add=(kind,id)=>{if(typeof id!=='string'||!id)return; if(!values.has(kind))values.set(kind,new Set());values.get(kind).add(id);};
   const used=(kind,id)=>{if(typeof id!=='string'||!id||/[\s?()[\]{}]/.test(id))return;id=kind==='entity'?id.replace(/<[^<>]*>$/,''):kind==='item'?id.replace(/:\d+$/,''):id;if(['item','block','entity'].includes(kind)&&!id.includes(':'))id='minecraft:'+id;if(!referenced.has(kind))referenced.set(kind,new Set());referenced.get(kind).add(id);};
   function file(side,relative,data) {
     relative=relative.replaceAll('\\','/');
     if(side==='behavior') {
+      for(const name of require('./filters.cjs').families(data))add('entity_family',name);
+      for(const kind of ['item','block']){const entry=data?.['minecraft:'+kind],id=entry?.description?.identifier,display=entry?.components?.['minecraft:display_name'],key=typeof display==='string'?display:display?.value;if(typeof id==='string'&&typeof key==='string')nameKeys[kind][id]=[key];}
       for(const kind of ['block','item','entity']) add(kind,data?.['minecraft:'+kind]?.description?.identifier);
       if(/^loot_tables\/.*\.json$/i.test(relative))add('loot_table',relative);
       if(/^functions\/.*\.mcfunction$/i.test(relative))add('function',relative.slice(10,-11));
@@ -56,7 +58,7 @@ function collector() {
     for(const [key,kind]of [['animations','animation'],['animation_controllers','animation_controller'],['render_controllers','render_controller']])for(const id of Object.keys(data?.[key]||{}))add(kind,id);
   }
   const finish=map=>Object.fromEntries([...map].map(([kind,ids])=>[kind,[...ids].sort()]));
-  return {add,file,finish:()=>finish(values),references:()=>finish(referenced)};
+  return {add,file,names:()=>nameKeys,finish:()=>finish(values),references:()=>finish(referenced)};
 }
 function merge(reference,local) {
   if(!local)return reference;
@@ -64,7 +66,7 @@ function merge(reference,local) {
   for(const [kind,ids]of Object.entries(local.vanilla||{}))vanilla[kind]=[...new Set([...(vanilla[kind]||[]),...ids])];
   const vanillaReferences={...reference?.vanillaReferences};
   for(const [kind,ids]of Object.entries(local.vanillaReferences||{}))vanillaReferences[kind]=[...new Set([...(vanillaReferences[kind]||[]),...ids])];
-  return {...reference,vanilla,vanillaReferences,languages:[...(reference?.languages||[]),...(local.languages||[])],localSource:local.source};
+  return {...reference,vanilla,vanillaReferences,languages:[...(reference?.languages||[]),...(local.languages||[])],vanillaNames:Object.fromEntries(['item','block'].map(kind=>[kind,Object.fromEntries([...new Set([...Object.keys(reference?.vanillaNames?.[kind]||{}),...Object.keys(local.vanillaNames?.[kind]||{})])].map(id=>[id,[...new Set([...(local.vanillaNames?.[kind]?.[id]||[]),...(reference?.vanillaNames?.[kind]?.[id]||[])])]]))])),localSource:local.source};
 }
 const allowed=(side,relative)=>side==='behavior'? /^(blocks|items|entities|loot_tables|functions|recipes|trading)\//.test(relative) : /^(texts|models|entity|attachables|animations|animation_controllers|render_controllers|particles|textures|sounds)\//.test(relative);
 async function local(project,{force=false}={}) {
@@ -74,7 +76,7 @@ async function local(project,{force=false}={}) {
   if(compareVersions(source.version,project.config.targetVersion)>0)throw Error(`Installed vanilla ${source.version} is newer than target ${project.config.targetVersion}; using samples instead.`);
   const cacheFile=await core.local(project.root,'.bedrock/reference/local-'+project.config.target+'.json');
   const cached=await core.readJson(cacheFile).catch(()=>null);
-  const same=cached?.indexVersion===4 && cached?.source?.folder===source.folder && cached.source.version===source.version && cached.source.channel===project.config.target;
+  const same=cached?.indexVersion===6 && cached?.source?.folder===source.folder && cached.source.version===source.version && cached.source.channel===project.config.target;
   if(!force && same && Date.now()-cached.updated<86400000)return cached;
   const root=await fs.realpath(source.folder), packs=[];
   // Inspect only expected layouts beneath the explicitly selected directory.
@@ -110,7 +112,7 @@ async function local(project,{force=false}={}) {
     }
   }
   for(const pack of packs)await walk(pack,pack.folder);
-  const result={indexVersion:4,source:{...source,channel:project.config.target},updated:Date.now(),languages,vanilla:index.finish(),vanillaReferences:index.references(),packs:packs.length};
+  const result={indexVersion:6,source:{...source,channel:project.config.target},updated:Date.now(),languages,vanillaNames:index.names(),vanilla:index.finish(),vanillaReferences:index.references(),packs:packs.length};
   if(!Object.keys(result.vanilla).length)throw Error('The selected packs did not contain readable vanilla identifiers');
   await core.writeJson(cacheFile,result);return result;
 }

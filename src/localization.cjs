@@ -40,7 +40,18 @@ function isTextField(keys,document){
  if(key==='minecraft:interact_button')return true;
  return key==='table_name'&&keys.at(-2)==='minecraft:crafting_table';
 }
-function candidates(value,kind){if(typeof value!=='string')return [];const key=value.startsWith('%')?value.slice(1):value,result=[key];if(kind==='entity'||kind==='client_entity')result.push('entity.'+value+'.name');if(kind==='item')result.push('item.'+value+'.name','item.'+value);if(kind==='block')result.push('tile.'+value+'.name','tile.'+value);return [...new Set(result)];}
-function resolve(index,value,kind,open=[],values=catalog(index,open)){return candidates(value,kind).map(key=>({key,entries:values.get(key)||[]})).filter(r=>r.entries.length);}
+function candidates(value,kind){
+ if(typeof value!=='string')return [];const key=value.startsWith('%')?value.slice(1):value,result=[key];
+ if(kind==='entity'||kind==='client_entity')result.push('entity.'+value+'.name');
+ if(kind==='item')result.push('item.'+value+'.name','item.'+value,'tile.'+value+'.name');
+ if(kind==='block')result.push('tile.'+value+'.name','tile.'+value,'item.'+value+'.name');
+ if(value.startsWith('minecraft:')){const id=value.slice(10);if(kind==='item'||kind==='block'){const prefixes=kind==='block'?['tile','item']:['item','tile'];for(const prefix of prefixes)result.push(prefix+'.'+id+'.name',prefix+'.'+id);const parts=id.split('_');if(parts.length>1)result.push('tile.'+parts.at(-1)+'.'+parts.slice(0,-1).join('_')+'.name');}if(kind==='entity'||kind==='client_entity')result.push('entity.'+id+'.name');}
+ return [...new Set(result)];
+}
+function resolve(index,value,kind,open=[],values=catalog(index,open)){
+ if(!kind&&typeof value==='string'&&value.startsWith('minecraft:')){if(index.reference?.vanilla?.item?.includes(value))kind='item';else if(index.reference?.vanilla?.block?.includes(value))kind='block';}
+ const keys=candidates(value,kind);if(value?.startsWith('minecraft:')&&['item','block'].includes(kind))for(const type of kind==='item'?['item','block']:['block','item'])keys.push(...(index.reference?.vanillaNames?.[type]?.[value]||[]));
+ return [...new Set(keys)].map(key=>({key,entries:values.get(key)||[]})).filter(r=>r.entries.length);
+}
 function markdown(vscode,resolved,root){const md=new vscode.MarkdownString();for(const {key,entries}of resolved){md.appendText(key+'\n\n');for(const e of entries)md.appendText(e.locale+': '+e.value+'\n'+(e.vanilla?'Vanilla: '+e.file:root?path.relative(root,e.file):path.basename(e.file))+':'+(e.line+1)+'\n\n');}md.isTrusted=false;return md;}
 module.exports={vanillaDocument,scriptStrings,catalog,isTextField,isLanguageFile,parse,documents,lookup,keys,candidates,resolve,markdown};
