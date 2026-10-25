@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.22.0 — October 25, 2026
+
+- Color language-file keys by category and show clickable pack usage references in key hovers, including implicit entity/item/block and spawn egg names plus unsaved JSON and script references.
+
+- Add projectile component and nested impact-effect schemas, Learn hovers, parameter completions, particle choices, damage ranges, and legacy anchor/bounce forms.
+
+- Add complete pickup_items parameter hovers, including search_height and pickup_same_items_as_in_hand, defaults, item descriptors and versioned pickup callbacks.
+
 ## 0.21.0 — October 25, 2026
 
 - Review all component root descriptions against Microsoft Learn, updating owned and imported hovers while preserving clearer authored guidance and compatibility notes.

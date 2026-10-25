@@ -118,6 +118,1188 @@
     "components": {
       "type": "object",
       "properties": {
+        "minecraft:projectile": {
+          "type": "object",
+          "description": "Turns the entity into a projectile: a thrown or shot entity that flies along a ballistic arc and reacts when it impacts a block, a fluid, or another entity.",
+          "properties": {
+            "anchor": {
+              "description": "Shooter-relative spawn reference: origin (feet), eye_height or middle. Legacy numeric forms are 0, 1 and 2 respectively.",
+              "default": "origin",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "origin",
+                    "eye_height",
+                    "middle"
+                  ]
+                },
+                {
+                  "type": "integer",
+                  "enum": [
+                    0,
+                    1,
+                    2
+                  ]
+                }
+              ],
+              "markdownDescription": "Shooter-relative spawn reference: origin (feet), eye_height or middle. Legacy numeric forms are 0, 1 and 2 respectively.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "angle_offset": {
+              "type": "number",
+              "description": "Extra upward launch angle in degrees; negative values aim downward.",
+              "default": 0,
+              "markdownDescription": "Extra upward launch angle in degrees; negative values aim downward.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "catch_fire": {
+              "type": "boolean",
+              "description": "Legacy fire flag: merely including this field ignites targets, even when false. Omit it to disable this behavior.",
+              "default": false,
+              "markdownDescription": "Legacy fire flag: merely including this field ignites targets, even when false. Omit it to disable this behavior.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "crit_particle_on_hurt": {
+              "type": "boolean",
+              "description": "Emit critical-hit particles when the projectile is struck.",
+              "default": false,
+              "markdownDescription": "Emit critical-hit particles when the projectile is struck.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "destroy_on_hurt": {
+              "type": "boolean",
+              "description": "Remove the projectile when it is struck.",
+              "default": false,
+              "markdownDescription": "Remove the projectile when it is struck.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "gravity": {
+              "type": "number",
+              "description": "Downward acceleration in blocks per tick squared.",
+              "default": 0.05,
+              "markdownDescription": "Downward acceleration in blocks per tick squared.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "hit_ground_sound": {
+              "type": "string",
+              "description": "Sound for block impacts; an empty value falls back to hit_sound.",
+              "markdownDescription": "Sound for block impacts; an empty value falls back to hit_sound.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "hit_sound": {
+              "type": "string",
+              "description": "Sound for entity impacts and for block impacts without hit_ground_sound.",
+              "markdownDescription": "Sound for entity impacts and for block impacts without hit_ground_sound.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "hit_nearest_passenger": {
+              "type": "boolean",
+              "description": "Apply impact effects to the nearest vehicle passenger instead of the vehicle.",
+              "default": false,
+              "markdownDescription": "Apply impact effects to the nearest vehicle passenger instead of the vehicle.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "hit_water": {
+              "type": "boolean",
+              "description": "Treat water as an impact surface.",
+              "default": false,
+              "markdownDescription": "Treat water as an impact surface.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "homing": {
+              "type": "boolean",
+              "description": "Steer toward the active target during flight.",
+              "default": false,
+              "markdownDescription": "Steer toward the active target during flight.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "ignored_entities": {
+              "type": "array",
+              "description": "Entity identifiers ignored by projectile collisions.",
+              "items": {
+                "type": "string",
+                "description": "Entity identifier to pass through.",
+                "markdownDescription": "Entity identifier to pass through.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+              },
+              "markdownDescription": "Entity identifiers ignored by projectile collisions.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "inertia": {
+              "type": "number",
+              "description": "Fraction of velocity retained each tick in air.",
+              "default": 0.99,
+              "markdownDescription": "Fraction of velocity retained each tick in air.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "is_dangerous": {
+              "type": "boolean",
+              "description": "Flag the projectile as dangerous for AI and client reactions.",
+              "default": false,
+              "markdownDescription": "Flag the projectile as dangerous for AI and client reactions.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "isolated_physics": {
+              "type": "boolean",
+              "description": "Ignore outside friction and drag. Requires format 1.26.20 and the Custom Projectiles experiment.",
+              "default": true,
+              "markdownDescription": "Ignore outside friction and drag. Requires format 1.26.20 and the Custom Projectiles experiment.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "lightning": {
+              "type": "boolean",
+              "description": "Allow a lightning strike on entity impacts during thunderstorms.",
+              "default": false,
+              "markdownDescription": "Allow a lightning strike on entity impacts during thunderstorms.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "liquid_inertia": {
+              "type": "number",
+              "description": "Fraction of velocity retained each tick in fluid.",
+              "default": 0.6,
+              "markdownDescription": "Fraction of velocity retained each tick in fluid.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "multiple_targets": {
+              "type": "boolean",
+              "description": "Allow multiple entity impacts during the same flight; Piercing also enables this.",
+              "default": false,
+              "markdownDescription": "Allow multiple entity impacts during the same flight; Piercing also enables this.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "offset": {
+              "description": "Spawn offset relative to the shooter anchor, as X/Y/Z coordinates.",
+              "anyOf": [
+                {
+                  "description": "X, Y and Z coordinates.",
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "markdownDescription": "X, Y and Z coordinates.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Spawn offset coordinates.",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "Horizontal X offset.",
+                      "default": 0,
+                      "markdownDescription": "Horizontal X offset.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Vertical Y offset.",
+                      "default": 0,
+                      "markdownDescription": "Vertical Y offset.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Horizontal Z offset.",
+                      "default": 0,
+                      "markdownDescription": "Horizontal Z offset.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Spawn offset coordinates.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Spawn offset relative to the shooter anchor, as X/Y/Z coordinates.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "on_fire_time": {
+              "type": "number",
+              "description": "Seconds the struck entity burns when ignition is enabled.",
+              "default": 5,
+              "markdownDescription": "Seconds the struck entity burns when ignition is enabled.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "on_hit": {
+              "type": "object",
+              "description": "Effects applied when the projectile collides with an entity, block or fluid.",
+              "properties": {
+                "particle_on_hit": {
+                  "type": "object",
+                  "description": "Emit particles at the impact position.",
+                  "properties": {
+                    "on_entity_hit": {
+                      "type": "boolean",
+                      "description": "Emit particles when an entity is hit.",
+                      "default": false,
+                      "markdownDescription": "Emit particles when an entity is hit.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "on_other_hit": {
+                      "type": "boolean",
+                      "description": "Emit particles for collisions with blocks or other non-entity surfaces.",
+                      "default": false,
+                      "markdownDescription": "Emit particles for collisions with blocks or other non-entity surfaces.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "num_particles": {
+                      "type": "integer",
+                      "description": "Number of particles emitted for each impact.",
+                      "default": 1,
+                      "markdownDescription": "Number of particles emitted for each impact.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "particle_type": {
+                      "description": "Built-in particle type emitted on impact.",
+                      "default": "none",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "balloongas",
+                            "bleach",
+                            "blockforcefield",
+                            "blueflame",
+                            "breezewindexplosion",
+                            "bubble",
+                            "bubblecolumndown",
+                            "bubblecolumnup",
+                            "bubblemanual",
+                            "campfiresmoke",
+                            "campfiresmoketall",
+                            "candleflame",
+                            "carrotboost",
+                            "coloredflame",
+                            "conduit",
+                            "creakingcrumble",
+                            "crit",
+                            "dragonbreath",
+                            "dragonbreathfire",
+                            "dragonbreathtrail",
+                            "dragondestroyblock",
+                            "driphoney",
+                            "driplava",
+                            "dripwater",
+                            "dustplume",
+                            "electricspark",
+                            "enchantingtable",
+                            "endrod",
+                            "evaporation",
+                            "explode",
+                            "eyeblossomclose",
+                            "eyeblossomopen",
+                            "fallingborderdust",
+                            "fallingdust",
+                            "fireworks",
+                            "fireworksoverlay",
+                            "fireworksstarter",
+                            "flame",
+                            "food",
+                            "greenflame",
+                            "heart",
+                            "hugeexplosion",
+                            "iconcrack",
+                            "ink",
+                            "largeexplode",
+                            "largesmoke",
+                            "lava",
+                            "mobappearance",
+                            "mobflame",
+                            "mobspell",
+                            "mobspellambient",
+                            "mobspellinstantaneous",
+                            "myceliumdust",
+                            "none",
+                            "note",
+                            "obsidiantear",
+                            "orangepoplarleaves",
+                            "paleoakleaves",
+                            "pausemobgrowth",
+                            "portal",
+                            "portalreverse",
+                            "rainsplash",
+                            "reddust",
+                            "redpoplarleaves",
+                            "resetmobgrowth",
+                            "risingborderdust",
+                            "sculksoul",
+                            "shriek",
+                            "shulkerbullet",
+                            "slime",
+                            "smoke",
+                            "sneeze",
+                            "snowballpoof",
+                            "snowflake",
+                            "sonicexplosion",
+                            "soul",
+                            "sparkler",
+                            "spit",
+                            "stalactitedriplava",
+                            "stalactitedripwater",
+                            "sulfurcube",
+                            "terrain",
+                            "totem",
+                            "townaura",
+                            "trackingemitter",
+                            "vaultconnection",
+                            "villagerangry",
+                            "villagerhappy",
+                            "watersplash",
+                            "watersplashmanual",
+                            "waterwake",
+                            "wax",
+                            "whitesmoke",
+                            "windexplosion",
+                            "witchspell",
+                            "wolfarmorcrack",
+                            "yellowpoplarleaves"
+                          ]
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "markdownDescription": "Built-in particle type emitted on impact.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "particle_item_name": {
+                      "type": "object",
+                      "description": "Item identifiers mapped to filter groups for choosing an iconcrack particle item.",
+                      "additionalProperties": {
+                        "$ref": "#/definitions/filter"
+                      },
+                      "markdownDescription": "Item identifiers mapped to filter groups for choosing an iconcrack particle item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Emit particles at the impact position.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "impact_damage": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "description": "Deal impact damage and optionally knock back, ignite or remove the projectile.",
+                  "properties": {
+                    "damage": {
+                      "description": "Impact damage as a fixed number or a randomly sampled min/max range. Velocity-scaled power_multiplier is added to this base damage.",
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "object",
+                          "description": "Random damage interval.",
+                          "properties": {
+                            "min": {
+                              "type": "number",
+                              "description": "Minimum impact damage.",
+                              "default": 0,
+                              "markdownDescription": "Minimum impact damage.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                            },
+                            "max": {
+                              "type": "number",
+                              "description": "Maximum impact damage.",
+                              "default": 0,
+                              "markdownDescription": "Maximum impact damage.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                            }
+                          },
+                          "markdownDescription": "Random damage interval.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                        }
+                      ],
+                      "markdownDescription": "Impact damage as a fixed number or a randomly sampled min/max range. Velocity-scaled power_multiplier is added to this base damage.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "knockback": {
+                      "type": "boolean",
+                      "description": "Push the struck entity away from the projectile.",
+                      "default": false,
+                      "markdownDescription": "Push the struck entity away from the projectile.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "destroy_on_hit": {
+                      "type": "boolean",
+                      "description": "Remove the projectile after it damages an entity.",
+                      "default": false,
+                      "markdownDescription": "Remove the projectile after it damages an entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "destroy_on_hit_requires_damage": {
+                      "type": "boolean",
+                      "description": "Require actual damage before destroy_on_hit removes the projectile.",
+                      "default": true,
+                      "markdownDescription": "Require actual damage before destroy_on_hit removes the projectile.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "apply_knockback_to_blocking_targets": {
+                      "type": "boolean",
+                      "description": "Apply knockback even when the target blocks the impact.",
+                      "default": false,
+                      "markdownDescription": "Apply knockback even when the target blocks the impact.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "catch_fire": {
+                      "type": "boolean",
+                      "description": "Ignite the target using the projectile on_fire_time.",
+                      "default": false,
+                      "markdownDescription": "Ignite the target using the projectile on_fire_time.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "ceil_pre_critical_damage": {
+                      "type": "boolean",
+                      "description": "Round damage upward before applying critical-hit scaling.",
+                      "default": false,
+                      "markdownDescription": "Round damage upward before applying critical-hit scaling.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "channeling": {
+                      "type": "boolean",
+                      "description": "Allow a lightning strike on the target during a thunderstorm.",
+                      "default": false,
+                      "markdownDescription": "Allow a lightning strike on the target during a thunderstorm.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "difficulty_randomization": {
+                      "type": "string",
+                      "description": "Difficulty scaling: none ignores difficulty, additive adds damage, and multiplicative changes the velocity-based multiplier.",
+                      "enum": [
+                        "none",
+                        "additive",
+                        "multiplicative"
+                      ],
+                      "default": "none",
+                      "markdownDescription": "Difficulty scaling: none ignores difficulty, additive adds damage, and multiplicative changes the velocity-based multiplier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "semi_random_diff_damage": {
+                      "type": "boolean",
+                      "description": "Legacy difficulty-dependent randomized damage setting.",
+                      "default": false,
+                      "markdownDescription": "Legacy difficulty-dependent randomized damage setting.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "filter": {
+                      "type": "string",
+                      "description": "Entity family or type eligible to receive this damage.",
+                      "markdownDescription": "Entity family or type eligible to receive this damage.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "min_critical_damage": {
+                      "type": "integer",
+                      "description": "Lower bound on final critical-hit damage after enchantments.",
+                      "default": 0,
+                      "markdownDescription": "Lower bound on final critical-hit damage after enchantments.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "max_critical_damage": {
+                      "type": "integer",
+                      "description": "Upper bound on final critical-hit damage after enchantments.",
+                      "default": 2147483647,
+                      "markdownDescription": "Upper bound on final critical-hit damage after enchantments.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "power_multiplier": {
+                      "type": "number",
+                      "description": "Velocity multiplier added to rolled impact damage.",
+                      "default": 0,
+                      "markdownDescription": "Velocity multiplier added to rolled impact damage.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "set_last_hurt_requires_damage": {
+                      "type": "boolean",
+                      "description": "Only record this projectile as the last damage source when damage is dealt.",
+                      "default": true,
+                      "markdownDescription": "Only record this projectile as the last damage source when damage is dealt.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Deal impact damage and optionally knock back, ignite or remove the projectile.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "remove_on_hit": {
+                  "type": "object",
+                  "description": "Remove the projectile after impact with a block, entity or water when hit_water is enabled.",
+                  "properties": {},
+                  "markdownDescription": "Remove the projectile after impact with a block, entity or water when hit_water is enabled.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "arrow_effect": {
+                  "type": "object",
+                  "description": "Apply effects from tipped-arrow potion data.",
+                  "properties": {
+                    "apply_effect_to_blocking_targets": {
+                      "type": "boolean",
+                      "description": "Apply potion effects even when the target blocks the arrow.",
+                      "default": true,
+                      "markdownDescription": "Apply potion effects even when the target blocks the arrow.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Apply effects from tipped-arrow potion data.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "catch_fire": {
+                  "type": "object",
+                  "description": "Ignite the hit target or blocks at the impact position.",
+                  "properties": {
+                    "fire_affected_by_griefing": {
+                      "type": "boolean",
+                      "description": "Honor mobGriefing when a mob-owned projectile ignites blocks.",
+                      "default": false,
+                      "markdownDescription": "Honor mobGriefing when a mob-owned projectile ignites blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "on_fire_time": {
+                      "type": "number",
+                      "description": "Seconds the hit entity burns.",
+                      "default": 0,
+                      "markdownDescription": "Seconds the hit entity burns.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Ignite the hit target or blocks at the impact position.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "definition_event": {
+                  "type": "object",
+                  "description": "Trigger entity events on selected impact recipients.",
+                  "properties": {
+                    "affect_projectile": {
+                      "type": "boolean",
+                      "description": "Send the event to the projectile.",
+                      "default": false,
+                      "markdownDescription": "Send the event to the projectile.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "affect_shooter": {
+                      "type": "boolean",
+                      "description": "Send the event to the shooter.",
+                      "default": false,
+                      "markdownDescription": "Send the event to the shooter.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "affect_target": {
+                      "type": "boolean",
+                      "description": "Send the event to the struck entity.",
+                      "default": false,
+                      "markdownDescription": "Send the event to the struck entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "affect_splash_area": {
+                      "type": "boolean",
+                      "description": "Send the event to entities within splash_area.",
+                      "default": false,
+                      "markdownDescription": "Send the event to entities within splash_area.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "splash_area": {
+                      "type": "number",
+                      "description": "Splash event radius in blocks.",
+                      "default": 0,
+                      "markdownDescription": "Splash event radius in blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "event_trigger": {
+                      "description": "Entity event trigger, with optional filters and a target.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "description": "Event name.",
+                          "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                        },
+                        {
+                          "type": "object",
+                          "description": "Event to send to a target.",
+                          "properties": {
+                            "event": {
+                              "type": "string",
+                              "description": "Event name.",
+                              "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                            },
+                            "target": {
+                              "type": "string",
+                              "description": "Target entity; self is the owning entity.",
+                              "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                            },
+                            "filters": {
+                              "$ref": "#/definitions/filter",
+                              "description": "Conditions evaluated by Minecraft filter tests.",
+                              "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                            }
+                          },
+                          "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                        }
+                      ],
+                      "markdownDescription": "Entity event trigger, with optional filters and a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Trigger entity events on selected impact recipients.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "douse_fire": {
+                  "type": "object",
+                  "description": "A water-effect potion extinguishes fires and campfires near the impact.",
+                  "properties": {},
+                  "markdownDescription": "A water-effect potion extinguishes fires and campfires near the impact.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "freeze_on_hit": {
+                  "type": "object",
+                  "description": "Freeze nearby water into ice; used by Education Edition chemistry.",
+                  "properties": {
+                    "shape": {
+                      "type": "string",
+                      "description": "Shape of the freezing volume.",
+                      "enum": [
+                        "cube",
+                        "sphere"
+                      ],
+                      "default": "cube",
+                      "markdownDescription": "Shape of the freezing volume.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "size": {
+                      "type": "number",
+                      "description": "Half-size of the freezing volume in blocks.",
+                      "default": 1,
+                      "markdownDescription": "Half-size of the freezing volume in blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "snap_to_block": {
+                      "type": "boolean",
+                      "description": "Center the freezing volume on the hit block instead of the exact impact position.",
+                      "default": false,
+                      "markdownDescription": "Center the freezing volume on the hit block instead of the exact impact position.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Freeze nearby water into ice; used by Education Edition chemistry.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "grant_xp": {
+                  "type": "object",
+                  "description": "Drop experience at the impact position.",
+                  "properties": {
+                    "minXP": {
+                      "type": "integer",
+                      "description": "Minimum experience dropped.",
+                      "default": 0,
+                      "markdownDescription": "Minimum experience dropped.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "maxXP": {
+                      "type": "integer",
+                      "description": "Maximum experience dropped.",
+                      "default": 0,
+                      "markdownDescription": "Maximum experience dropped.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Drop experience at the impact position.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "hurt_owner": {
+                  "type": "object",
+                  "description": "Damage the owner when the projectile lands.",
+                  "properties": {
+                    "ignite": {
+                      "type": "boolean",
+                      "description": "Ignite the owner when applying damage.",
+                      "default": false,
+                      "markdownDescription": "Ignite the owner when applying damage.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "knockback": {
+                      "type": "boolean",
+                      "description": "Apply knockback to the owner.",
+                      "default": false,
+                      "markdownDescription": "Apply knockback to the owner.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "owner_damage": {
+                      "type": "number",
+                      "description": "Damage dealt to the owner.",
+                      "default": 0,
+                      "markdownDescription": "Damage dealt to the owner.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Damage the owner when the projectile lands.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "ignite": {
+                  "type": "object",
+                  "description": "Run the projectile entity on_ignite definition when it impacts.",
+                  "properties": {},
+                  "markdownDescription": "Run the projectile entity on_ignite definition when it impacts.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "mob_effect": {
+                  "type": "object",
+                  "description": "Apply status effects to the struck entity.",
+                  "properties": {
+                    "effects": {
+                      "type": "array",
+                      "description": "Status effects applied on impact.",
+                      "items": {
+                        "type": "object",
+                        "description": "One status effect and its difficulty-dependent durations.",
+                        "properties": {
+                          "effect": {
+                            "type": "string",
+                            "description": "Status effect name.",
+                            "markdownDescription": "Status effect name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                          },
+                          "amplifier": {
+                            "type": "integer",
+                            "description": "Effect amplifier.",
+                            "default": 1,
+                            "markdownDescription": "Effect amplifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                          },
+                          "durationeasy": {
+                            "description": "Effect duration on Easy difficulty.",
+                            "type": [
+                              "integer",
+                              "string"
+                            ],
+                            "markdownDescription": "Effect duration on Easy difficulty.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                          },
+                          "durationnormal": {
+                            "description": "Effect duration on Normal difficulty.",
+                            "type": [
+                              "integer",
+                              "string"
+                            ],
+                            "markdownDescription": "Effect duration on Normal difficulty.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                          },
+                          "durationhard": {
+                            "description": "Effect duration on Hard difficulty.",
+                            "type": [
+                              "integer",
+                              "string"
+                            ],
+                            "markdownDescription": "Effect duration on Hard difficulty.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                          }
+                        },
+                        "markdownDescription": "One status effect and its difficulty-dependent durations.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                      },
+                      "markdownDescription": "Status effects applied on impact.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Apply status effects to the struck entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "spawn_aoe_cloud": {
+                  "type": "object",
+                  "description": "Create a lingering area-effect cloud at impact.",
+                  "properties": {
+                    "affect_owner": {
+                      "type": "boolean",
+                      "description": "Allow the cloud to affect the shooter.",
+                      "default": true,
+                      "markdownDescription": "Allow the cloud to affect the shooter.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "duration": {
+                      "description": "Cloud lifetime in seconds.",
+                      "type": [
+                        "integer",
+                        "string"
+                      ],
+                      "markdownDescription": "Cloud lifetime in seconds.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "particle": {
+                      "description": "Particle type emitted by the cloud.",
+                      "default": "mobspellambient",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "balloongas",
+                            "bleach",
+                            "blockforcefield",
+                            "blueflame",
+                            "breezewindexplosion",
+                            "bubble",
+                            "bubblecolumndown",
+                            "bubblecolumnup",
+                            "bubblemanual",
+                            "campfiresmoke",
+                            "campfiresmoketall",
+                            "candleflame",
+                            "carrotboost",
+                            "coloredflame",
+                            "conduit",
+                            "creakingcrumble",
+                            "crit",
+                            "dragonbreath",
+                            "dragonbreathfire",
+                            "dragonbreathtrail",
+                            "dragondestroyblock",
+                            "driphoney",
+                            "driplava",
+                            "dripwater",
+                            "dustplume",
+                            "electricspark",
+                            "enchantingtable",
+                            "endrod",
+                            "evaporation",
+                            "explode",
+                            "eyeblossomclose",
+                            "eyeblossomopen",
+                            "fallingborderdust",
+                            "fallingdust",
+                            "fireworks",
+                            "fireworksoverlay",
+                            "fireworksstarter",
+                            "flame",
+                            "food",
+                            "greenflame",
+                            "heart",
+                            "hugeexplosion",
+                            "iconcrack",
+                            "ink",
+                            "largeexplode",
+                            "largesmoke",
+                            "lava",
+                            "mobappearance",
+                            "mobflame",
+                            "mobspell",
+                            "mobspellambient",
+                            "mobspellinstantaneous",
+                            "myceliumdust",
+                            "none",
+                            "note",
+                            "obsidiantear",
+                            "orangepoplarleaves",
+                            "paleoakleaves",
+                            "pausemobgrowth",
+                            "portal",
+                            "portalreverse",
+                            "rainsplash",
+                            "reddust",
+                            "redpoplarleaves",
+                            "resetmobgrowth",
+                            "risingborderdust",
+                            "sculksoul",
+                            "shriek",
+                            "shulkerbullet",
+                            "slime",
+                            "smoke",
+                            "sneeze",
+                            "snowballpoof",
+                            "snowflake",
+                            "sonicexplosion",
+                            "soul",
+                            "sparkler",
+                            "spit",
+                            "stalactitedriplava",
+                            "stalactitedripwater",
+                            "sulfurcube",
+                            "terrain",
+                            "totem",
+                            "townaura",
+                            "trackingemitter",
+                            "vaultconnection",
+                            "villagerangry",
+                            "villagerhappy",
+                            "watersplash",
+                            "watersplashmanual",
+                            "waterwake",
+                            "wax",
+                            "whitesmoke",
+                            "windexplosion",
+                            "witchspell",
+                            "wolfarmorcrack",
+                            "yellowpoplarleaves"
+                          ]
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "markdownDescription": "Particle type emitted by the cloud.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "potion": {
+                      "type": "integer",
+                      "description": "Potion auxiliary value; -1 uses the projectile potion.",
+                      "default": -1,
+                      "markdownDescription": "Potion auxiliary value; -1 uses the projectile potion.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "radius": {
+                      "type": "number",
+                      "description": "Initial cloud radius in blocks.",
+                      "default": 0,
+                      "markdownDescription": "Initial cloud radius in blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "radius_on_use": {
+                      "type": "number",
+                      "description": "Radius change after applying an effect; -1 leaves it unchanged.",
+                      "default": -1,
+                      "markdownDescription": "Radius change after applying an effect; -1 leaves it unchanged.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "reapplication_delay": {
+                      "type": "integer",
+                      "description": "Ticks before effects can be applied again to the same entity.",
+                      "default": 0,
+                      "markdownDescription": "Ticks before effects can be applied again to the same entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Create a lingering area-effect cloud at impact.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "spawn_chance": {
+                  "type": "object",
+                  "description": "Roll for one or two groups of entities to spawn at impact.",
+                  "properties": {
+                    "first_spawn_chance": {
+                      "type": "number",
+                      "description": "Probability of spawning the first group, from 0 to 1.",
+                      "default": 0,
+                      "markdownDescription": "Probability of spawning the first group, from 0 to 1.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "first_spawn_count": {
+                      "type": "integer",
+                      "description": "Number of entities in the first group.",
+                      "default": 0,
+                      "markdownDescription": "Number of entities in the first group.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "second_spawn_chance": {
+                      "type": "number",
+                      "description": "Independent probability of spawning the second group, from 0 to 1.",
+                      "default": 0,
+                      "markdownDescription": "Independent probability of spawning the second group, from 0 to 1.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "second_spawn_count": {
+                      "type": "integer",
+                      "description": "Number of entities in the second group.",
+                      "default": 0,
+                      "markdownDescription": "Number of entities in the second group.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "spawn_baby": {
+                      "type": "boolean",
+                      "description": "Spawn baby entities when supported by their definitions.",
+                      "default": false,
+                      "markdownDescription": "Spawn baby entities when supported by their definitions.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "spawn_definition": {
+                      "type": "string",
+                      "description": "Entity identifier to spawn.",
+                      "markdownDescription": "Entity identifier to spawn.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    },
+                    "on_spawn": {
+                      "type": "array",
+                      "description": "Entity event triggers sent to each spawned entity.",
+                      "items": {
+                        "description": "Event name or a conditional trigger with a target entity.",
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "description": "Event name.",
+                            "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                          },
+                          {
+                            "type": "object",
+                            "description": "Event to send to a target.",
+                            "properties": {
+                              "event": {
+                                "type": "string",
+                                "description": "Event name.",
+                                "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                              },
+                              "target": {
+                                "type": "string",
+                                "description": "Target entity; self is the owning entity.",
+                                "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                              },
+                              "filters": {
+                                "$ref": "#/definitions/filter",
+                                "description": "Conditions evaluated by Minecraft filter tests.",
+                                "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                              }
+                            },
+                            "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                          }
+                        ],
+                        "markdownDescription": "Event name or a conditional trigger with a target entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                      },
+                      "markdownDescription": "Entity event triggers sent to each spawned entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Roll for one or two groups of entities to spawn at impact.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "stick_in_ground": {
+                  "type": "object",
+                  "description": "Embed the projectile in the impacted block.",
+                  "properties": {
+                    "shake_time": {
+                      "type": "number",
+                      "description": "Seconds the embedded projectile visibly shakes.",
+                      "default": 0,
+                      "markdownDescription": "Seconds the embedded projectile visibly shakes.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Embed the projectile in the impacted block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "teleport_owner": {
+                  "type": "object",
+                  "description": "Teleport the shooter to the impact position.",
+                  "properties": {},
+                  "markdownDescription": "Teleport the shooter to the impact position.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "thrown_potion_effect": {
+                  "type": "object",
+                  "description": "Apply splash potion effects near impact.",
+                  "properties": {
+                    "effect": {
+                      "type": "integer",
+                      "description": "Potion auxiliary value used for the splash effects.",
+                      "default": -1,
+                      "markdownDescription": "Potion auxiliary value used for the splash effects.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Apply splash potion effects near impact.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                },
+                "wind_burst_on_hit": {
+                  "type": "object",
+                  "description": "Release a wind burst that pushes nearby entities away.",
+                  "properties": {},
+                  "markdownDescription": "Release a wind burst that pushes nearby entities away.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+                }
+              },
+              "markdownDescription": "Effects applied when the projectile collides with an entity, block or fluid.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "owner_launch_immunity_ticks": {
+              "type": "integer",
+              "description": "Ticks after launch during which the projectile cannot hit its shooter.",
+              "default": 5,
+              "markdownDescription": "Ticks after launch during which the projectile cannot hit its shooter.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "particle": {
+              "description": "Built-in particle type used at impact.",
+              "default": "iconcrack",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "balloongas",
+                    "bleach",
+                    "blockforcefield",
+                    "blueflame",
+                    "breezewindexplosion",
+                    "bubble",
+                    "bubblecolumndown",
+                    "bubblecolumnup",
+                    "bubblemanual",
+                    "campfiresmoke",
+                    "campfiresmoketall",
+                    "candleflame",
+                    "carrotboost",
+                    "coloredflame",
+                    "conduit",
+                    "creakingcrumble",
+                    "crit",
+                    "dragonbreath",
+                    "dragonbreathfire",
+                    "dragonbreathtrail",
+                    "dragondestroyblock",
+                    "driphoney",
+                    "driplava",
+                    "dripwater",
+                    "dustplume",
+                    "electricspark",
+                    "enchantingtable",
+                    "endrod",
+                    "evaporation",
+                    "explode",
+                    "eyeblossomclose",
+                    "eyeblossomopen",
+                    "fallingborderdust",
+                    "fallingdust",
+                    "fireworks",
+                    "fireworksoverlay",
+                    "fireworksstarter",
+                    "flame",
+                    "food",
+                    "greenflame",
+                    "heart",
+                    "hugeexplosion",
+                    "iconcrack",
+                    "ink",
+                    "largeexplode",
+                    "largesmoke",
+                    "lava",
+                    "mobappearance",
+                    "mobflame",
+                    "mobspell",
+                    "mobspellambient",
+                    "mobspellinstantaneous",
+                    "myceliumdust",
+                    "none",
+                    "note",
+                    "obsidiantear",
+                    "orangepoplarleaves",
+                    "paleoakleaves",
+                    "pausemobgrowth",
+                    "portal",
+                    "portalreverse",
+                    "rainsplash",
+                    "reddust",
+                    "redpoplarleaves",
+                    "resetmobgrowth",
+                    "risingborderdust",
+                    "sculksoul",
+                    "shriek",
+                    "shulkerbullet",
+                    "slime",
+                    "smoke",
+                    "sneeze",
+                    "snowballpoof",
+                    "snowflake",
+                    "sonicexplosion",
+                    "soul",
+                    "sparkler",
+                    "spit",
+                    "stalactitedriplava",
+                    "stalactitedripwater",
+                    "sulfurcube",
+                    "terrain",
+                    "totem",
+                    "townaura",
+                    "trackingemitter",
+                    "vaultconnection",
+                    "villagerangry",
+                    "villagerhappy",
+                    "watersplash",
+                    "watersplashmanual",
+                    "waterwake",
+                    "wax",
+                    "whitesmoke",
+                    "windexplosion",
+                    "witchspell",
+                    "wolfarmorcrack",
+                    "yellowpoplarleaves"
+                  ]
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "markdownDescription": "Built-in particle type used at impact.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "potion_effect": {
+              "type": "integer",
+              "description": "Potion auxiliary value; water potion data is needed by douse_fire.",
+              "default": -1,
+              "markdownDescription": "Potion auxiliary value; water potion data is needed by douse_fire.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "power": {
+              "type": "number",
+              "description": "Initial launch speed in blocks per tick.",
+              "default": 1.3,
+              "markdownDescription": "Initial launch speed in blocks per tick.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "reflect_immunity": {
+              "type": "number",
+              "description": "Seconds after launch during which reflection is disabled.",
+              "default": 0,
+              "markdownDescription": "Seconds after launch during which reflection is disabled.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "reflect_on_hurt": {
+              "type": "boolean",
+              "description": "Allow reflection when struck or hit by another projectile; projectile-on-projectile reflection applies from 1.26.0.",
+              "default": false,
+              "markdownDescription": "Allow reflection when struck or hit by another projectile; projectile-on-projectile reflection applies from 1.26.0.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "shoot_sound": {
+              "type": "string",
+              "description": "Sound played when the projectile launches.",
+              "markdownDescription": "Sound played when the projectile launches.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "shoot_target": {
+              "type": "boolean",
+              "description": "Aim at the shooter current target when available.",
+              "default": true,
+              "markdownDescription": "Aim at the shooter current target when available.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "should_bounce": {
+              "description": "Entity-impact bouncing: no disables it, if_invulnerable bounces off invulnerable targets, and if_no_damage_dealt bounces when the hit deals no damage. Legacy booleans are also accepted.",
+              "default": "no",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "no",
+                    "if_invulnerable",
+                    "if_no_damage_dealt"
+                  ]
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "markdownDescription": "Entity-impact bouncing: no disables it, if_invulnerable bounces off invulnerable targets, and if_no_damage_dealt bounces when the hit deals no damage. Legacy booleans are also accepted.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "splash_range": {
+              "type": "number",
+              "description": "Radius in blocks for splash or lingering potion effects.",
+              "default": 4,
+              "markdownDescription": "Radius in blocks for splash or lingering potion effects.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "spread_fire": {
+              "type": "boolean",
+              "description": "Transfer fire from a burning projectile to the target.",
+              "default": true,
+              "markdownDescription": "Transfer fire from a burning projectile to the target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "stop_on_hurt": {
+              "type": "boolean",
+              "description": "Stop projectile movement when it is struck.",
+              "default": false,
+              "markdownDescription": "Stop projectile movement when it is struck.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "uncertainty_base": {
+              "type": "number",
+              "description": "Base launch inaccuracy; total is uncertainty_base minus difficultyLevel times uncertainty_multiplier.",
+              "default": 0,
+              "markdownDescription": "Base launch inaccuracy; total is uncertainty_base minus difficultyLevel times uncertainty_multiplier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            },
+            "uncertainty_multiplier": {
+              "type": "number",
+              "description": "Launch inaccuracy reduction per difficulty level.",
+              "default": 0,
+              "markdownDescription": "Launch inaccuracy reduction per difficulty level.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Turns the entity into a projectile: a thrown or shot entity that flies along a ballistic arc and reacts when it impacts a block, a fluid, or another entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable)"
+        },
         "minecraft:health": {
           "type": "object",
           "description": "Defines the health pool for an entity, measured in health points (1 point = half a heart). Typical values: cow (10), zombie (20), iron golem (100), wither (600).",
@@ -3796,6 +4978,211 @@
             }
           },
           "markdownDescription": "Allows this entity to generate paths that include vertical walls like the vanilla Spiders do.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_navigation.climb?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:behavior.pickup_items": {
+          "type": "object",
+          "description": "Allows the mob to pick up items on the ground.",
+          "properties": {
+            "priority": {
+              "type": "integer",
+              "description": "Lower numeric priority runs first.",
+              "markdownDescription": "Lower numeric priority runs first.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "can_pickup_any_item": {
+              "type": "boolean",
+              "description": "Allow picking up any item.",
+              "default": false,
+              "markdownDescription": "Allow picking up any item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "can_pickup_to_hand_or_equipment": {
+              "type": "boolean",
+              "description": "Allow placing picked-up items in the hand or armor slots.",
+              "default": true,
+              "markdownDescription": "Allow placing picked-up items in the hand or armor slots.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "control_flags": {
+              "type": "array",
+              "description": "Movement controls used by this goal.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "jump",
+                  "look",
+                  "move"
+                ]
+              },
+              "markdownDescription": "Movement controls used by this goal.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "cooldown_after_being_attacked": {
+              "type": "integer",
+              "description": "Seconds during which item pickup is disabled after an attack.",
+              "default": 0,
+              "markdownDescription": "Seconds during which item pickup is disabled after an attack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "excluded_items": {
+              "type": "array",
+              "description": "Items excluded from pickup, using identifiers or item/tag descriptors.",
+              "items": {
+                "description": "Item identifier or an ingredient descriptor with an optional replacement item.",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "description": "Item identifier.",
+                    "markdownDescription": "Item identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                  },
+                  {
+                    "type": "object",
+                    "description": "Item descriptor or ingredient with a replacement item.",
+                    "properties": {
+                      "item": {
+                        "type": "string",
+                        "description": "Item identifier.",
+                        "markdownDescription": "Item identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Item identifier.",
+                        "markdownDescription": "Item identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                      },
+                      "tags": {
+                        "type": "string",
+                        "description": "Molang tag predicate.",
+                        "markdownDescription": "Molang tag predicate.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                      },
+                      "result_item": {
+                        "type": "string",
+                        "description": "Item remaining after use.",
+                        "markdownDescription": "Item remaining after use.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                      },
+                      "transform_to_item": {
+                        "type": "string",
+                        "description": "Legacy item remaining after use.",
+                        "markdownDescription": "Legacy item remaining after use.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                      }
+                    },
+                    "markdownDescription": "Item descriptor or ingredient with a replacement item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                  }
+                ],
+                "markdownDescription": "Item identifier or an ingredient descriptor with an optional replacement item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+              },
+              "markdownDescription": "Items excluded from pickup, using identifiers or item/tag descriptors.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "goal_radius": {
+              "type": "number",
+              "description": "Distance in blocks that counts as reaching the item, preventing repeated movement around the destination.",
+              "default": 0.5,
+              "markdownDescription": "Distance in blocks that counts as reaching the item, preventing repeated movement around the destination.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "max_dist": {
+              "type": "integer",
+              "description": "Maximum distance in blocks to search for dropped items.",
+              "default": 1,
+              "markdownDescription": "Maximum distance in blocks to search for dropped items.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "on_pickup_item_start": {
+              "description": "Event triggered when the mob moves to collect an item. Requires format version 1.26.20 or newer.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event triggered when the mob moves to collect an item. Requires format version 1.26.20 or newer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "on_pickup_item_end": {
+              "description": "Event triggered after collection finishes or the mob loses interest in the item. Requires format version 1.26.20 or newer.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event triggered after collection finishes or the mob loses interest in the item. Requires format version 1.26.20 or newer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "pickup_based_on_chance": {
+              "type": "boolean",
+              "description": "Use a difficulty-dependent random chance to decide whether the mob can pick up items.",
+              "default": false,
+              "markdownDescription": "Use a difficulty-dependent random chance to decide whether the mob can pick up items.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "pickup_same_items_as_in_hand": {
+              "type": "boolean",
+              "description": "Only collect items matching the item currently held by the mob.",
+              "default": false,
+              "markdownDescription": "Only collect items matching the item currently held by the mob.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "search_height": {
+              "type": "integer",
+              "description": "Vertical height in blocks searched for dropped items.",
+              "default": 1,
+              "markdownDescription": "Vertical height in blocks searched for dropped items.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "speed_multiplier": {
+              "type": "number",
+              "description": "Movement speed multiplier while collecting an item.",
+              "default": 1,
+              "markdownDescription": "Movement speed multiplier while collecting an item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "stop_if_holding_item": {
+              "type": "boolean",
+              "description": "Prevent this goal from starting while the mob holds an item. Requires format version 1.26.30 or newer.",
+              "default": false,
+              "markdownDescription": "Prevent this goal from starting while the mob holds an item. Requires format version 1.26.30 or newer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            },
+            "track_target": {
+              "type": "boolean",
+              "description": "Continue pursuing the selected item while it remains a valid target.",
+              "default": false,
+              "markdownDescription": "Continue pursuing the selected item while it remains a valid target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Allows the mob to pick up items on the ground.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable)"
         },
         "minecraft:behavior.stay_near_noteblock": {
           "type": "object",

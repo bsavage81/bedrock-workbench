@@ -5,7 +5,7 @@ const core = require('./core.cjs');
 const scripts = require('./script-components.cjs');
 const { molangParser, MOLANG_QUERIES, MOLANG_MATH } = require('./vendor/molang.cjs');
 class ContentIndex {
-  constructor(project) { this.project = project; this.types = new Map(); this.documents = new Map(); this.issues = []; this.scriptSources = new Map(); this.languages=new Map(); this.customComponents = []; this.scriptsDirty = false; }
+  constructor(project) { this.project = project; this.types = new Map(); this.documents = new Map(); this.issues = []; this.scriptSources = new Map(); this.commandSources = new Map(); this.languages=new Map(); this.customComponents = []; this.scriptsDirty = false; }
   add(type, id, file) {
     if (typeof id !== 'string' || !id) return;
     if (!this.types.has(type)) this.types.set(type, new Map());
@@ -16,6 +16,7 @@ class ContentIndex {
     const normalize = value => process.platform === 'win32' ? path.resolve(value).toLowerCase() : path.resolve(value);
     const matches = candidate => normalize(candidate) === normalize(file) || core.inside(file, candidate);
     for (const candidate of this.documents.keys()) if (matches(candidate)) this.documents.delete(candidate);
+    for (const candidate of this.commandSources.keys()) if (matches(candidate)) this.commandSources.delete(candidate);
     for(const candidate of this.languages.keys())if(matches(candidate))this.languages.delete(candidate);
     for (const candidate of this.scriptSources.keys()) if (matches(candidate)) { this.scriptSources.delete(candidate); this.scriptsDirty = true; }
     this.issues = this.issues.filter(issue => !matches(issue.file));
@@ -61,6 +62,7 @@ async function indexFile(index, side, relative) {
       index.add('function', rel.slice(10, -11), file);
       if ((await fs.stat(file)).size <= 2 * 1024 * 1024) {
         const source = await fs.readFile(file, 'utf8');
+        index.commandSources.set(file,source);
         for (const line of source.split(/\r?\n/)) {
           if (line.trimStart().startsWith('#')) continue;
           const objective = /(?:^|\brun\s+)\s*scoreboard\s+objectives\s+add\s+([\w.-]+)/.exec(line);

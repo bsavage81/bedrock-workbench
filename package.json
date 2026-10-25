@@ -2,7 +2,7 @@
   "name": "bedrock-workbench",
   "displayName": "Bedrock Workbench",
   "description": "Build, deploy and export Minecraft Bedrock add-ons with separate beta and stable profiles.",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "publisher": "bsavage81",
   "license": "UNLICENSED",
   "engines": {
@@ -188,6 +188,11 @@
     ],
     "languages": [
       {
+        "id": "bedrock-lang",
+        "aliases": ["Minecraft Language", "Bedrock Lang"],
+        "extensions": [".lang"]
+      },
+      {
         "id": "mcfunction",
         "aliases": [
           "Minecraft Function",
@@ -198,7 +203,16 @@
         ]
       }
     ],
+    "grammars": [{"language":"bedrock-lang","scopeName":"source.bedrock-lang","path":"./syntaxes/bedrock-lang.tmLanguage.json"}],
     "colors": [
+      {"id":"bedrock.lang.entity","description":"Entity name translation keys.","defaults":{"dark":"#4EC9B0","light":"#167C6B","highContrast":"#4EC9B0","highContrastLight":"#005A50"}},
+      {"id":"bedrock.lang.spawnEgg","description":"Spawn egg translation keys.","defaults":{"dark":"#C586C0","light":"#8A287F","highContrast":"#E5A0DF","highContrastLight":"#702068"}},
+      {"id":"bedrock.lang.item","description":"Item translation keys.","defaults":{"dark":"#DCDCAA","light":"#766000","highContrast":"#FFFFAA","highContrastLight":"#604B00"}},
+      {"id":"bedrock.lang.block","description":"Block translation keys.","defaults":{"dark":"#CE9178","light":"#A04A21","highContrast":"#FFAD88","highContrastLight":"#843800"}},
+      {"id":"bedrock.lang.ui","description":"Interface translation keys.","defaults":{"dark":"#9CDCFE","light":"#0066A2","highContrast":"#9CDCFE","highContrastLight":"#004E80"}},
+      {"id":"bedrock.lang.action","description":"Action and death-message translation keys.","defaults":{"dark":"#B5CEA8","light":"#416C28","highContrast":"#C8EDA9","highContrastLight":"#2B5018"}},
+      {"id":"bedrock.lang.pack","description":"Pack metadata translation keys.","defaults":{"dark":"#D7BA7D","light":"#846200","highContrast":"#F9D78B","highContrastLight":"#684D00"}},
+      {"id":"bedrock.lang.other","description":"Other translation keys.","defaults":{"dark":"#C5C5C5","light":"#444444","highContrast":"#FFFFFF","highContrastLight":"#000000"}},
       {
         "id": "bedrock.translationPreview",
         "description": "Inline pack translation previews.",

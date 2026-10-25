@@ -8,6 +8,7 @@ const event={description:'Event name or a conditional trigger with a target enti
 const ingredient={description:'Item identifier or an ingredient descriptor with an optional replacement item.',anyOf:[s('Item identifier.'),o('Item descriptor or ingredient with a replacement item.',{item:s('Item identifier.'),name:s('Item identifier.'),tags:s('Molang tag predicate.'),result_item:s('Item remaining after use.'),transform_to_item:s('Legacy item remaining after use.')})]};
 const entityTypes=many(o('Eligible target.',{filters:r('filter'),max_dist:n('Maximum range.'),must_see:b('Require line of sight.'),must_see_forget_duration:n('Visibility memory in seconds.'),reevaluate_description:b('Reevaluate the target description.'),sprint_speed_multiplier:n('Sprint speed multiplier.'),walk_speed_multiplier:n('Walking speed multiplier.')}));
 const components={};const put=(id,schema)=>components['minecraft:'+id]=schema;
+put('projectile',require('./projectile-schema.cjs')({o,a,s,n,i,b,event,vector}));
 put('health',o('Entity health attribute.',{value:range,min:n('Minimum health.'),max:n('Maximum health.')}));
 for(const name of ['movement','movement.fly','underwater_movement','lava_movement','follow_range','knockback_resistance','luck','friction_modifier'])put(name,o('Entity '+name+' attribute.',{value:range,min:n('Minimum.'),max:n('Maximum.')}));
 put('movement.sway',o('Moves the mob with a side-to-side sway that resembles swimming.',{max_turn:{...n('Maximum turning angle in degrees per tick.'),default:30},sway_amplitude:{...n('Strength of the sideways sway movement.'),default:0.05},sway_frequency:{...n('Multiplier controlling how frequently the movement sways.'),default:0.5}}));
@@ -52,6 +53,23 @@ const navFields=Object.fromEntries(['can_path_over_water','can_pass_doors','can_
 for(const name of ['walk','fly','swim','generic','hover','climb'])put('navigation.'+name,o('Navigation route planning.',{...navFields}));
 const goal=(description,fields={})=>o(description,{priority:i('Lower numeric priority runs first.'),...fields});
 const speed={speed_multiplier:n('Movement speed multiplier.')};
+put('behavior.pickup_items',goal('Allows the mob to pick up items on the ground.',{
+ can_pickup_any_item:{...b('Allow picking up any item.'),default:false},
+ can_pickup_to_hand_or_equipment:{...b('Allow placing picked-up items in the hand or armor slots.'),default:true},
+ control_flags:a('Movement controls used by this goal.',{type:'string',enum:['jump','look','move']}),
+ cooldown_after_being_attacked:{...i('Seconds during which item pickup is disabled after an attack.'),default:0},
+ excluded_items:a('Items excluded from pickup, using identifiers or item/tag descriptors.',ingredient),
+ goal_radius:{...n('Distance in blocks that counts as reaching the item, preventing repeated movement around the destination.'),default:0.5},
+ max_dist:{...i('Maximum distance in blocks to search for dropped items.'),default:1},
+ on_pickup_item_start:{...event,description:'Event triggered when the mob moves to collect an item. Requires format version 1.26.20 or newer.'},
+ on_pickup_item_end:{...event,description:'Event triggered after collection finishes or the mob loses interest in the item. Requires format version 1.26.20 or newer.'},
+ pickup_based_on_chance:{...b('Use a difficulty-dependent random chance to decide whether the mob can pick up items.'),default:false},
+ pickup_same_items_as_in_hand:{...b('Only collect items matching the item currently held by the mob.'),default:false},
+ search_height:{...i('Vertical height in blocks searched for dropped items.'),default:1},
+ speed_multiplier:{...n('Movement speed multiplier while collecting an item.'),default:1},
+ stop_if_holding_item:{...b('Prevent this goal from starting while the mob holds an item. Requires format version 1.26.30 or newer.'),default:false},
+ track_target:{...b('Continue pursuing the selected item while it remains a valid target.'),default:false}
+}));
 put('behavior.stay_near_noteblock',goal('Stays near a note block after hearing it play.',{control_flags:a('Movement controls used by this goal.',{type:'string',enum:['jump','look','move']}),listen_time:{...i('Time to remain near a note block after hearing it.'),default:30},speed:{...n('Movement speed when approaching the note block.'),default:1},start_distance:{...n('Distance from the note block needed before attempting to start this goal.'),default:10},stop_distance:{...n('Distance from the note block the entity tries to reach.'),default:2}}));
 
 put('behavior.random_hover',goal('Hovers toward random destinations near the surface.',{control_flags:a('Movement controls used by this goal.',{type:'string',enum:['jump','look','move']}),hover_height:{description:'Desired height above the surface. Format 1.26.20 and newer use a min/max range object; older files can use a scalar or two-value array.',anyOf:[{type:'number'},{type:'array',items:{type:'number'},minItems:2,maxItems:2},o('Hover-height range.',{min:n('Minimum hovering height above the surface.'),max:n('Maximum hovering height above the surface.')})]},interval:{...i('Random selection interval used to choose a new hover destination.'),default:120},speed_multiplier:{...n('Movement speed multiplier during random hovering.'),default:1},xz_dist:{...i('Horizontal search distance in blocks for a hover destination.'),minimum:1,default:10},y_dist:{...i('Vertical search distance in blocks for a hover destination.'),minimum:1,default:7},y_offset:{...n('Vertical offset in blocks added to the chosen destination.'),default:0}}));

@@ -3,6 +3,53 @@ const assert=require('node:assert/strict');
 const path=require('node:path');
 const lang=require('../src/localization.cjs');
 const decorations=require('../src/translation-decorations.cjs');
+const languageEditor=require('../src/language-editor.cjs');
+
+test('language colors identify key families and leave values and comments untouched',()=>{
+ const source='\uFEFFentity.test:fish.name=Fish\r\nitem.spawn_egg.entity.test:fish.name=Egg\r\nitem.test:rod.name=Rod\r\ntile.test:stone.name=Stone\r\nui.greeting=Hello\r\naction.catch=Catch\r\npack.name=Pack\r\ncustom.key=Other\r\n# entity.comment=Ignored\r\n';
+ const ranges=languageEditor.keyRanges(source,'en_US.lang');assert.deepEqual(ranges.map(r=>r.category),['entity','spawnEgg','item','block','ui','action','pack','other']);
+ for(const range of ranges){assert.ok(!source.slice(range.offset,range.offset+range.length).includes('='));assert.equal(source[range.offset+range.length],'=');}
+ const pkg=require('../package.json');assert.equal(pkg.contributes.languages.find(l=>l.extensions.includes('.lang')).id,'bedrock-lang');
+ for(const range of ranges)assert.ok(pkg.contributes.colors.some(c=>c.id==='bedrock.lang.'+range.category));
+});
+
+test('language usage includes implicit names, explicit localized fields and scripts but excludes unrelated strings',()=>{
+ const json=require('jsonc-parser'),index=fixture();index.documents=new Map();index.scriptSources=new Map();
+ function add(file,value,side='behavior'){const text=JSON.stringify(value,null,2),full=path.join(index.project.root,file);index.documents.set(full,{file:full,relative:file.slice(3),side,text,data:value,tree:json.parseTree(text)});return full;}
+ const owner=add('BP/entities/fish.json',{'minecraft:entity':{description:{identifier:'test:fish'}}});
+ const client=add('RP/entity/fish.json',{'minecraft:client_entity':{description:{identifier:'test:fish'}}},'resource');
+ assert.deepEqual(languageEditor.references(index,'entity.test:fish.name').map(r=>r.file).sort(),[owner,client].sort());
+ assert.equal(languageEditor.references(index,'item.spawn_egg.entity.test:fish.name').length,2);
+ const item=add('BP/items/rod.json',{'minecraft:item':{description:{identifier:'test:rod'}}});
+ assert.equal(languageEditor.references(index,'item.test:rod.name')[0].file,item);
+ const block=add('BP/blocks/stone.json',{'minecraft:block':{description:{identifier:'test:stone'}}});
+ assert.equal(languageEditor.references(index,'tile.test:stone.name')[0].file,block);
+ add('RP/texts/message.json',{rawtext:[{translate:'ui.greeting'}]},'resource');
+ add('RP/ui/screen.json',{label:{type:'label',text:'%ui.greeting'},literal:{type:'label',localize:false,text:'ui.greeting'},unrelated:'ui.greeting'},'resource');
+ add('BP/manifest.json',{header:{name:'ui.greeting',description:'ui.greeting'}});
+ index.scriptSources.set(path.join(index.project.root,'BP/scripts/main.ts'),"const message={translate:'ui.greeting'}; const unrelated='ui.greeting';");
+ const refs=languageEditor.references(index,'ui.greeting');assert.equal(refs.length,5);assert.equal(new Set(refs.map(r=>r.file)).size,4);assert.ok(refs.every(r=>Number.isInteger(r.line)&&Number.isInteger(r.column)));
+ index.commandSources=new Map([[path.join(index.project.root,'BP/functions/greet.mcfunction'),'# tellraw @a {"rawtext":[{"translate":"ui.greeting"}]}\r\nexecute as @a run tellraw @s {"rawtext":[{"translate":"ui.greeting"}]}\r\n']]);
+ const commandRef=languageEditor.references(index,'ui.greeting').find(r=>r.reason==='Function translation reference');assert.equal(commandRef.line,1);assert.equal(languageEditor.references(index,'ui.greeting').length,6);
+ assert.deepEqual(languageEditor.references(index,'missing'),[]);
+});
+
+test('language hover shows safe clickable usage paths instead of repeating the declaration',()=>{
+ const json=require('jsonc-parser'),index=fixture(),file=path.join(index.project.root,'BP/entities/fish.json'),text='{"minecraft:entity":{"description":{"identifier":"test:fish"}}}';index.documents=new Map([[file,{file,relative:'entities/fish.json',side:'behavior',text,tree:json.parseTree(text)}]]);index.scriptSources=new Map();
+ const vscode={MarkdownString:class{value='';appendText(s){this.value+=s;return this;}appendMarkdown(s){this.value+=s;return this;}},Uri:{file:file=>({with:({fragment})=>({toString:()=> 'file:///'+file.replaceAll('\\','/')+'#'+fragment})})}};
+ const hover=languageEditor.hover(vscode,index,'entity.test:fish.name');assert.match(hover.value,/Used by 1 pack file/);assert.match(hover.value,/BP\/entities\/fish.json:1/);assert.match(hover.value,/#L1,/);assert.ok(!hover.value.includes('entity.test:fish.name'));assert.equal(hover.isTrusted,false);
+ assert.match(languageEditor.hover(vscode,index,'unreferenced').value,/No references found/);
+});
+
+test('language decorations refresh only the parsed key ranges and clear non-pack editors',async t=>{
+ const index=fixture(),file=[...index.languages.keys()][0],listeners={},calls=[],subscriptions=[];let text='entity.test:fish.name=Fish';
+ const event=name=>callback=>{listeners[name]=callback;return {dispose(){}};};
+ const editor={document:{uri:{scheme:'file',fsPath:file},getText:()=>text,positionAt:n=>n},setDecorations:(type,ranges)=>calls.push({id:type.id,ranges})};
+ const vscode={ThemeColor:class{constructor(id){this.id=id;}},Range:class{constructor(start,end){this.start=start;this.end=end;}},DecorationRangeBehavior:{ClosedClosed:1},window:{visibleTextEditors:[editor],createTextEditorDecorationType:options=>({id:options.color.id,dispose(){}}),onDidChangeVisibleTextEditors:event('visible')},workspace:{onDidChangeTextDocument:event('edit')}};
+ languageEditor.attach(vscode,{subscriptions},()=>index.project);t.after(()=>subscriptions.forEach(s=>s.dispose()));await new Promise(r=>setTimeout(r,150));assert.equal(calls.find(c=>c.id==='bedrock.lang.entity').ranges[0].end,text.indexOf('='));
+ text='item.test:rod.name=Rod';calls.length=0;listeners.edit();await new Promise(r=>setTimeout(r,150));assert.equal(calls.find(c=>c.id==='bedrock.lang.entity').ranges.length,0);assert.equal(calls.find(c=>c.id==='bedrock.lang.item').ranges.length,1);
+ editor.document.uri.fsPath=path.join(index.project.root,'notes.lang');calls.length=0;listeners.visible();await new Promise(r=>setTimeout(r,150));assert.ok(calls.every(c=>!c.ranges.length));
+});
 function fixture(){const root=path.resolve('.test-temp/translation-preview'),project={root,packs:{behavior:path.join(root,'BP'),resource:path.join(root,'RP')}};const file=path.join(project.packs.resource,'texts/en_US.lang');return {project,languages:new Map([[file,lang.parse('action.catch=Catch\nitem.test:fish.name=Fish\nshared=Project\n',file)]]),reference:{languages:[lang.vanillaDocument('shared=Vanilla\nvanilla.only=Vanilla only\n','resource_pack/texts/en_US.lang'),lang.vanillaDocument('action.catch=Fangen\n','resource_pack/texts/de_DE.lang')]}};}
 function document(index,value,file='BP/entities/test.json'){const text=typeof value==='string'?value:JSON.stringify(value);return {uri:{scheme:'file',fsPath:path.join(index.project.root,file)},getText:()=>text};}
 test('inline previews sit after values, prefer English and preserve source',()=>{

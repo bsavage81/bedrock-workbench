@@ -1,0 +1,10 @@
+{
+  "scopeName": "source.bedrock-lang",
+  "patterns": [
+    {"name":"comment.line.number-sign.bedrock-lang","match":"^\\s*#.*$"},
+    {"name":"meta.translation.bedrock-lang","begin":"^\\s*([^=\\s][^=]*?)(\\s*=)","beginCaptures":{"1":{"name":"variable.other.property.bedrock-lang"},"2":{"name":"keyword.operator.assignment.bedrock-lang"}},"end":"$","patterns":[
+      {"name":"comment.line.number-sign.bedrock-lang","match":"(?:\\t#+|\\s+###).*$"},
+      {"name":"constant.character.escape.bedrock-lang","match":"§[0-9a-z]|%(?:\\d+\\$)?[sdf]|\\{\\d+\\}"}
+    ]}
+  ]
+}
