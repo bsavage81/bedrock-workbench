@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.19.0 — October 25, 2026
+
+- Complete translation-capable fields from both target-matched vanilla and project language files, showing translated text in the suggestions. Prefer project overrides and keep vanilla keys read-only during renames.
+- Show supplied translations beside JSON values in theme-aware green italic text instead of on the key hover. Keep other languages on the preview hover and refresh previews for unsaved language edits.
+
 ## 0.18.0 — October 24, 2026
 
 - Expand original entity authoring to 84 curated components/AI goals, nested event responses, filters, groups and properties, with version-aware Learn hovers.

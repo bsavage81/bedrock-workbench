@@ -64,9 +64,9 @@ function merge(reference,local) {
   for(const [kind,ids]of Object.entries(local.vanilla||{}))vanilla[kind]=[...new Set([...(vanilla[kind]||[]),...ids])];
   const vanillaReferences={...reference?.vanillaReferences};
   for(const [kind,ids]of Object.entries(local.vanillaReferences||{}))vanillaReferences[kind]=[...new Set([...(vanillaReferences[kind]||[]),...ids])];
-  return {...reference,vanilla,vanillaReferences,localSource:local.source};
+  return {...reference,vanilla,vanillaReferences,languages:[...(reference?.languages||[]),...(local.languages||[])],localSource:local.source};
 }
-const allowed=(side,relative)=>side==='behavior'? /^(blocks|items|entities|loot_tables|functions|recipes|trading)\//.test(relative) : /^(models|entity|attachables|animations|animation_controllers|render_controllers|particles|textures|sounds)\//.test(relative);
+const allowed=(side,relative)=>side==='behavior'? /^(blocks|items|entities|loot_tables|functions|recipes|trading)\//.test(relative) : /^(texts|models|entity|attachables|animations|animation_controllers|render_controllers|particles|textures|sounds)\//.test(relative);
 async function local(project,{force=false}={}) {
   const source=project.vanillaSource;
   if(!source)return;
@@ -74,7 +74,7 @@ async function local(project,{force=false}={}) {
   if(compareVersions(source.version,project.config.targetVersion)>0)throw Error(`Installed vanilla ${source.version} is newer than target ${project.config.targetVersion}; using samples instead.`);
   const cacheFile=await core.local(project.root,'.bedrock/reference/local-'+project.config.target+'.json');
   const cached=await core.readJson(cacheFile).catch(()=>null);
-  const same=cached?.indexVersion===3 && cached?.source?.folder===source.folder && cached.source.version===source.version && cached.source.channel===project.config.target;
+  const same=cached?.indexVersion===4 && cached?.source?.folder===source.folder && cached.source.version===source.version && cached.source.channel===project.config.target;
   if(!force && same && Date.now()-cached.updated<86400000)return cached;
   const root=await fs.realpath(source.folder), packs=[];
   // Inspect only expected layouts beneath the explicitly selected directory.
@@ -93,7 +93,7 @@ async function local(project,{force=false}={}) {
     else if(await core.exists(path.join(root,'entities'))||await core.exists(path.join(root,'items'))||await core.exists(path.join(root,'blocks')))packs.push({side:'behavior',folder:root});
   }
   if(!packs.length)throw Error('No readable vanilla packs found. Select the game Content/data folder, a samples folder, or a vanilla pack folder.');
-  const index=collector();let bytes=0,entries=0;
+  const index=collector(),languages=[];let bytes=0,entries=0;
   async function walk(pack,folder,relative='') {
     for(const entry of await fs.readdir(folder,{withFileTypes:true})) {
       if(++entries>100000)throw Error('Vanilla reference directory exceeds the entry limit');
@@ -101,6 +101,7 @@ async function local(project,{force=false}={}) {
       const rel=(relative?relative+'/':'')+entry.name,file=path.join(folder,entry.name);
       if(entry.isDirectory()){if(allowed(pack.side,rel+'/'))await walk(pack,file,rel);continue;}
       if(!entry.isFile()||!allowed(pack.side,rel))continue;
+      if(pack.side==='resource'&&/^texts\/[^/]+\.lang$/.test(rel)){const stat=await fs.stat(file);if(stat.size>2*1024*1024)continue;bytes+=stat.size;if(bytes>128*1024*1024)throw Error('Vanilla reference data exceeds the size limit');languages.push(require('./localization.cjs').vanillaDocument(await fs.readFile(file,'utf8'),file));continue;}
       if(!/\.json$/i.test(rel)){index.file(pack.side,rel);continue;}
       const stat=await fs.stat(file);if(stat.size>8*1024*1024)continue;
       bytes+=stat.size;if(bytes>128*1024*1024)throw Error('Vanilla JSON reference data exceeds the size limit');
@@ -109,7 +110,7 @@ async function local(project,{force=false}={}) {
     }
   }
   for(const pack of packs)await walk(pack,pack.folder);
-  const result={indexVersion:3,source:{...source,channel:project.config.target},updated:Date.now(),vanilla:index.finish(),vanillaReferences:index.references(),packs:packs.length};
+  const result={indexVersion:4,source:{...source,channel:project.config.target},updated:Date.now(),languages,vanilla:index.finish(),vanillaReferences:index.references(),packs:packs.length};
   if(!Object.keys(result.vanilla).length)throw Error('The selected packs did not contain readable vanilla identifiers');
   await core.writeJson(cacheFile,result);return result;
 }

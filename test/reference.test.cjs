@@ -9,6 +9,7 @@ function archive() {
     'behavior_pack/blocks/stone.json':json({'minecraft:block':{description:{identifier:'minecraft:stone'}}}),
     'behavior_pack/loot_tables/blocks/stone.json':json({pools:[]}),
     'resource_pack/models/entity/test.geo.json':json({'minecraft:geometry':[{description:{identifier:'geometry.vanilla_test'}}]}),
+    'resource_pack/texts/en_US.lang':strToU8('item.apple.name=Apple\n'),
     'resource_pack/animations/test.json':json({animations:{'animation.vanilla_test':{}}}),
     'resource_pack/textures/terrain_texture.json': strToU8('{// atlas\n"texture_data":{"stone":{"textures":"textures/blocks/stone"}}}'),
     'resource_pack/textures/item_texture.json': json({texture_data: {apple: {textures: 'textures/items/apple'}}}),
@@ -21,7 +22,7 @@ function archive() {
 }
 test('Mojang documentation and schema references supply component and field descriptions without beta content', () => {
   const index = buildIndex(archive(), 'v1.26.50.4');
-  assert.equal(index.intelligenceVersion, 6);
+  assert.equal(index.intelligenceVersion, 7);assert.deepEqual(index.languages[0].values,[['item.apple.name','Apple',0]]);
   assert.deepEqual(index.vanilla.terrain_texture, ['stone']);
   assert.deepEqual(index.vanilla.item_texture, ['apple']);
   assert.ok(index.vanilla.item.includes('minecraft:apple'));
