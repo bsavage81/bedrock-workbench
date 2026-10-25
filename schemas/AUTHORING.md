@@ -130,3 +130,9 @@ Additional primary references consulted October 24, 2026 (stable view):
 - https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box
 - https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter
 - https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection
+
+Creative inventory groups:
+- Item and block `description.menu_category.group` suggests the vanilla identifiers from Microsoft's Crafting Item Catalog guide plus names declared in saved project catalogs. New strings remain valid; legacy format versions before 1.21.60 receive the older vanilla spelling.
+- Define custom groups in `BP/item_catalog/crafting_item_catalog.json`, under `minecraft:crafting_items_catalog.categories[].groups[].group_identifier` with a namespaced `name` and an item `icon`. Add the same namespaced key to the resource pack's language file for the display name.
+- The original catalog schema supplies category choices, custom-group/loose-item starters, icon/content identifier completions, and structural validation. Catalog edits/deletions refresh the project index; custom group references navigate to their catalog definition. Groups supplied by other packs remain allowed.
+- Source: https://learn.microsoft.com/en-us/minecraft/creator/documents/craftingitemcatalogdocumentation?view=minecraft-bedrock-stable (consulted October 24, 2026). The bundled vanilla list follows that guide's namespaced group list; it is a suggestion list, not a closed validation enum.

@@ -226,3 +226,9 @@ Remaining: general function argument flow, external package types, unsaved scrip
 - Rules are reviewable in project settings, with optional reasons.
 - Live checks and validation reports share suppression rules; syntax/schema findings are preserved.
 - Native VS Code verification covers both scopes, reports, and removing rules.
+
+### Creative inventory groups
+
+- [x] Vanilla and saved custom catalog group suggestions for block/item menu categories, with legacy spelling by format version.
+- [x] Original crafting catalog schema, group starters, icon/content item references, custom group navigation, and refresh on catalog changes.
+- [x] New/custom group names remain valid, including names supplied by other packs.

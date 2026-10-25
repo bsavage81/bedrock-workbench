@@ -1,0 +1,100 @@
+// Original rules from the official Crafting Item Catalog guide.
+module.exports={
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bedrock Workbench crafting item catalog",
+  "type": "object",
+  "required": [
+    "format_version",
+    "minecraft:crafting_items_catalog"
+  ],
+  "properties": {
+    "format_version": {
+      "type": "string"
+    },
+    "minecraft:crafting_items_catalog": {
+      "type": "object",
+      "required": [
+        "categories"
+      ],
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "category_name",
+              "groups"
+            ],
+            "properties": {
+              "category_name": {
+                "type": "string",
+                "enum": [
+                  "construction",
+                  "nature",
+                  "equipment",
+                  "items"
+                ]
+              },
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "group_identifier": {
+                      "type": "object",
+                      "required": [
+                        "name"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Namespaced group identifier and localization key. Use an existing group or type a new custom name.",
+                          "markdownDescription": "Namespaced group identifier and localization key. Use an existing group or type a new custom name.\n\n[Microsoft Learn](https://learn.microsoft.com/en-us/minecraft/creator/documents/craftingitemcatalogdocumentation?view=minecraft-bedrock-stable)"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "description": "Item identifier used as the icon when defining a new group.",
+                          "markdownDescription": "Item identifier used as the icon when defining a new group.\n\n[Microsoft Learn](https://learn.microsoft.com/en-us/minecraft/creator/documents/craftingitemcatalogdocumentation?view=minecraft-bedrock-stable)"
+                        }
+                      }
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "description": "Item or block identifier to place in this group.",
+                        "markdownDescription": "Item or block identifier to place in this group.\n\n[Microsoft Learn](https://learn.microsoft.com/en-us/minecraft/creator/documents/craftingitemcatalogdocumentation?view=minecraft-bedrock-stable)"
+                      }
+                    }
+                  },
+                  "defaultSnippets": [
+                    {
+                      "label": "Custom creative group",
+                      "body": {
+                        "group_identifier": {
+                          "name": "${1:my_pack:my_group}",
+                          "icon": "${2:my_pack:my_item}"
+                        },
+                        "items": [
+                          "${3:my_pack:my_item}"
+                        ]
+                      }
+                    },
+                    {
+                      "label": "Loose items",
+                      "body": {
+                        "items": [
+                          "${1:my_pack:my_item}"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+};

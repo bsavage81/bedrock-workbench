@@ -509,6 +509,11 @@ async function run() {
   await setItem({'minecraft:durability':{max_durability:'wrong'}});
   await until(async()=>vscode.languages.getDiagnostics(authoredItemUri).some(d=>/integer|number/i.test(d.message)),'Native item structural validation missing');
   await setItem({'minecraft:durability':{max_durability:12}});
+  const catalogUri=vscode.Uri.file(path.join(root,'BP/item_catalog/crafting_item_catalog.json'));
+  await fs.mkdir(path.dirname(catalogUri.fsPath),{recursive:true});
+  await fs.writeFile(catalogUri.fsPath,JSON.stringify({format_version:'1.21.60','minecraft:crafting_items_catalog':{categories:[{category_name:'equipment',groups:[{group_identifier:{name:'test:tools',icon:'minecraft:iron_sword'},items:['minecraft:iron_sword']}]}]}}));
+  const groupEdit=new vscode.WorkspaceEdit();groupEdit.replace(authoredItemUri,new vscode.Range(authoredItemDoc.positionAt(0),authoredItemDoc.positionAt(authoredItemDoc.getText().length)),JSON.stringify({format_version:'1.26.50','minecraft:item':{description:{identifier:'test:host_owned',menu_category:{category:'equipment',group:''}},components:{}}}));assert.ok(await vscode.workspace.applyEdit(groupEdit));
+  await until(async()=>{const choices=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('""')+1));return choices.items.some(i=>i.label==='test:tools')&&choices.items.some(i=>i.label==='minecraft:itemGroup.name.sword');},'Vanilla/custom menu group suggestions missing');
   const syntaxUri=vscode.Uri.file(path.join(root,'RP/entity/duplicate-syntax.json'));
   await fs.writeFile(syntaxUri.fsPath,'{"format_version":"1.10.0","minecraft:client_entity":{"description":{"identifier": }}}');
   const syntaxDoc=await vscode.workspace.openTextDocument(syntaxUri);await vscode.window.showTextDocument(syntaxDoc);

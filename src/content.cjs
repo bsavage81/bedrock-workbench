@@ -77,6 +77,7 @@ async function indexFile(index, side, relative) {
     for (const [root, type] of [['minecraft:entity', 'entity'], ['minecraft:item', 'item'], ['minecraft:block', 'block'], ['minecraft:client_entity', 'client_entity'], ['minecraft:attachable', 'attachable']]) {
       if ((side === 'behavior') === ['entity', 'item', 'block'].includes(type)) index.add(type, data?.[root]?.description?.identifier, file);
     }
+    if(side==='behavior')for(const name of require('./creative-groups.cjs').definitions(data))index.add('creative_group',name,file);
     const itemTags=data?.['minecraft:item']?.components?.['minecraft:tags']?.tags;
     if(side==='behavior'&&Array.isArray(itemTags))for(const tag of itemTags)index.add('item_tag',tag,file);
     if (side === 'resource') {
@@ -101,6 +102,11 @@ async function update(index, file) {
 }
 function referenceKind(keys, value, document) {
   const key = keys.at(-1), parent = keys.at(-2), root = keys[0];
+  if(document.side==='behavior'&&['minecraft:item','minecraft:block'].includes(root)&&keys.length===4&&keys[1]==='description'&&keys[2]==='menu_category'&&key==='group')return 'creative_group';
+  if(document.side==='behavior'&&root==='minecraft:crafting_items_catalog'&&keys[1]==='categories'&&typeof keys[2]==='number'&&keys[3]==='groups'&&typeof keys[4]==='number') {
+    if(keys.length===7&&keys[5]==='group_identifier') {if(key==='name')return 'creative_group';if(key==='icon')return 'item';}
+    if(keys.length===7&&keys[5]==='items'&&typeof key==='number')return 'item';
+  }
   if(document.relative?.startsWith('loot_tables/') && key==='name') {
     const type=json.findNodeAtLocation(document.tree,[...keys.slice(0,-1),'type'])?.value;
     if(type==='item'||type==='minecraft:item')return 'item';
@@ -170,6 +176,11 @@ function builtinGeometries(document, project) {
 }
 function referenceValues(index, kind, document, reference = index.reference) {
   const values = new Map(index.values(kind));
+  if(kind==='creative_group') {
+    const format=(document.data || (document.tree&&json.getNodeValue(document.tree)))?.format_version;
+    const legacy=typeof format==='string'&&require('./releases.cjs').compareVersions(format,'1.21.60')<0;
+    for(const name of require('./creative-groups.cjs').vanilla)values.set(legacy?name.slice(10):name,[]);
+  }
   if (kind === 'item') for (const entry of index.values('block')) if (!values.has(entry[0])) values.set(...entry);
   if (kind === 'animation') for (const entry of index.values('animation_controller')) if (!values.has(entry[0])) values.set(...entry);
   const vanilla = reference?.vanilla?.[kind];
@@ -185,6 +196,9 @@ function referenceDefinitions(index, kind, id) {
       const geometries = json.findNodeAtLocation(document.tree, ['minecraft:geometry']);
       node = geometries?.children?.map(g => json.findNodeAtLocation(g, ['description', 'identifier'])).find(n => n?.value === id) || json.findNodeAtLocation(document.tree, [id])?.parent?.children[0];
     }
+      if(document&&kind==='creative_group') {
+        const visit=n=>{if(n.type==='string'&&n.value===id&&json.getNodePath(n).at(-1)==='name')node=n;for(const child of n.children||[])visit(child);};visit(document.tree);
+      }
       if(document&&kind==='item_tag')node=json.findNodeAtLocation(document.tree,['minecraft:item','components','minecraft:tags','tags'])?.children?.find(child=>child.value===id);
     const before = document?.text.slice(0, node?.offset || 0) || '', lines = before.split('\n');
     return { file, line: lines.length - 1, column: lines.at(-1).length };
@@ -233,7 +247,7 @@ function references(document) {
 function referenceIssues(index, document, {includeIgnored=false}={}) {
   const issues=references(document).filter(ref => {
     if(!ref.value||/[?()[\]{}]/.test(ref.value))return false;
-    if(ref.type==='item_tag')return false; // Tags declare names; new custom tags are valid.
+    if(['item_tag','creative_group'].includes(ref.type))return false; // Tags declare names; new custom tags are valid.
     const values=referenceValues(index,ref.type,document), accepted=new Set(index.reference?.vanillaReferences?.[ref.type]||[]);
     const id=ref.type==='entity'?ref.value.replace(/<[^<>]*>$/,''):ref.type==='item'?ref.value.replace(/:\d+$/,''):ref.value;
     const candidates=[id];if(['item','block','entity'].includes(ref.type)&&!id.includes(':'))candidates.push('minecraft:'+id);

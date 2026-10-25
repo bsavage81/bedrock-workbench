@@ -203,6 +203,7 @@ function attach(vscode, context, getProject, output) {
         return [...values].map(([id, files]) => {
           const item = new vscode.CompletionItem(id, vscode.CompletionItemKind.Reference); completeValue(item,document,state,position,id);
           const local=index.localReference?.vanilla?.[kind]?.includes(id),builtin=kind==='geometry' && content.builtinGeometries(data,index.project).includes(id);
+          if(kind==='creative_group'&&!files.length) {item.detail='Vanilla creative group';item.documentation=require('./creative-groups.cjs').source;return item;}
           item.detail = files.length ? `Project ${kind.replaceAll('_', ' ')}` : local ? `Installed vanilla ${index.localReference.source.version}` : builtin ? 'Vanilla block geometry' : `Minecraft ${index.reference?.tag || 'reference'}`;
           item.documentation = files.length ? files.map(file => path.relative(index.project.root, file)).join('\n') : local ? index.localReference.source.folder : builtin ? 'Built-in block geometry. Availability depends on the block format and target engine.' : index.reference?.source; return item;
         });
@@ -221,6 +222,7 @@ function attach(vscode, context, getProject, output) {
         }
         const kind = content.referenceKind(location.path, node.value, data); if (!kind) return;
         const index = await ensure(), files = index?.values(kind).get(node.value);
+        if(kind==='creative_group')return new vscode.Hover(`${node.value}\n\n${files?.length?files.map(file=>path.relative(getProject().root,file)).join('\n'):'Vanilla creative group'}\n\n[Microsoft Learn](${require('./creative-groups.cjs').source})`);
         if (files?.length) return new vscode.Hover(`Project ${kind.replaceAll('_', ' ')}: ${node.value}\n\n${files.map(file => path.relative(getProject().root, file)).join('\n')}`);
       }
     }),

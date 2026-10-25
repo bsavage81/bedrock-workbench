@@ -38,7 +38,10 @@
                   ]
                 },
                 "group": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Creative inventory group. Choose a vanilla group or a custom group declared in item_catalog/crafting_item_catalog.json.",
+                  "maxLength": 256,
+                  "markdownDescription": "Creative inventory group. Custom groups are defined in the behavior pack catalog.\n\n[Microsoft Learn](https://learn.microsoft.com/en-us/minecraft/creator/documents/craftingitemcatalogdocumentation?view=minecraft-bedrock-stable)"
                 },
                 "is_hidden_in_commands": {
                   "type": "boolean"

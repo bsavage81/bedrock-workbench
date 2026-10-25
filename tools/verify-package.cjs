@@ -14,6 +14,9 @@ const { unzipSync } = require('fflate');
     if (!destination.startsWith(unpacked + path.sep)) throw new Error('Unsafe archive path');
     await fs.mkdir(path.dirname(destination), { recursive: true }); await fs.writeFile(destination, bytes);
   }
+  const groupSchema=require(path.join(unpacked,'extension/schemas/creative-catalog.schema.json'));
+  assert.ok(groupSchema.properties['minecraft:crafting_items_catalog']);
+  assert.ok(require(path.join(unpacked,'extension/src/creative-groups.cjs')).vanilla.includes('minecraft:itemGroup.name.sword'));
   const core = require(path.join(unpacked, 'extension/src/core.cjs'));
   const sample = path.resolve('projects/SavageCraft v2');
   const sourceProject = await core.loadProject(sample);

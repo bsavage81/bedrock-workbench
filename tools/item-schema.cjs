@@ -94,7 +94,7 @@ module.exports={
     'minecraft:item':o('Item description and components.',{
       description:o('Item identity and Creative inventory settings.',{
         identifier:{...s('Namespaced item identifier. Historical vanilla serialization names retain their case.'),pattern:'^(?:[a-z0-9_.-]+:[a-z0-9_./-]+|minecraft:[A-Za-z0-9_./-]+)$'},
-        menu_category:o('Creative inventory placement.',{category:e('Creative category.',['construction','nature','equipment','items','none']),group:s('Creative inventory group.'),is_hidden_in_commands:b('Hide this item from commands.')}),
+        menu_category:o('Creative inventory placement.',{category:e('Creative category.',['construction','nature','equipment','items','none']),group:{...s('Creative inventory group. Choose a vanilla group or a custom group declared in item_catalog/crafting_item_catalog.json.'),maxLength:256},is_hidden_in_commands:b('Hide this item from commands.')}),
         category:s('Legacy Creative category.')
       },['identifier']),components:r('components','Built-in and script-registered item components.')
     },['description'])

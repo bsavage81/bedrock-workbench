@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.1 — October 24, 2026
+
+- Suggest vanilla creative inventory groups and saved custom catalog groups for block and item menu categories, using legacy spelling for older format versions.
+- Add an original crafting item catalog schema with custom-group and loose-item starters, icon/content item suggestions, and structural validation.
+- Refresh custom group suggestions on catalog changes, navigate to definitions, and link group hovers to Microsoft Learn. Keep new and external group names allowed.
+
 ## 0.15.0 — October 24, 2026
 
 - Add independently authored rules for 52 built-in/legacy item components, with nested validation, Microsoft Learn hovers, value choices, and array-entry starters.

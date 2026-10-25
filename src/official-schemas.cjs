@@ -8,9 +8,10 @@ const VERSION = require(path.join(PACKAGE, 'package.json')).version;
 const catalog = require('@minecraft/bedrock-schemas/catalog.json');
 const documentation = require('./documentation.cjs');
 const documentationCatalog = require('./documentation-links.json');
-const BUILD = 13;
+const BUILD = 14;
 // Independent Workbench replacements. Broader Mojang routes remain fallbacks.
 const OWNED = {
+  'bp/item_catalog/index.schema.json': require('../schemas/creative-catalog.schema.json'),
   'bp/blocks/index.schema.json': require('../schemas/block.schema.json'),
   'bp/items/index.schema.json': require('../schemas/item.schema.json'),
   'bp/loot_tables/index.schema.json': require('../schemas/loot-table.schema.json'),
@@ -111,6 +112,7 @@ function routes() {
   }).concat([
     { relative: 'bp/animations/index.schema.json', side: 'resource', patterns: ['animations/**/*.json'], name: 'Resource animations' },
     { relative: 'bp/animation_controllers/index.schema.json', side: 'resource', patterns: ['animation_controllers/**/*.json'], name: 'Resource animation controllers' }
+    ,{relative:'bp/item_catalog/index.schema.json',side:'behavior',patterns:['item_catalog/crafting_item_catalog.json'],name:'Crafting item catalog'}
   ]).filter(entry => entry.patterns.length);
 }
 function glob(pattern) {
@@ -138,6 +140,7 @@ async function prepare(project) {
         if (JSON.stringify(current) !== JSON.stringify(next)) await core.writeJson(destination, next);
       }
       await core.writeJson(await core.local(project.root, path.relative(project.root, path.join(directory, 'common/expression.schema.json'))), { anyOf: [{ type: 'string' }, { type: 'number' }], description: 'Molang expression: a string expression or numeric literal.' });
+      for(const [relative,schema]of Object.entries(OWNED))await core.writeJson(await core.local(project.root,path.relative(project.root,path.join(directory,relative))),schema);
       await core.writeJson(marker, { build: BUILD, version: VERSION });
     }
     const mappings = routes();

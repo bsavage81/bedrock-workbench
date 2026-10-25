@@ -38,7 +38,8 @@
                 },
                 "group": {
                   "type": "string",
-                  "description": "Creative inventory group."
+                  "description": "Creative inventory group. Choose a vanilla group or a custom group declared in item_catalog/crafting_item_catalog.json.",
+                  "maxLength": 256
                 },
                 "is_hidden_in_commands": {
                   "type": "boolean",

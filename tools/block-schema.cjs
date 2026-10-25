@@ -43,7 +43,7 @@ module.exports = require('./block-components.cjs')({
   $schema: 'http://json-schema.org/draft-07/schema#', title: 'Bedrock Workbench block',
   ...object({ format_version: string('Block format version; older versions remain accepted.'), 'minecraft:block': object({
     description: object({ identifier: { type: 'string', pattern: '^[a-z0-9_.-]+:[a-z0-9_./-]+$' },
-      menu_category: object({ category: choices(['construction', 'nature', 'equipment', 'items', 'none']), group: string(), is_hidden_in_commands: { type: 'boolean' } }),
+      menu_category: object({ category: choices(['construction', 'nature', 'equipment', 'items', 'none']), group: {...string('Creative inventory group. Choose a vanilla group or a custom group declared in item_catalog/crafting_item_catalog.json.'),maxLength:256,markdownDescription:"Creative inventory group. Custom groups are defined in the behavior pack catalog.\n\n[Microsoft Learn](https://learn.microsoft.com/en-us/minecraft/creator/documents/craftingitemcatalogdocumentation?view=minecraft-bedrock-stable)"}, is_hidden_in_commands: { type: 'boolean' } }),
       states: { type: 'object', additionalProperties: { anyOf: [array({ type: ['integer', 'boolean', 'string'] }), object({ values: object({ min: { type: 'integer' }, max: { type: 'integer' } }, ['min', 'max']) }, ['values'])] } },
       traits: object({ 'minecraft:placement_direction': object({ enabled_states: array(string()), y_rotation_offset: { type: 'number' } }), 'minecraft:placement_position': object({ enabled_states: array(string()) }) })
     }, ['identifier']),
