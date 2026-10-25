@@ -31,10 +31,17 @@ function hover(vscode,index,key){const md=new vscode.MarkdownString(),found=refe
  }
  md.isTrusted=false;return md;
 }
+function decorationColors(kind){
+ const id='bedrock.lang.'+kind,entry=require('../package.json').contributes.colors.find(color=>color.id===id);
+ // Custom color variables can be absent while VS Code refreshes an installed
+ // extension's contributions. An explicit CSS fallback keeps source text visible.
+ const variable='--vscode-'+id.replaceAll('.','-');
+ return {color:'var('+variable+', '+entry.defaults.dark+')',light:{color:'var('+variable+', '+entry.defaults.light+')'},dark:{color:'var('+variable+', '+entry.defaults.dark+')'}};
+}
 function attach(vscode,context,getProject){if(!vscode.window.createTextEditorDecorationType)return;
- const types=Object.fromEntries(Object.keys(labels).map(kind=>[kind,vscode.window.createTextEditorDecorationType({color:new vscode.ThemeColor('bedrock.lang.'+kind),rangeBehavior:vscode.DecorationRangeBehavior.ClosedClosed})]));
+ const types=Object.fromEntries(Object.keys(labels).map(kind=>[kind,vscode.window.createTextEditorDecorationType({...decorationColors(kind),rangeBehavior:vscode.DecorationRangeBehavior.ClosedClosed})]));
  let timer;function update(){const project=getProject();for(const editor of vscode.window.visibleTextEditors){const groups={};if(project&&editor.document.uri.scheme==='file'&&lang.isLanguageFile(project,editor.document.uri.fsPath))for(const entry of keyRanges(editor.document.getText(),editor.document.uri.fsPath))(groups[entry.category]??=[]).push(new vscode.Range(editor.document.positionAt(entry.offset),editor.document.positionAt(entry.offset+entry.length)));for(const [kind,type]of Object.entries(types))editor.setDecorations(type,groups[kind]||[]);}}
  function schedule(){clearTimeout(timer);timer=setTimeout(update,100);}
  context.subscriptions.push(...Object.values(types),vscode.window.onDidChangeVisibleTextEditors(schedule),vscode.workspace.onDidChangeTextDocument(schedule),{dispose(){clearTimeout(timer);}});schedule();
 }
-module.exports={category,keyRanges,references,hover,attach};
+module.exports={category,keyRanges,references,hover,attach,decorationColors};

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.22.1 — October 25, 2026
+
+- Keep language keys visible when custom theme colors have not resolved by supplying explicit light/dark fallback colors.
+
 ## 0.22.0 — October 25, 2026
 
 - Color language-file keys by category and show clickable pack usage references in key hovers, including implicit entity/item/block and spawn egg names plus unsaved JSON and script references.

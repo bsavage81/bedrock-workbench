@@ -13,6 +13,14 @@ test('language colors identify key families and leave values and comments untouc
  for(const range of ranges)assert.ok(pkg.contributes.colors.some(c=>c.id==='bedrock.lang.'+range.category));
 });
 
+test('language decoration colors provide explicit visible fallbacks for both editor themes',()=>{
+ for(const kind of ['entity','spawnEgg','item','block','ui','action','pack','other']){
+  const options=languageEditor.decorationColors(kind),entry=require('../package.json').contributes.colors.find(c=>c.id==='bedrock.lang.'+kind);
+  assert.ok(options.color.includes(entry.defaults.dark));assert.ok(options.light.color.includes(entry.defaults.light));assert.ok(options.dark.color.includes(entry.defaults.dark));
+  for(const value of [options.color,options.light.color,options.dark.color])assert.match(value,/^var\(--vscode-bedrock-lang-\w+, #[a-fA-F0-9]{6}\)$/);
+ }
+});
+
 test('language usage includes implicit names, explicit localized fields and scripts but excludes unrelated strings',()=>{
  const json=require('jsonc-parser'),index=fixture();index.documents=new Map();index.scriptSources=new Map();
  function add(file,value,side='behavior'){const text=JSON.stringify(value,null,2),full=path.join(index.project.root,file);index.documents.set(full,{file:full,relative:file.slice(3),side,text,data:value,tree:json.parseTree(text)});return full;}
@@ -45,7 +53,7 @@ test('language decorations refresh only the parsed key ranges and clear non-pack
  const index=fixture(),file=[...index.languages.keys()][0],listeners={},calls=[],subscriptions=[];let text='entity.test:fish.name=Fish';
  const event=name=>callback=>{listeners[name]=callback;return {dispose(){}};};
  const editor={document:{uri:{scheme:'file',fsPath:file},getText:()=>text,positionAt:n=>n},setDecorations:(type,ranges)=>calls.push({id:type.id,ranges})};
- const vscode={ThemeColor:class{constructor(id){this.id=id;}},Range:class{constructor(start,end){this.start=start;this.end=end;}},DecorationRangeBehavior:{ClosedClosed:1},window:{visibleTextEditors:[editor],createTextEditorDecorationType:options=>({id:options.color.id,dispose(){}}),onDidChangeVisibleTextEditors:event('visible')},workspace:{onDidChangeTextDocument:event('edit')}};
+ const vscode={ThemeColor:class{constructor(id){this.id=id;}},Range:class{constructor(start,end){this.start=start;this.end=end;}},DecorationRangeBehavior:{ClosedClosed:1},window:{visibleTextEditors:[editor],createTextEditorDecorationType:options=>({id:options.color.match(/--vscode-([^,]+)/)[1].replaceAll('-','.'),dispose(){}}),onDidChangeVisibleTextEditors:event('visible')},workspace:{onDidChangeTextDocument:event('edit')}};
  languageEditor.attach(vscode,{subscriptions},()=>index.project);t.after(()=>subscriptions.forEach(s=>s.dispose()));await new Promise(r=>setTimeout(r,150));assert.equal(calls.find(c=>c.id==='bedrock.lang.entity').ranges[0].end,text.indexOf('='));
  text='item.test:rod.name=Rod';calls.length=0;listeners.edit();await new Promise(r=>setTimeout(r,150));assert.equal(calls.find(c=>c.id==='bedrock.lang.entity').ranges.length,0);assert.equal(calls.find(c=>c.id==='bedrock.lang.item').ranges.length,1);
  editor.document.uri.fsPath=path.join(index.project.root,'notes.lang');calls.length=0;listeners.visible();await new Promise(r=>setTimeout(r,150));assert.ok(calls.every(c=>!c.ranges.length));
