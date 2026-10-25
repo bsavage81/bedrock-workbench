@@ -57,18 +57,20 @@ function attach(vscode, context, getProject, output) {
     if (disposed) return;
     const data = documentData(document);
     if (!data) { diagnostics.delete(document.uri); return; }
-    const issues = [...require('./format-versions.cjs').issues(data,getProject()), ...content.molangIssues(data), ...(cached ? [...content.referenceIssues(cached, data), ...content.customComponentIssues(cached, data)] : [])];
+    const compatibility=require('./component-compatibility.cjs').issues(data,getProject()).filter(issue=>!issue.native||!require('./diagnostic-policy.cjs').nativeOwnsSyntax(vscode,document.uri.fsPath));
+    const issues = [...compatibility,...require('./format-versions.cjs').issues(data,getProject()), ...content.molangIssues(data), ...(cached ? [...content.referenceIssues(cached, data), ...content.customComponentIssues(cached, data)] : [])];
     diagnostics.set(document.uri, issues.map(issue => diagnostic(document, issue)));
   }
   const selector = [{ language: 'json', scheme: 'file' }, { language: 'jsonc', scheme: 'file' }];
   if(vscode.languages.registerCodeActionsProvider)context.subscriptions.push(vscode.languages.registerCodeActionsProvider(selector,{
     async provideCodeActions(document,range) {
       const data=documentData(document);if(!data)return;
-      const index=await ensure();if(!index)return;
-      return content.referenceIssues(index,data).filter(issue=>range.intersection(new vscode.Range(document.positionAt(issue.offset),document.positionAt(issue.offset+issue.length)))).flatMap(issue=>['file','project'].map(scope=>{
+      const compatibility=await require('./compatibility-actions.cjs').codeActions(vscode,document,range,data,getProject());
+      const index=await ensure();if(!index)return compatibility;
+      return compatibility.concat(content.referenceIssues(index,data).filter(issue=>range.intersection(new vscode.Range(document.positionAt(issue.offset),document.positionAt(issue.offset+issue.length)))).flatMap(issue=>['file','project'].map(scope=>{
         const action=new vscode.CodeAction(`Mark '${issue.reference.value}' as intended ${scope==='file'?'in this file':'throughout project'}`,vscode.CodeActionKind.QuickFix);
         action.command={command:'bedrock.ignoreReference',title:action.title,arguments:[{...issue.reference,file:document.uri.fsPath,scope}]};return action;
-      }));
+      })));
     }
   },{providedCodeActionKinds:[vscode.CodeActionKind.QuickFix]}));
   function completeKey(item, document, state, key, valueSnippet, position) {

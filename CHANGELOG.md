@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.17.0 — October 24, 2026
+
+- Add version-specific material ambient-occlusion types/ranges and field/value spellings for redstone, precipitation and entity feeding. Correct visual-rotation state names.
+- Validate documented component companions, root-only redstone consumers, removed food effects, and experiment requirements with stable-release boundaries.
+- Add explicit Quick Fixes for compatible field/value renames, boolean ambient-occlusion conversion, project experiment requirements, removed fields and file format updates within the target ceiling.
+- Preserve conflicts and legacy script events for manual migration; avoid duplicate native material diagnostics and keep source edits out of validation reports.
+
 ## 0.16.0 — October 24, 2026
 
 - Add shared format-version checks for document/engine compatibility, block/item/entity component and field minima, permutations, component groups, and custom-component syntax.

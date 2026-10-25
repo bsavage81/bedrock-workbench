@@ -433,26 +433,9 @@
                   "markdownDescription": "Lock all bone UVs, or only the listed bone names.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
                 },
                 "n_way_visual_rotation": {
-                  "type": "object",
-                  "description": "Maps axes to block states driving visual-only rotation.",
-                  "properties": {
-                    "x": {
-                      "type": "string",
-                      "description": "Block state controlling rotation around x.",
-                      "markdownDescription": "Block state controlling rotation around x.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
-                    },
-                    "y": {
-                      "type": "string",
-                      "description": "Block state controlling rotation around y.",
-                      "markdownDescription": "Block state controlling rotation around y.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
-                    },
-                    "z": {
-                      "type": "string",
-                      "description": "Block state controlling rotation around z.",
-                      "markdownDescription": "Block state controlling rotation around z.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
-                    }
-                  },
-                  "markdownDescription": "Maps axes to block states driving visual-only rotation.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+                  "type": "string",
+                  "description": "Block state name driving visual-only rotation; requires format 1.26.30.",
+                  "markdownDescription": "Block state name driving visual-only rotation; requires format 1.26.30.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
                 }
               },
               "required": [
@@ -1617,26 +1600,9 @@
               "markdownDescription": "Lock all bone UVs, or only the listed bone names.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
             },
             "n_way_visual_rotation": {
-              "type": "object",
-              "description": "Maps axes to block states driving visual-only rotation.",
-              "properties": {
-                "x": {
-                  "type": "string",
-                  "description": "Block state controlling rotation around x.",
-                  "markdownDescription": "Block state controlling rotation around x.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
-                },
-                "y": {
-                  "type": "string",
-                  "description": "Block state controlling rotation around y.",
-                  "markdownDescription": "Block state controlling rotation around y.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
-                },
-                "z": {
-                  "type": "string",
-                  "description": "Block state controlling rotation around z.",
-                  "markdownDescription": "Block state controlling rotation around z.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
-                }
-              },
-              "markdownDescription": "Maps axes to block states driving visual-only rotation.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+              "type": "string",
+              "description": "Block state name driving visual-only rotation; requires format 1.26.30.",
+              "markdownDescription": "Block state name driving visual-only rotation; requires format 1.26.30.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
             }
           },
           "required": [

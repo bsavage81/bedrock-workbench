@@ -8,7 +8,7 @@ const VERSION = require(path.join(PACKAGE, 'package.json')).version;
 const catalog = require('@minecraft/bedrock-schemas/catalog.json');
 const documentation = require('./documentation.cjs');
 const documentationCatalog = require('./documentation-links.json');
-const BUILD = 15;
+const BUILD = 16;
 // Independent Workbench replacements. Broader Mojang routes remain fallbacks.
 const OWNED = {
   'bp/item_catalog/index.schema.json': require('../schemas/creative-catalog.schema.json'),
@@ -52,7 +52,7 @@ function adapt(schema, relative) {
     // fallback copies would leak newer components/fields into older documents.
     if(kind==='entity'){
       const rules=require('./format-requirements.json').components.entity;
-      function suppress(node){if(!node||typeof node!=='object')return;if(node.properties)for(const name of Object.keys(node.properties))if(rules[name]||rules[component]?.fields?.[name])delete node.properties[name];for(const child of Object.values(node))if(Array.isArray(child))child.forEach(suppress);else if(child&&typeof child==='object')suppress(child);}
+      function suppress(node){if(!node||typeof node!=='object')return;if(node.properties)for(const name of Object.keys(node.properties))if(rules[name]||rules[component]?.fields?.[name]||['transform_to_item','result_item'].includes(name)&&component==='minecraft:ageable')delete node.properties[name];for(const child of Object.values(node))if(Array.isArray(child))child.forEach(suppress);else if(child&&typeof child==='object')suppress(child);}
       suppress(schema);
     }
   }

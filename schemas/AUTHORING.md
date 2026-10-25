@@ -147,4 +147,23 @@ BP block/item/entity components and documented fields are conditional on the fil
 
 The bundled unversioned item/block/entity static associations have been removed: project-scoped version-aware associations supply these schemas for arbitrary pack locations. Older engine targets receive owned schemas; the newer broad Mojang fallback routes are excluded. Cache build 15 includes the target in its identity. Compatible samples intelligence version 6 records observed document formats by pack side and folder, while saved project formats and documented component boundaries supplement suggestions. Geometry, particle, recipe and texture formats are not blindly replaced with the target engine string. Sample format observations are examples, not a closed list of all valid historical formats.
 
-Outstanding audits: full historical removal/version replacement tables, every nested shape transition (including recent material ambient-occlusion changes), all experimental exceptions and every RP/other BP format dialect. Do not describe the current rules as complete historical engine validation. No source pack versions are rewritten by these checks.
+Outstanding audits: full historical removal/version replacement tables, every remaining nested shape transition, all experimental exceptions and every RP/other BP format dialect. Do not describe the current rules as complete historical engine validation. No source pack versions are rewritten by these checks.
+
+## Version-specific shapes and requirements
+
+`src/component-compatibility.cjs` adds explicitly audited transitions after the minimum-version schema pass. Material `ambient_occlusion` retains boolean/number forms before 1.26.20 and uses a number in [0, 10] from 1.26.20, including embedded/item visual materials. Redstone suggestions use `propogates_power` before 1.26.0 and `propagates_power` afterward. Precipitation suggestions use the legacy snow spelling before 1.26.30; that spelling stays readable but gets a deprecation warning on newer formats. Entity ageable feed entries use `result_item` from 1.21.130 and `transform_to_item` before it. The geometry visual-rotation field is a block-state name, not an axis object.
+
+Semantic checks cover geometry/material pairing from 1.21.80 with root-to-permutation inheritance, modern food/use-modifier pairing, root-only redstone consumers, removed food `remove_effects`, legacy charging components, culling shape/rule pairing, and documented experiment requirements. Redstone's Upcoming Creator Features requirement ends at 1.26.0. Legacy snow logging needs that requirement before 1.26.30. Geometry culling layers require Upcoming Creator Features. Non-unit culling shapes on vanilla identifiers require Voxel Shapes; custom block shapes on supported modern formats do not get a blanket experiment requirement. Project flags describe requirements: they cannot switch experiments on inside an existing Minecraft world.
+
+`src/compatibility-actions.cjs` offers explicit Quick Fixes. Rename edits retain values, comments and unrelated properties; conflicting fields have no automatic rename. Boolean ambient values can be converted to 0/1. Removed effects can be deleted only through an explicitly labeled behavior-changing action. Only shared simple charging fields are automatically renamed: legacy events need manual script migration. Format updates stay at or below the project engine target. Experiment edits set a supported project requirement to true and tell the user to enable the world setting too. No fixes execute automatically. Validation reports strip source edit payloads; live native material errors are not duplicated by Workbench.
+
+Primary sources consulted October 24, 2026 (stable view):
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_consumer
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_precipitation_interactions
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_food
+- https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_use_modifiers
+
+Unknown historical and experimental transitions remain permissive. This is an audited set of requirements, not complete simulation of every past engine dialect or script behavior.

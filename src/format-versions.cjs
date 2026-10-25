@@ -37,7 +37,7 @@ function apply(schema,kind,target){
   if(requirement.min){value.markdownDescription=(value.markdownDescription||value.description||'')+'\n\nMinimum format version: '+requirement.min+'.';gate(requirement.min,body({[id]:value}),body({[id]:{doNotSuggest:true,description:id+' requires format_version '+requirement.min+' or later.'}}));}
   else (schema.allOf||=[]).push(body({[id]:value}));
  }
- return schema;
+ return require('./component-compatibility.cjs').apply(schema,kind,target,atLeastPattern);
 }
 function choices(index,document,project){
  const current=document.data||(document.tree&&json.getNodeValue(document.tree)),kind=['block','item','entity'].find(k=>current?.['minecraft:'+k]);

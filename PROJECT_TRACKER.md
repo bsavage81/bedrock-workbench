@@ -241,3 +241,11 @@ Remaining: general function argument flow, external package types, unsaved scrip
 - [x] Suggest document formats from matching compatible samples, saved files of the same family, and documented BP component boundaries. Keep manifests' numeric schema versions separate.
 - [x] Remove unversioned static BP schema overlap and preserve owned schema authoring for older targets without attaching the newer Mojang fallback catalog.
 - [ ] Continue auditing historical removals, shape changes, experiment-specific exceptions and unsupported document families. Unknown requirements remain permissive.
+
+### Version-specific component shapes and requirements
+
+- [x] Modern/legacy material ambient-occlusion types and bounds, nested visual materials, field/value rename suggestions, and corrected visual-rotation state names.
+- [x] Companion components with permutation inheritance; root-only consumer restrictions; removed food fields and legacy charge behavior warnings.
+- [x] Experiment requirements with documented stable boundaries and vanilla/custom voxel-shape distinctions.
+- [x] Explicit Quick Fixes for safe renames, boolean conversions, supported project requirements and file format updates within the target ceiling.
+- [x] Preserve conflicts and event-based migrations for manual work; retain JSONC comments/unrelated values; omit source edits from saved reports.

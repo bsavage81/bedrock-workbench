@@ -18,6 +18,7 @@ async function validateProject(root, {vanillaSource}={}) {
   const unavailable = new Set(); const uuids = new Map();
   const headers = new Map([...index.documents.values()].filter(d => d.relative === 'manifest.json').map(d => [d.data?.header?.uuid, d]));
   for (const document of index.documents.values()) {
+    let schemaChecked=false;
     if (document.relative === 'manifest.json') {
       const modules = Array.isArray(document.data?.modules) ? document.data.modules : [];
       const dependencies = Array.isArray(document.data?.dependencies) ? document.data.dependencies : [];
@@ -39,12 +40,14 @@ async function validateProject(root, {vanillaSource}={}) {
       }
     } else if (validateSchema) {
       try {
-        for (const error of await validateSchema(document.side, document.relative, document.data)) issues.push(at(document, pointerKeys(error.path), error.message, 'warning'));
+        const schemaErrors=await validateSchema(document.side,document.relative,document.data);schemaChecked=true;
+        for (const error of schemaErrors) issues.push(at(document, pointerKeys(error.path), error.message, 'warning'));
       } catch (error) {
         const folder = document.side + ':' + document.relative.split('/')[0];
         if (!unavailable.has(folder)) { unavailable.add(folder); issues.push(at(document, [], `Official schema check unavailable for ${folder}: ${error.message}`, 'information')); }
       }
     }
+    issues.push(...require('./component-compatibility.cjs').issues(document,project).filter(issue=>!issue.native||!schemaChecked).map(({fixes,native,...issue})=>issue));
     issues.push(...require('./format-versions.cjs').issues(document,project));
     issues.push(...content.referenceIssues(index, document,{includeIgnored:true}), ...content.customComponentIssues(index, document), ...content.molangIssues(document));
   }

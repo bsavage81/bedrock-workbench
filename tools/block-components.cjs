@@ -47,7 +47,7 @@ module.exports = function extend(schema) {
   c['minecraft:redstone_consumer'].patternProperties = {'^propogates_power$':b('Legacy spelling before format 1.26.0.')};
   c['minecraft:precipitation_interactions'].properties.precipitation_behavior = {anyOf:[c['minecraft:precipitation_interactions'].properties.precipitation_behavior,{type:'string',pattern:'^snow_log_no_collision$'}],description:'Rain/snow response. snowlogging replaces snow_log_no_collision in 1.26.30.'};
   const geom = c['minecraft:geometry'].anyOf[0];
-  geom.properties.n_way_visual_rotation = o('Maps axes to block states driving visual-only rotation.',Object.fromEntries(['x','y','z'].map(axis=>[axis,s('Block state controlling rotation around '+axis+'.')])));
+  geom.properties.n_way_visual_rotation = s('Block state name driving visual-only rotation; requires format 1.26.30.');
   d.blockGeometry = c['minecraft:geometry']; d.blockMaterials = c['minecraft:material_instances'];
   const pf = c['minecraft:placement_filter'].properties.conditions.items.properties;
   pf.block_filter.items.anyOf[1].properties.name = s('Block identifier matched by this descriptor.');
