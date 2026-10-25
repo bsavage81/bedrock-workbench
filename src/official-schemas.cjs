@@ -8,7 +8,7 @@ const VERSION = require(path.join(PACKAGE, 'package.json')).version;
 const catalog = require('@minecraft/bedrock-schemas/catalog.json');
 const documentation = require('./documentation.cjs');
 const documentationCatalog = require('./documentation-links.json');
-const BUILD = 26;
+const BUILD = 34;
 // Independent Workbench replacements. Broader Mojang routes remain fallbacks.
 const OWNED = {
   'bp/item_catalog/index.schema.json': require('../schemas/creative-catalog.schema.json'),
@@ -35,11 +35,12 @@ function adapt(schema, relative) {
   }
   visit(schema);
   const kind=relative.startsWith('bp/entities/') ? 'entity' : relative.startsWith('bp/items/') ? 'item' : relative.startsWith('bp/blocks/') ? 'block' : undefined;
-  function linkComponents(node, component) {
+  function linkComponents(node, component,componentRoot=false) {
     if(!node || typeof node!=='object') return;
+    if(componentRoot&&component)node.description=documentation.componentDescription(kind,component,node.description);
     if(component && (node.description || node.markdownDescription || node.$ref)) node.markdownDescription=(node.description || node.markdownDescription?.replace(/\[[^\]]*\]\(https?:\/\/[^)]+\)/g,'').trim() || '')+'\n\n'+documentation.componentLink(kind,component);
     for(const [key,value] of Object.entries(node)) {
-      if(key==='properties') for(const [name,child]of Object.entries(value)) linkComponents(child, documentationCatalog.components[kind]?.[name] ? name : component);
+      if(key==='properties') for(const [name,child]of Object.entries(value)) linkComponents(child, documentationCatalog.components[kind]?.[name] ? name : component,!!documentationCatalog.components[kind]?.[name]);
       else if(Array.isArray(value)) value.forEach(child=>linkComponents(child,component));
       else if(value && typeof value==='object') linkComponents(value,component);
     }
@@ -47,7 +48,7 @@ function adapt(schema, relative) {
   if(kind) {
     const fileId=/^(?:entity|item|block)_minecraft_(.+)\.schema\.json$/.exec(path.posix.basename(relative))?.[1];
     const component=fileId && Object.keys(documentationCatalog.components[kind]).find(id=>id.slice(10).replaceAll('.','_')===fileId);
-    linkComponents(schema,component);
+    linkComponents(schema,component,!!component);
     // The version-aware reference entry supplies these keys. Keeping the broad
     // fallback copies would leak newer components/fields into older documents.
     if(kind==='entity'){

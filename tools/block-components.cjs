@@ -76,6 +76,7 @@ module.exports = function extend(schema) {
   }
   describe(schema);
   for(const [id,component] of Object.entries(c)) {
+    component.description=require('../src/documentation.cjs').componentDescription('block',id,component.description);
     const link=require('../src/documentation.cjs').componentLink('block',id);
     component.markdownDescription = (component.description||'')+'\n\n'+link;
     const seen=new Set();

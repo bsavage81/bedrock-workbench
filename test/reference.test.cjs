@@ -24,7 +24,7 @@ function archive() {
 }
 test('Mojang documentation and schema references supply component and field descriptions without beta content', () => {
   const index = buildIndex(archive(), 'v1.26.50.4');
-  assert.deepEqual(index.vanillaNames.item['minecraft:cod'],['item.fish.name','item.fish']);assert.deepEqual(index.vanillaNames.block['minecraft:stone'],['tile.stone.stone.name','tile.stone.stone']);assert.equal(index.intelligenceVersion, 10);assert.deepEqual(index.languages[0].values,[['item.apple.name','Apple',0]]);
+  assert.deepEqual(index.vanillaNames.item['minecraft:cod'],['item.fish.name','item.fish']);assert.deepEqual(index.vanillaNames.block['minecraft:stone'],['tile.stone.stone.name','tile.stone.stone']);assert.equal(index.intelligenceVersion, 11);assert.deepEqual(index.languages[0].values,[['item.apple.name','Apple',0]]);
   assert.deepEqual(index.vanilla.terrain_texture, ['stone']);
   assert.deepEqual(index.vanilla.item_texture, ['apple']);
   assert.ok(index.vanilla.item.includes('minecraft:apple'));
@@ -92,7 +92,7 @@ test('trade_interest retains its description and timing fields after a numeric c
  const fields=['within_radius','interest_time','remove_item_time','carried_item_switch_time','cooldown'];
  files['metadata/doc_modules/entities.json']=strToU8(JSON.stringify({name:'Server Entity Documentation',nodes:[{name:'AI Goals',nodes:[{name:'minecraft:behavior.trade_interest',show_in_index:true,description:['Allows the mob to look at a player that is holding a tradable item.'],nodes:fields.map(name=>({name,type:'Decimal',description:['Trade interest '+name.replaceAll('_',' ')+'.']}))},{name:'minecraft:behavior.trade_interest',show_in_index:false,description:['-574851053']}]}]}));
  const index=buildIndex(zipSync(files),'v1.26.50.4'),goal=index.components.entity['minecraft:behavior.trade_interest'];
- assert.equal(goal.description,'Allows the mob to look at a player that is holding a tradable item.');assert.deepEqual(Object.keys(goal.fields),fields);assert.ok(fields.every(name=>goal.fields[name].description));assert.ok(!JSON.stringify(componentSchema(index,'entity')).includes('-574851053'));
+ assert.equal(goal.description,'Allows the mob to look at a player that is holding a tradable item.');assert.deepEqual(Object.keys(goal.fields),[...fields,'priority']);assert.ok(fields.every(name=>goal.fields[name].description));assert.ok(!JSON.stringify(componentSchema(index,'entity')).includes('-574851053'));
 });
 
 test('restrict_open_door preserves its real description when a hidden reference has a positive ID',()=>{
@@ -111,4 +111,8 @@ test('pushable_by_entity keeps its description and minimum version after numeric
  const {unzipSync}=require('fflate'),files=unzipSync(archive());
  files['metadata/doc_modules/entities.json']=strToU8(JSON.stringify({name:'Server Entity Documentation',nodes:[{name:'Components',nodes:[{name:'minecraft:pushable_by_entity',show_in_index:true,description:['Other entities can push this entity.']},{name:'minecraft:pushable_by_entity',show_in_index:false,description:['-1023158512']}]}]}));
  const index=buildIndex(zipSync(files),'v1.26.50.4'),schema=componentSchema(index,'entity');assert.equal(index.components.entity['minecraft:pushable_by_entity'].description,'Other entities can push this entity.');assert.ok(!JSON.stringify(schema).includes('-1023158512'));assert.ok(JSON.stringify(schema).includes('1.26.10'));assert.ok(JSON.stringify(schema).includes('minecraftcomponent_pushable_by_entity'));
+});
+
+test('standard AI goal priority is documented when omitted by Mojang field metadata',()=>{
+ const {unzipSync}=require('fflate'),files=unzipSync(archive());files['metadata/doc_modules/entities.json']=strToU8(JSON.stringify({name:'Server Entity Documentation',nodes:[{name:'AI Goals',nodes:[{name:'minecraft:behavior.random_hover',description:['Randomly hovers.'],nodes:[{name:'interval',type:'Integer'}]}]}]}));const index=buildIndex(zipSync(files),'v1.26.50.4');assert.equal(index.components.entity['minecraft:behavior.random_hover'].fields.priority.type,'Integer');assert.match(index.components.entity['minecraft:behavior.random_hover'].fields.priority.description,/Lower numbers/);
 });

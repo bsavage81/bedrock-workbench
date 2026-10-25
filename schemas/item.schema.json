@@ -76,7 +76,7 @@
       "description": "Built-in and custom item components. Custom parameter hints are advisory.",
       "properties": {
         "minecraft:allow_off_hand": {
-          "description": "Whether this item can be held in the offhand.",
+          "description": "The allow_off_hand component determines whether the item can be placed in the off hand slot of the inventory.",
           "anyOf": [
             {
               "type": "boolean",
@@ -96,11 +96,11 @@
               "markdownDescription": "Whether this item can be held in the offhand.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_allow_off_hand?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Whether this item can be held in the offhand.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_allow_off_hand?view=minecraft-bedrock-stable)"
+          "markdownDescription": "The allow_off_hand component determines whether the item can be placed in the off hand slot of the inventory.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_allow_off_hand?view=minecraft-bedrock-stable)"
         },
         "minecraft:block_placer": {
           "type": "object",
-          "description": "Places a block when used. replace_block_item requires matching item and block identifiers.",
+          "description": "Sets the item as a placer item component for blocks. Items with this component will place a block when used.\n\nPlaces a block when used. replace_block_item requires matching item and block identifiers.",
           "properties": {
             "block": {
               "description": "A block identifier or tag/state descriptor.",
@@ -198,11 +198,11 @@
               "markdownDescription": "Align placement while use is held; requires a supporting 1.26.x format.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_block_placer?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Places a block when used. replace_block_item requires matching item and block identifiers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_block_placer?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Sets the item as a placer item component for blocks. Items with this component will place a block when used.\n\nPlaces a block when used. replace_block_item requires matching item and block identifiers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_block_placer?view=minecraft-bedrock-stable)"
         },
         "minecraft:bundle_interaction": {
           "type": "object",
-          "description": "Bundle-style interactions and tooltip. Requires storage_item for storage.",
+          "description": "Enables the bundle-specific interaction scheme and tooltip for an item.\n\nBundle-style interactions and tooltip. Requires storage_item for storage.",
           "properties": {
             "num_viewable_slots": {
               "type": "integer",
@@ -212,10 +212,10 @@
               "markdownDescription": "Visible bundle slots.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_bundle_interaction?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Bundle-style interactions and tooltip. Requires storage_item for storage.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_bundle_interaction?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Enables the bundle-specific interaction scheme and tooltip for an item.\n\nBundle-style interactions and tooltip. Requires storage_item for storage.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_bundle_interaction?view=minecraft-bedrock-stable)"
         },
         "minecraft:can_destroy_in_creative": {
-          "description": "Whether this held item can break blocks in Creative mode.",
+          "description": "The can_destroy_in_creative component determines if the item can be used by a player to break blocks when in creative mode.",
           "anyOf": [
             {
               "type": "boolean",
@@ -235,11 +235,11 @@
               "markdownDescription": "Whether this held item can break blocks in Creative mode.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_can_destroy_in_creative?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Whether this held item can break blocks in Creative mode.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_can_destroy_in_creative?view=minecraft-bedrock-stable)"
+          "markdownDescription": "The can_destroy_in_creative component determines if the item can be used by a player to break blocks when in creative mode.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_can_destroy_in_creative?view=minecraft-bedrock-stable)"
         },
         "minecraft:compostable": {
           "type": "object",
-          "description": "Chance to add a compost layer.",
+          "description": "Specifies that an item is compostable and provides the chance of creating a composting layer in the composter.",
           "properties": {
             "composting_chance": {
               "type": "integer",
@@ -249,11 +249,11 @@
               "markdownDescription": "Composting success percentage.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_compostable?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Chance to add a compost layer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_compostable?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Specifies that an item is compostable and provides the chance of creating a composting layer in the composter.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_compostable?view=minecraft-bedrock-stable)"
         },
         "minecraft:cooldown": {
           "type": "object",
-          "description": "Shared cooldown for items in the same category.",
+          "description": "Adds a cooldown to an item, preventing it from being used again for a specified duration. Items sharing the same category will enter cooldown together when any one of them is used.",
           "properties": {
             "category": {
               "type": "string",
@@ -276,10 +276,10 @@
               "markdownDescription": "Action that starts the cooldown.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_cooldown?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Shared cooldown for items in the same category.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_cooldown?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Adds a cooldown to an item, preventing it from being used again for a specified duration. Items sharing the same category will enter cooldown together when any one of them is used.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_cooldown?view=minecraft-bedrock-stable)"
         },
         "minecraft:damage": {
-          "description": "Extra attack damage contributed by the item. Format 1.26.0 supports values through 32767.",
+          "description": "The damage component determines how much extra damage the item does on attack.\n\nExtra attack damage contributed by the item. Format 1.26.0 supports values through 32767.",
           "anyOf": [
             {
               "type": "integer",
@@ -303,11 +303,11 @@
               "markdownDescription": "Extra attack damage contributed by the item. Format 1.26.0 supports values through 32767.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_damage?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Extra attack damage contributed by the item. Format 1.26.0 supports values through 32767.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_damage?view=minecraft-bedrock-stable)"
+          "markdownDescription": "The damage component determines how much extra damage the item does on attack.\n\nExtra attack damage contributed by the item. Format 1.26.0 supports values through 32767.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_damage?view=minecraft-bedrock-stable)"
         },
         "minecraft:damage_absorption": {
           "type": "object",
-          "description": "Damage causes absorbed while this item is worn.",
+          "description": "It allows an item to absorb damage that would otherwise be dealt to its wearer. For this to happen, the item needs to be equipped in an armor slot. The absorbed damage reduces the item's durability, with any excess damage being ignored. Because of this, the item also needs a minecraft:durability component.",
           "properties": {
             "absorbable_causes": {
               "type": "array",
@@ -320,11 +320,11 @@
               "markdownDescription": "Accepted damage causes.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_damage_absorption?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Damage causes absorbed while this item is worn.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_damage_absorption?view=minecraft-bedrock-stable)"
+          "markdownDescription": "It allows an item to absorb damage that would otherwise be dealt to its wearer. For this to happen, the item needs to be equipped in an armor slot. The absorbed damage reduces the item's durability, with any excess damage being ignored. Because of this, the item also needs a minecraft:durability component.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_damage_absorption?view=minecraft-bedrock-stable)"
         },
         "minecraft:digger": {
           "type": "object",
-          "description": "Tool mining speeds for block selectors.",
+          "description": "Configures an item as a digging tool, allowing it to break specific blocks faster than normal. Define which blocks are affected and the speed multiplier for each.",
           "properties": {
             "use_efficiency": {
               "type": "boolean",
@@ -404,10 +404,10 @@
               "markdownDescription": "Block-specific mining speed entries.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_digger?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Tool mining speeds for block selectors.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_digger?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Configures an item as a digging tool, allowing it to break specific blocks faster than normal. Define which blocks are affected and the speed multiplier for each.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_digger?view=minecraft-bedrock-stable)"
         },
         "minecraft:display_name": {
-          "description": "Item display text or localization key.",
+          "description": "Sets the item display name within Minecraft: Bedrock Edition. This component may also be used to pull from the localization file by referencing a key from it.",
           "anyOf": [
             {
               "type": "string",
@@ -427,11 +427,11 @@
               "markdownDescription": "Item display text or localization key.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_display_name?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Item display text or localization key.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_display_name?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Sets the item display name within Minecraft: Bedrock Edition. This component may also be used to pull from the localization file by referencing a key from it.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_display_name?view=minecraft-bedrock-stable)"
         },
         "minecraft:durability": {
           "type": "object",
-          "description": "Durability before breaking, including a chance of losing durability.",
+          "description": "Sets how much damage the item can take before breaking, and allows the item to be combined at an anvil, grindstone, or crafting table.",
           "properties": {
             "max_durability": {
               "type": "integer",
@@ -464,11 +464,11 @@
           "required": [
             "max_durability"
           ],
-          "markdownDescription": "Durability before breaking, including a chance of losing durability.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_durability?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Sets how much damage the item can take before breaking, and allows the item to be combined at an anvil, grindstone, or crafting table.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_durability?view=minecraft-bedrock-stable)"
         },
         "minecraft:durability_sensor": {
           "type": "object",
-          "description": "Effects when remaining durability crosses a threshold.",
+          "description": "Enables an item to emit effects when it receives damage. Because of this, the item also needs a minecraft:durability component.",
           "properties": {
             "durability_thresholds": {
               "type": "array",
@@ -545,11 +545,11 @@
               "markdownDescription": "Legacy component-level sound event.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_durability_sensor?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Effects when remaining durability crosses a threshold.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_durability_sensor?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Enables an item to emit effects when it receives damage. Because of this, the item also needs a minecraft:durability component.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_durability_sensor?view=minecraft-bedrock-stable)"
         },
         "minecraft:dyeable": {
           "type": "object",
-          "description": "Allows crafting-grid dyes to color this item.",
+          "description": "Enables players to dye this item using dyes in a crafting grid, like leather armor. Configure the default color when undyed. The item stores its color in NBT data and renders with the player-chosen tint, enabling customizable cosmetic appearances for armor and equipment.",
           "properties": {
             "default_color": {
               "description": "Default color as hexadecimal text or RGB.",
@@ -577,11 +577,11 @@
               "markdownDescription": "Default color as hexadecimal text or RGB.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_dyeable?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Allows crafting-grid dyes to color this item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_dyeable?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Enables players to dye this item using dyes in a crafting grid, like leather armor. Configure the default color when undyed. The item stores its color in NBT data and renders with the player-chosen tint, enabling customizable cosmetic appearances for armor and equipment.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_dyeable?view=minecraft-bedrock-stable)"
         },
         "minecraft:enchantable": {
           "type": "object",
-          "description": "Enchantments applicable to this item.",
+          "description": "Determines what enchantments can be applied to the item. Not all enchantments will have an effect on all item components.",
           "properties": {
             "slot": {
               "type": "string",
@@ -626,11 +626,11 @@
             "slot",
             "value"
           ],
-          "markdownDescription": "Enchantments applicable to this item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_enchantable?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Determines what enchantments can be applied to the item. Not all enchantments will have an effect on all item components.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_enchantable?view=minecraft-bedrock-stable)"
         },
         "minecraft:entity_placer": {
           "type": "object",
-          "description": "Spawns an entity when used or dispensed.",
+          "description": "Allows an item to place entities into the world. Additionally, in version 1.19.80 and above, the component allows the item to set the spawn type of a monster spawner.",
           "properties": {
             "entity": {
               "type": "string",
@@ -728,10 +728,10 @@
               "markdownDescription": "Blocks this item may be dispensed on.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_entity_placer?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Spawns an entity when used or dispensed.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_entity_placer?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Allows an item to place entities into the world. Additionally, in version 1.19.80 and above, the component allows the item to set the spawn type of a monster spawner.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_entity_placer?view=minecraft-bedrock-stable)"
         },
         "minecraft:fire_resistant": {
-          "description": "Protect the dropped item from fire and lava.",
+          "description": "Determines whether the item is immune to burning when dropped in fire or lava.",
           "anyOf": [
             {
               "type": "boolean",
@@ -751,11 +751,11 @@
               "markdownDescription": "Protect the dropped item from fire and lava.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_fire_resistant?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Protect the dropped item from fire and lava.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_fire_resistant?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Determines whether the item is immune to burning when dropped in fire or lava.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_fire_resistant?view=minecraft-bedrock-stable)"
         },
         "minecraft:food": {
           "type": "object",
-          "description": "Edible item settings. Modern food also needs use_modifiers to define eating duration.",
+          "description": "Sets the item as a food component, allowing it to be edible to the player.",
           "properties": {
             "can_always_eat": {
               "type": "boolean",
@@ -817,10 +817,10 @@
               "markdownDescription": "Deprecated food effects.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_food?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Edible item settings. Modern food also needs use_modifiers to define eating duration.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_food?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Sets the item as a food component, allowing it to be edible to the player.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_food?view=minecraft-bedrock-stable)"
         },
         "minecraft:fuel": {
-          "description": "Burn duration when used as furnace fuel.",
+          "description": "Allows this item to be used as fuel in a furnace to 'cook' other items.",
           "anyOf": [
             {
               "type": "number",
@@ -842,10 +842,10 @@
               "markdownDescription": "Fuel settings.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_fuel?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Burn duration when used as furnace fuel.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_fuel?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Allows this item to be used as fuel in a furnace to 'cook' other items.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_fuel?view=minecraft-bedrock-stable)"
         },
         "minecraft:glint": {
-          "description": "Enchanted visual glint.",
+          "description": "Determines whether the item has the enchanted glint render effect on it.",
           "anyOf": [
             {
               "type": "boolean",
@@ -865,10 +865,10 @@
               "markdownDescription": "Enchanted visual glint.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_glint?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Enchanted visual glint.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_glint?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Determines whether the item has the enchanted glint render effect on it.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_glint?view=minecraft-bedrock-stable)"
         },
         "minecraft:hand_equipped": {
-          "description": "Render like a held tool.",
+          "description": "The hand_equipped component determines if an item is rendered like a tool while it is in a player's hand.",
           "anyOf": [
             {
               "type": "boolean",
@@ -888,10 +888,10 @@
               "markdownDescription": "Render like a held tool.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_hand_equipped?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Render like a held tool.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_hand_equipped?view=minecraft-bedrock-stable)"
+          "markdownDescription": "The hand_equipped component determines if an item is rendered like a tool while it is in a player's hand.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_hand_equipped?view=minecraft-bedrock-stable)"
         },
         "minecraft:hover_text_color": {
-          "description": "Color name for the item tooltip.",
+          "description": "Determines the color of the item name when hovering over it.",
           "anyOf": [
             {
               "type": "string",
@@ -911,10 +911,10 @@
               "markdownDescription": "Color name for the item tooltip.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_hover_text_color?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Color name for the item tooltip.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_hover_text_color?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Determines the color of the item name when hovering over it.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_hover_text_color?view=minecraft-bedrock-stable)"
         },
         "minecraft:icon": {
-          "description": "Item icon texture-atlas alias, or a map of icon texture roles.",
+          "description": "Determines the icon to represent the item in the UI and elsewhere.",
           "anyOf": [
             {
               "type": "string",
@@ -964,10 +964,10 @@
               "markdownDescription": "Icon textures.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_icon?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Item icon texture-atlas alias, or a map of icon texture roles.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_icon?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Determines the icon to represent the item in the UI and elsewhere.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_icon?view=minecraft-bedrock-stable)"
         },
         "minecraft:interact_button": {
-          "description": "Touch-control interaction button visibility or label.",
+          "description": "A boolean or string that determines if the interact button is shown in touch controls, and what text is displayed on the button. When set to 'true', the default 'Use Item' text will be used.",
           "anyOf": [
             {
               "type": "boolean",
@@ -980,11 +980,11 @@
               "markdownDescription": "Button text or localization key.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_interact_button?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Touch-control interaction button visibility or label.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_interact_button?view=minecraft-bedrock-stable)"
+          "markdownDescription": "A boolean or string that determines if the interact button is shown in touch controls, and what text is displayed on the button. When set to 'true', the default 'Use Item' text will be used.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_interact_button?view=minecraft-bedrock-stable)"
         },
         "minecraft:kinetic_weapon": {
           "type": "object",
-          "description": "Velocity-based weapon damage while in use; requires format 1.21.130 or newer.",
+          "description": "Allows an item to deal kinetic damage and its effects. This happens every tick while in use, in a straight line along the user's view vector, with damage computed based on both the user's and the target's velocity projected onto the view vector (via a dot product). The more the user and target move toward each other, and the more this movement is aligned with the user's view vector, the higher the damage. After \"damage_multiplier\" and \"damage_modifier\" are applied, the resulting damage is floored to the nearest lower integer.\n\nVelocity-based weapon damage while in use; requires format 1.21.130 or newer.",
           "properties": {
             "reach": {
               "type": "object",
@@ -1107,10 +1107,10 @@
               "markdownDescription": "Kinetic effect conditions.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_kinetic_weapon?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Velocity-based weapon damage while in use; requires format 1.21.130 or newer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_kinetic_weapon?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Allows an item to deal kinetic damage and its effects. This happens every tick while in use, in a straight line along the user's view vector, with damage computed based on both the user's and the target's velocity projected onto the view vector (via a dot product). The more the user and target move toward each other, and the more this movement is aligned with the user's view vector, the higher the damage. After \"damage_multiplier\" and \"damage_modifier\" are applied, the resulting damage is floored to the nearest lower integer.\n\nVelocity-based weapon damage while in use; requires format 1.21.130 or newer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_kinetic_weapon?view=minecraft-bedrock-stable)"
         },
         "minecraft:liquid_clipped": {
-          "description": "Whether use interactions target liquids.",
+          "description": "The liquid_clipped component determines whether the item interacts with liquid blocks on use. To allow placement of blocks on liquids, see the 'placement_filter' block component.",
           "anyOf": [
             {
               "type": "boolean",
@@ -1130,10 +1130,10 @@
               "markdownDescription": "Whether use interactions target liquids.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_liquid_clipped?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Whether use interactions target liquids.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_liquid_clipped?view=minecraft-bedrock-stable)"
+          "markdownDescription": "The liquid_clipped component determines whether the item interacts with liquid blocks on use. To allow placement of blocks on liquids, see the 'placement_filter' block component.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_liquid_clipped?view=minecraft-bedrock-stable)"
         },
         "minecraft:max_stack_size": {
-          "description": "Maximum count in a stack.",
+          "description": "Determines how many of an item can be stacked together.",
           "anyOf": [
             {
               "type": "integer",
@@ -1157,11 +1157,11 @@
               "markdownDescription": "Maximum count in a stack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_max_stack_size?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Maximum count in a stack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_max_stack_size?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Determines how many of an item can be stacked together.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_max_stack_size?view=minecraft-bedrock-stable)"
         },
         "minecraft:piercing_weapon": {
           "type": "object",
-          "description": "Hits entities along the view ray; requires format 1.21.130 or newer.",
+          "description": "Allows an item to deal damage to all entities detected in a straight line along the user's view vector. Items with this component cannot destroy blocks, as the attack action always takes priority, regardless of what the user is looking at.\n\nHits entities along the view ray; requires format 1.21.130 or newer.",
           "properties": {
             "reach": {
               "type": "object",
@@ -1203,11 +1203,11 @@
               "markdownDescription": "Additional hit-detection tolerance.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_piercing_weapon?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Hits entities along the view ray; requires format 1.21.130 or newer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_piercing_weapon?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Allows an item to deal damage to all entities detected in a straight line along the user's view vector. Items with this component cannot destroy blocks, as the attack action always takes priority, regardless of what the user is looking at.\n\nHits entities along the view ray; requires format 1.21.130 or newer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_piercing_weapon?view=minecraft-bedrock-stable)"
         },
         "minecraft:projectile": {
           "type": "object",
-          "description": "Entity fired by this projectile item.",
+          "description": "Defines an item as a projectile that can be shot from dispensers or used as ammunition with minecraft:shooter. When combined with minecraft:throwable, this component specifies which entity is spawned when the item is thrown.",
           "properties": {
             "projectile_entity": {
               "type": "string",
@@ -1220,10 +1220,10 @@
               "markdownDescription": "Minimum charged power for a critical hit.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_projectile?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Entity fired by this projectile item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_projectile?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Defines an item as a projectile that can be shot from dispensers or used as ammunition with minecraft:shooter. When combined with minecraft:throwable, this component specifies which entity is spawned when the item is thrown.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_projectile?view=minecraft-bedrock-stable)"
         },
         "minecraft:rarity": {
-          "description": "Base rarity used for tooltip color.",
+          "description": "Specifies the base rarity and subsequently color of the item name when the player hovers the cursor over the item.",
           "anyOf": [
             {
               "type": "string",
@@ -1255,11 +1255,11 @@
               "markdownDescription": "Base rarity used for tooltip color.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_rarity?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Base rarity used for tooltip color.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_rarity?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Specifies the base rarity and subsequently color of the item name when the player hovers the cursor over the item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_rarity?view=minecraft-bedrock-stable)"
         },
         "minecraft:record": {
           "type": "object",
-          "description": "Music disc playback settings.",
+          "description": "Used by record items to play music.",
           "properties": {
             "sound_event": {
               "description": "Record sound-event name.",
@@ -1309,11 +1309,11 @@
               "markdownDescription": "Comparator output strength.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_record?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Music disc playback settings.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_record?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Used by record items to play music.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_record?view=minecraft-bedrock-stable)"
         },
         "minecraft:repairable": {
           "type": "object",
-          "description": "Repair ingredients and recovered durability.",
+          "description": "Defines the items that can be used to repair a defined item, and the amount of durability each item restores upon repair. Each entry needs to define a list of strings for 'items' that can be used for the repair and an optional 'repair_amount' for how much durability is repaired.",
           "properties": {
             "repair_items": {
               "type": "array",
@@ -1485,11 +1485,11 @@
               "markdownDescription": "Legacy event trigger; modern items use script callbacks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_repairable?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Repair ingredients and recovered durability.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_repairable?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Defines the items that can be used to repair a defined item, and the amount of durability each item restores upon repair. Each entry needs to define a list of strings for 'items' that can be used for the repair and an optional 'repair_amount' for how much durability is repaired.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_repairable?view=minecraft-bedrock-stable)"
         },
         "minecraft:seed": {
           "type": "object",
-          "description": "Legacy seed planting settings; modern custom items use block_placer.",
+          "description": "Sets the item as a seed that can be planted to grow crops. When used on valid ground, the seed will place the specified crop block.\n\nLegacy seed planting settings; modern custom items use block_placer.",
           "properties": {
             "crop_result": {
               "type": "string",
@@ -1533,11 +1533,11 @@
             }
           },
           "doNotSuggest": true,
-          "markdownDescription": "Legacy seed planting settings; modern custom items use block_placer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_seed?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Sets the item as a seed that can be planted to grow crops. When used on valid ground, the seed will place the specified crop block.\n\nLegacy seed planting settings; modern custom items use block_placer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_seed?view=minecraft-bedrock-stable)"
         },
         "minecraft:shooter": {
           "type": "object",
-          "description": "Shoots projectile ammunition. Pair with use_modifiers for draw duration.",
+          "description": "Compels an item to shoot projectiles, similarly to a bow or crossbow. Must have the minecraft:use_modifiers component in order to function properly.",
           "properties": {
             "ammunition": {
               "type": "array",
@@ -1618,10 +1618,10 @@
               "markdownDescription": "Charge while drawing, like a crossbow.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_shooter?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Shoots projectile ammunition. Pair with use_modifiers for draw duration.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_shooter?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Compels an item to shoot projectiles, similarly to a bow or crossbow. Must have the minecraft:use_modifiers component in order to function properly.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_shooter?view=minecraft-bedrock-stable)"
         },
         "minecraft:should_despawn": {
-          "description": "Whether the dropped item eventually despawns.",
+          "description": "Should_despawn component determines if the item should eventually despawn while floating in the world.",
           "anyOf": [
             {
               "type": "boolean",
@@ -1641,10 +1641,10 @@
               "markdownDescription": "Whether the dropped item eventually despawns.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_should_despawn?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Whether the dropped item eventually despawns.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_should_despawn?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Should_despawn component determines if the item should eventually despawn while floating in the world.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_should_despawn?view=minecraft-bedrock-stable)"
         },
         "minecraft:stacked_by_data": {
-          "description": "Whether differing auxiliary values may share a stack.",
+          "description": "The stacked_by_data component determines whether the same items with different aux values can stack. Also defines whether the item entities can merge while floating in the world.",
           "anyOf": [
             {
               "type": "boolean",
@@ -1664,11 +1664,11 @@
               "markdownDescription": "Whether differing auxiliary values may share a stack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_stacked_by_data?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Whether differing auxiliary values may share a stack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_stacked_by_data?view=minecraft-bedrock-stable)"
+          "markdownDescription": "The stacked_by_data component determines whether the same items with different aux values can stack. Also defines whether the item entities can merge while floating in the world.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_stacked_by_data?view=minecraft-bedrock-stable)"
         },
         "minecraft:storage_item": {
           "type": "object",
-          "description": "Dynamic inventory storage, such as a bundle.",
+          "description": "Enables an item to store data of the dynamic container associated with it. A dynamic container is a container for storing items that is linked to an item instead of a block or an entity.",
           "properties": {
             "allow_nested_storage_items": {
               "type": "boolean",
@@ -1725,11 +1725,11 @@
               "markdownDescription": "Maximum storage slots.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_storage_item?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Dynamic inventory storage, such as a bundle.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_storage_item?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Enables an item to store data of the dynamic container associated with it. A dynamic container is a container for storing items that is linked to an item instead of a block or an entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_storage_item?view=minecraft-bedrock-stable)"
         },
         "minecraft:storage_weight_limit": {
           "type": "object",
-          "description": "Maximum combined contained-item weight.",
+          "description": "Specifies the maximum weight limit that a storage item can hold.",
           "properties": {
             "max_weight_limit": {
               "type": "integer",
@@ -1739,7 +1739,7 @@
               "markdownDescription": "Storage weight limit.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_storage_weight_limit?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Maximum combined contained-item weight.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_storage_weight_limit?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Specifies the maximum weight limit that a storage item can hold.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_storage_weight_limit?view=minecraft-bedrock-stable)"
         },
         "minecraft:storage_weight_modifier": {
           "type": "object",
@@ -1755,7 +1755,7 @@
           "markdownDescription": "Weight when stored in another storage item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_storage_weight_modifier?view=minecraft-bedrock-stable)"
         },
         "minecraft:swing_duration": {
-          "description": "Visual swing duration; does not change attack frequency.",
+          "description": "Duration, in seconds, of the item's swing animation played when mining or attacking. Affects visuals only and does not impact attack frequency or other gameplay mechanics.",
           "anyOf": [
             {
               "type": "number",
@@ -1777,11 +1777,11 @@
               "markdownDescription": "Visual swing duration; does not change attack frequency.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_swing_duration?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Visual swing duration; does not change attack frequency.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_swing_duration?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Duration, in seconds, of the item's swing animation played when mining or attacking. Affects visuals only and does not impact attack frequency or other gameplay mechanics.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_swing_duration?view=minecraft-bedrock-stable)"
         },
         "minecraft:swing_sounds": {
           "type": "object",
-          "description": "Attack swing sound overrides.",
+          "description": "Overrides the swing sounds emitted by the user. Each field accepts the name of any sound event defined in sound_definitions.json, including the built-in vanilla sound events.",
           "properties": {
             "attack_critical_hit": {
               "type": "string",
@@ -1799,11 +1799,11 @@
               "markdownDescription": "Miss or ineffective-hit sound definition.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_swing_sounds?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Attack swing sound overrides.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_swing_sounds?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Overrides the swing sounds emitted by the user. Each field accepts the name of any sound event defined in sound_definitions.json, including the built-in vanilla sound events.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_swing_sounds?view=minecraft-bedrock-stable)"
         },
         "minecraft:tags": {
           "type": "object",
-          "description": "Item tags used by recipes, filters and scripts.",
+          "description": "Determines which tags are included on a given item.",
           "properties": {
             "tags": {
               "type": "array",
@@ -1816,11 +1816,11 @@
               "markdownDescription": "Item tag names.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_tags?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Item tags used by recipes, filters and scripts.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_tags?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Determines which tags are included on a given item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_tags?view=minecraft-bedrock-stable)"
         },
         "minecraft:throwable": {
           "type": "object",
-          "description": "Throw power and draw behavior; normally paired with projectile.",
+          "description": "Makes an item throwable by the player, similar to a snowball or ender pearl. Use with minecraft:projectile to specify which entity is spawned when thrown.",
           "properties": {
             "do_swing_animation": {
               "type": "boolean",
@@ -1855,10 +1855,10 @@
               "markdownDescription": "Scale throw power with draw time.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_throwable?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Throw power and draw behavior; normally paired with projectile.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_throwable?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Makes an item throwable by the player, similar to a snowball or ender pearl. Use with minecraft:projectile to specify which entity is spawned when thrown.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_throwable?view=minecraft-bedrock-stable)"
         },
         "minecraft:use_animation": {
-          "description": "Animation played while using this item.",
+          "description": "Use_animation specifies which animation is played when the player uses the item.",
           "anyOf": [
             {
               "description": "Use animation.",
@@ -1924,11 +1924,11 @@
               "markdownDescription": "Animation played while using this item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_use_animation?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Animation played while using this item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_use_animation?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Use_animation specifies which animation is played when the player uses the item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_use_animation?view=minecraft-bedrock-stable)"
         },
         "minecraft:use_modifiers": {
           "type": "object",
-          "description": "Item use timing and movement modifiers.",
+          "description": "Determines how long an item takes to use in combination with components such as Shooter, Throwable, or Food.",
           "properties": {
             "use_duration": {
               "type": "number",
@@ -1973,11 +1973,11 @@
               "markdownDescription": "When to begin using the item. Requires format 1.26.30 or newer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_use_modifiers?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Item use timing and movement modifiers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_use_modifiers?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Determines how long an item takes to use in combination with components such as Shooter, Throwable, or Food.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_use_modifiers?view=minecraft-bedrock-stable)"
         },
         "minecraft:wearable": {
           "type": "object",
-          "description": "Equipment slot and armor behavior.",
+          "description": "Sets the wearable item component, which allows an item to be worn by a player in a specified equipment slot.",
           "properties": {
             "slot": {
               "type": "string",
@@ -2010,22 +2010,22 @@
               "markdownDescription": "Hide the wearer on locator maps and the locator bar.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_wearable?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Equipment slot and armor behavior.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_wearable?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Sets the wearable item component, which allows an item to be worn by a player in a specified equipment slot.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_wearable?view=minecraft-bedrock-stable)"
         },
         "minecraft:custom_components": {
           "type": "array",
-          "description": "Legacy ordered script-registered item component IDs.",
+          "description": "Specifies an array of custom components defined in a script that should be added to this item.\n\nLegacy ordered script-registered item component IDs.",
           "items": {
             "type": "string",
             "description": "Registered item component ID.",
             "markdownDescription": "Registered item component ID.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_custom_components?view=minecraft-bedrock-stable)"
           },
           "doNotSuggest": true,
-          "markdownDescription": "Legacy ordered script-registered item component IDs.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_custom_components?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Specifies an array of custom components defined in a script that should be added to this item.\n\nLegacy ordered script-registered item component IDs.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_custom_components?view=minecraft-bedrock-stable)"
         },
         "minecraft:chargeable": {
           "type": "object",
-          "description": "Deprecated item charging behavior; use use_modifiers.",
+          "description": "Event trigger for when the item has completed its use duration.\n\nDeprecated item charging behavior; use use_modifiers.",
           "properties": {
             "on_complete": {
               "description": "Legacy event trigger; modern items use script callbacks.",
@@ -2067,10 +2067,10 @@
             }
           },
           "doNotSuggest": true,
-          "markdownDescription": "Deprecated item charging behavior; use use_modifiers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_chargeable?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Event trigger for when the item has completed its use duration.\n\nDeprecated item charging behavior; use use_modifiers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_chargeable?view=minecraft-bedrock-stable)"
         },
         "minecraft:use_duration": {
-          "description": "Legacy use duration. Modern items use use_modifiers.",
+          "description": "This component determines how long the item takes to use when used in combination with components like \"shooter\", \"throwable\", or \"food\".\n\nLegacy use duration. Modern items use use_modifiers.",
           "anyOf": [
             {
               "type": "number",
@@ -2093,7 +2093,7 @@
             }
           ],
           "doNotSuggest": true,
-          "markdownDescription": "Legacy use duration. Modern items use use_modifiers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_use_duration?view=minecraft-bedrock-stable)"
+          "markdownDescription": "This component determines how long the item takes to use when used in combination with components like \"shooter\", \"throwable\", or \"food\".\n\nLegacy use duration. Modern items use use_modifiers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_use_duration?view=minecraft-bedrock-stable)"
         },
         "minecraft:on_use": {
           "description": "Legacy event trigger; modern items use script callbacks.",
@@ -2165,7 +2165,7 @@
         },
         "minecraft:weapon": {
           "type": "object",
-          "description": "Deprecated event-driven weapon behavior; use script custom components.",
+          "description": "Deprecated weapon item component. This component is automatically added to vanilla weapon items like swords, axes, and bows.\n\nDeprecated event-driven weapon behavior; use script custom components.",
           "properties": {
             "on_hurt_entity": {
               "description": "Legacy event trigger; modern items use script callbacks.",
@@ -2268,11 +2268,11 @@
             }
           },
           "doNotSuggest": true,
-          "markdownDescription": "Deprecated event-driven weapon behavior; use script custom components.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_weapon?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Deprecated weapon item component. This component is automatically added to vanilla weapon items like swords, axes, and bows.\n\nDeprecated event-driven weapon behavior; use script custom components.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_weapon?view=minecraft-bedrock-stable)"
         },
         "minecraft:render_offsets": {
           "type": "object",
-          "description": "Legacy held-item rendering transforms.",
+          "description": "Render offsets component: optional values can be given to offset the way the item is rendered.\n\nLegacy held-item rendering transforms.",
           "properties": {
             "main_hand": {
               "type": "object",
@@ -2462,7 +2462,7 @@
             }
           },
           "doNotSuggest": true,
-          "markdownDescription": "Legacy held-item rendering transforms.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_render_offsets?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Render offsets component: optional values can be given to offset the way the item is rendered.\n\nLegacy held-item rendering transforms.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_render_offsets?view=minecraft-bedrock-stable)"
         }
       },
       "additionalProperties": true

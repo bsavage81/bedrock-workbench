@@ -14,7 +14,7 @@ function reference(node,document){const keys=json.getNodePath(node),key=keys.at(
   if(!isKey&&key==='event'&&['components','component_groups','events'].includes(keys[1])){const target=json.findNodeAtLocation(document.tree,[...keys.slice(0,-1),'target'])?.value;if(target===undefined||target==='self')return {kind:'entity_event',scope:'entity'};}
   if(!isKey&&keys.includes('minecraft:behavior.move_to_block')&&(['on_reach','on_stay_completed'].includes(key)||typeof key==='number'&&['on_reach','on_stay_completed'].includes(keys.at(-2))))return {kind:'entity_event',scope:'entity'};
   if(!isKey&&keys[1]==='events'&&key==='trigger')return {kind:'entity_event',scope:'entity'};
-  if(!isKey&&['components','component_groups'].includes(keys[1])&&['grow_up','time_down_event','tame_event','on_rider_enter_event','on_rider_exit_event'].includes(key))return {kind:'entity_event',scope:'entity'};
+  if(!isKey&&['components','component_groups'].includes(keys[1])&&['grow_up','time_down_event','tame_event','on_rider_enter_event','on_rider_exit_event','on_balloon','on_unballoon'].includes(key))return {kind:'entity_event',scope:'entity'};
  }
  if(['minecraft:entity','minecraft:client_entity','minecraft:attachable'].includes(root)&&keys[1]==='description'&&keys[2]==='scripts'&&keys[3]==='animate'&&((typeof key==='number'&&!isKey)||(keys.length===6&&isKey)))return {kind:'animation_alias',scope:root};
  if(root==='animation_controllers'){

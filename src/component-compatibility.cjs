@@ -57,6 +57,7 @@ function apply(schema,kind,target,pattern){
    if(kind==='block'&&id==='minecraft:redstone_consumer'){if(value.properties)delete value.properties.propagates_power;if(value.patternProperties)delete value.patternProperties['^propogates_power'+'$'];}
    if(kind==='block'&&id==='minecraft:precipitation_interactions'&&value.properties)delete value.properties.precipitation_behavior;
    if(kind==='entity'&&id==='minecraft:ageable'&&value.properties?.feed_items){const prune=node=>{if(!node||typeof node!=='object')return;if(node.properties){delete node.properties.transform_to_item;delete node.properties.result_item;}for(const child of Object.values(node))if(Array.isArray(child))child.forEach(prune);else if(child&&typeof child==='object')prune(child);};prune(value.properties.feed_items);}
+   if(kind==='entity'&&id==='minecraft:behavior.random_hover'&&value.properties)delete value.properties.hover_height;
    if(kind==='item'&&id==='minecraft:chargeable')value.doNotSuggest=true;
   }
   for(const value of Object.values(node))if(Array.isArray(value))value.forEach(strip);else if(value&&typeof value==='object')strip(value);
@@ -73,6 +74,11 @@ function apply(schema,kind,target,pattern){
   if(present.has('minecraft:redstone_consumer'))gate('1.26.0',renamed('propagates_power','propogates_power'),renamed('propogates_power','propagates_power'));
   const rain=name=>({'minecraft:precipitation_interactions':{properties:{precipitation_behavior:{anyOf:[{type:'string',enum:['none','obstruct_rain','obstruct_rain_accumulate_snow',name]},{type:'string'}],...link('Rain and snow interaction. The snowlogging spelling begins in format 1.26.30.','minecraft:precipitation_interactions')}}}});
   if(present.has('minecraft:precipitation_interactions'))gate('1.26.30',rain('snowlogging'),rain('snow_log_no_collision'));
+ }
+ if(kind==='entity'&&present.has('minecraft:behavior.random_hover')){
+  const height=description=>({type:'object',properties:{min:{type:'number',...link('Minimum hovering height above the surface.','minecraft:behavior.random_hover')},max:{type:'number',...link('Maximum hovering height above the surface.','minecraft:behavior.random_hover')}},...link(description,'minecraft:behavior.random_hover')});
+  const component=value=>({'minecraft:behavior.random_hover':{properties:{hover_height:value}}});
+  gate('1.26.20',component(height('Desired height above the surface. From format 1.26.20 this must be a range object with min and max bounds.')),component({anyOf:[{type:'number'},{type:'array',items:{type:'number'},minItems:2,maxItems:2},height('Legacy hover-height range object.')],...link('Desired surface-relative height. Before format 1.26.20 a scalar, two-value array or min/max object is accepted.','minecraft:behavior.random_hover')}));
  }
  if(kind==='entity'&&present.has('minecraft:ageable')&&ageableFeed){
   const feed=(current,old)=>({'minecraft:ageable':{properties:{feed_items:{items:{properties:{[current]:{type:'string',...link('Item created after feeding this ingredient. Renamed to result_item in format 1.21.130.','minecraft:ageable')},[old]:{doNotSuggest:true}}}}}}});

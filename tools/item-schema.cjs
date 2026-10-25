@@ -83,6 +83,7 @@ for(const name of deprecated)c['minecraft:'+name].doNotSuggest=true;
 // Deprecated fields still validate but are hidden from modern property suggestions.
 c['minecraft:food'].patternProperties={'^remove_effects$':a('Deprecated food effects.',s('Effect identifier.'))};
 for(const [id,component]of Object.entries(c)) {
+  component.description=documentation.componentDescription('item',id,component.description);
   const link=documentation.componentLink('item',id),seen=new Set();
   function describe(node){if(!node||typeof node!=='object'||seen.has(node))return;seen.add(node);if(node.description)node.markdownDescription=node.description+'\n\n'+link;for(const value of Object.values(node))if(Array.isArray(value))value.forEach(describe);else if(value&&typeof value==='object')describe(value);}
   describe(component);

@@ -136,13 +136,14 @@ function referenceKind(keys, value, document) {
     }
   }
   if(root==='minecraft:entity'&&depth){
+    if(component==='minecraft:breathable'&&['breathe_blocks','non_breathe_blocks'].includes(tail[0])&&tail.length===2&&typeof key==='number')return 'block';
     if(component==='minecraft:behavior.move_to_block'&&tail[0]==='target_blocks'&&(tail.length===1||tail.length===2&&typeof key==='number'))return 'block';
     if(['minecraft:loot','minecraft:equipment'].includes(component)&&key==='table')return 'loot_table';
     if(component==='minecraft:breedable'&&['baby_type','mate_type'].includes(key))return 'entity';
     if(component==='minecraft:spawn_entity'&&key==='spawn_entity')return 'entity';
     if(component==='minecraft:transformation'&&key==='into')return 'entity';
     if(['minecraft:breedable','minecraft:tameable','minecraft:ageable','minecraft:behavior.tempt'].includes(component)&&['breed_items','tame_items','feed_items','items','pause_growth_items','reset_growth_items','drop_items'].includes(tail[0])&&(typeof key==='number'||['item','name','result_item','transform_to_item'].includes(key)||tail.length===1))return 'item';
-    if(component==='minecraft:interact'&&key==='table'&&tail.includes('spawn_items'))return 'loot_table';
+    if(component==='minecraft:interact'&&key==='table'&&(tail.includes('spawn_items')||tail.includes('add_items')))return 'loot_table';
     if(component==='minecraft:interact'&&key==='transform_to_item')return 'item';
     if(component==='minecraft:interact'&&tail.includes('spawn_entities')&&(typeof key==='number'||key==='spawn_entities'))return 'entity';
   }

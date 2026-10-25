@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs/promises'),path=require('node:path'),json=require('jsonc-parser');const content=require('../src/content.cjs'),entity=require('../src/entity-authoring.cjs'),symbols=require('../src/project-symbols.cjs'),lang=require('../src/localization.cjs');
 const doc=data=>({file:'entity.json',side:'behavior',relative:'entities/test.json',data,text:JSON.stringify(data),tree:json.parseTree(JSON.stringify(data))});
 test('owned entity schema validates meaningful nested forms and rejects broken payloads',()=>{
- const schema=require('../schemas/entity.schema.json'),validate=new(require('ajv'))({strict:false}).compile(schema);assert.equal(Object.keys(schema.definitions.components.properties).length,89);
+ const schema=require('../schemas/entity.schema.json'),validate=new(require('ajv'))({strict:false}).compile(schema);assert.equal(Object.keys(schema.definitions.components.properties).length,96);
  const good={format_version:'1.26.50','minecraft:entity':{description:{identifier:'test:fish',properties:{'test:mode':{type:'enum',values:['idle','swim'],default:'idle'}}},components:{'minecraft:health':{value:{range_min:3,range_max:5},max:5},'minecraft:behavior.tempt':{priority:1,items:[{tags:"q.any_tag('test:food')"},'minecraft:fish']},'test:unknown':{arbitrary:[true]}},component_groups:{wet:{'minecraft:timer':{time:[1,3],time_down_event:{event:'test:done',target:'self'}}}},events:{'test:done':{sequence:[{add:{component_groups:['wet']}}]}}}};assert.ok(validate(good),JSON.stringify(validate.errors));
  const bad=structuredClone(good);bad['minecraft:entity'].components['minecraft:health'].max='bad';assert.equal(validate(bad),false);bad['minecraft:entity'].components['minecraft:health'].max=5;bad['minecraft:entity'].events['test:done'].sequence='bad';assert.equal(validate(bad),false);
  for(const value of Object.values(schema.definitions.components.properties))if(value.description)assert.match(value.markdownDescription,/learn.microsoft.com/);
@@ -95,4 +95,53 @@ test('offspring property inheritance uses file declarations without confusing mu
   const index=new content.ContentIndex({});index.documents.set(document.file,document);const changes=symbols.plan(index,{kind:'entity_property',id:'savage:size',scope:'entity',local:true,file:document.file},'savage:weight');assert.equal(changes.filter(c=>c.text==='"savage:weight"').length,2);
  }
  const document=doc({'minecraft:entity':{description:{properties:{'savage:size':{type:'int'}}},components:{'minecraft:offspring':{property_inheritance:{}}}}});const offset=document.text.indexOf('{}')+1;assert.equal(entity.completionContext(document,offset)?.inheritance,true);
+});
+
+test('conditional damage entries provide parameter documentation and validate integer damage',()=>{
+ const schema=require('../schemas/entity.schema.json'),definition=schema.definitions.components.properties['minecraft:hurt_on_condition'],fields=definition.properties.damage_conditions.items.properties;
+ for(const field of ['cause','damage_per_tick']){assert.ok(fields[field].description);assert.match(fields[field].markdownDescription,/minecraftcomponent_hurt_on_condition/);}assert.equal(fields.damage_per_tick.default,1);assert.equal(fields.damage_per_tick.type,'integer');
+ const validate=new(require('ajv'))({strict:false}).compile(schema),data={format_version:'1.26.50','minecraft:entity':{components:{'minecraft:hurt_on_condition':{damage_conditions:[{filters:{test:'in_lava',subject:'self',operator:'==',value:true},cause:'lava',damage_per_tick:4}]}}}};assert.ok(validate(data),JSON.stringify(validate.errors));data['minecraft:entity'].components['minecraft:hurt_on_condition'].damage_conditions[0].damage_per_tick='bad';assert.equal(validate(data),false);
+});
+
+test('ambient sound entries provide condition and sound-event hover definitions',()=>{
+ const schema=require('../schemas/entity.schema.json'),definition=schema.definitions.components.properties['minecraft:ambient_sound_interval'],fields=definition.properties.event_names.items.properties;for(const name of ['condition','event_name']){assert.equal(fields[name].type,'string');assert.match(fields[name].markdownDescription,/minecraftcomponent_ambient_sound_interval/);}assert.match(fields.condition.description,/Molang/);assert.match(definition.properties.event_names.description,/first true/);assert.equal(definition.properties.event_name.default,'ambient');
+ const data={format_version:'1.26.50','minecraft:entity':{components:{'minecraft:ambient_sound_interval':{event_names:[{condition:'query.is_using_item',event_name:'ambient.tame'},{condition:'!query.is_using_item',event_name:'ambient'}]}}}},validate=new(require('ajv'))({strict:false}).compile(schema);assert.ok(validate(data),JSON.stringify(validate.errors));data['minecraft:entity'].components['minecraft:ambient_sound_interval'].event_names[0].event_name=42;assert.equal(validate(data),false);
+});
+
+test('balloonable provides documented mass, distances and event references',()=>{
+ const schema=require('../schemas/entity.schema.json'),definition=schema.definitions.components.properties['minecraft:balloonable'];assert.deepEqual(Object.keys(definition.properties),['mass','max_distance','soft_distance','on_balloon','on_unballoon']);assert.equal(definition.properties.mass.default,1);for(const field of Object.values(definition.properties))assert.match(field.markdownDescription,/minecraftcomponent_balloonable/);
+ const document=doc({format_version:'1.26.50','minecraft:entity':{components:{'minecraft:balloonable':{mass:0.5,on_balloon:'attached',on_unballoon:{event:'detached',target:'self'}}},events:{attached:{},detached:{}}}}),validate=new(require('ajv'))({strict:false}).compile(schema);assert.ok(validate(document.data),JSON.stringify(validate.errors));assert.deepEqual(entity.uses(document).filter(r=>r.kind==='entity_event').map(r=>r.id),['attached','detached']);assert.deepEqual(entity.issues(document),[]);
+});
+
+test('both item-delivery goals document parameters and nested throw callbacks',()=>{
+ const schema=require('../schemas/entity.schema.json'),validate=new(require('ajv'))({strict:false}).compile(schema);
+ for(const destination of ['noteblock','owner']){const id='minecraft:behavior.go_and_give_items_to_'+destination,rule=schema.definitions.components.properties[id],callback=rule.properties.on_item_throw.items;for(const [key,field]of Object.entries(rule.properties))assert.match(field.markdownDescription,new RegExp('minecraftbehavior_go_and_give_items_to_'+destination),id+'.'+key);for(const [key,field]of Object.entries(callback.properties))assert.match(field.markdownDescription,new RegExp('minecraftbehavior_go_and_give_items_to_'+destination),id+'.on_item_throw.'+key);
+ const document=doc({format_version:'1.26.50','minecraft:entity':{components:{[id]:{on_item_throw:[{event:'pickup_item_delay',target:'self'}],priority:3,run_speed:8,throw_sound:'item_thrown'}},events:{pickup_item_delay:{}}}});assert.ok(validate(document.data),JSON.stringify(validate.errors));assert.ok(entity.uses(document).some(r=>r.kind==='entity_event'&&r.id==='pickup_item_delay'));assert.deepEqual(entity.issues(document),[]);assert.ok(rule.properties[destination==='noteblock'?'reach_block_distance':'reach_mob_distance']);
+ }
+});
+
+test('random hover priority has a Learn hover and preserves the reported legacy payload',()=>{
+ const schema=require('../schemas/entity.schema.json'),rule=schema.definitions.components.properties['minecraft:behavior.random_hover'];assert.match(rule.properties.priority.markdownDescription,/minecraftbehavior_random_hover/);for(const name of ['hover_height','y_dist','interval','xz_dist','y_offset'])assert.ok(rule.properties[name].description);
+ const validate=new(require('ajv'))({strict:false}).compile(require('../src/format-versions.cjs').apply(schema,'entity','1.26.50'));for(const [format,height,expected]of [['1.26.0',[1,4],true],['1.26.10',2,true],['1.26.20',[1,4],false],['1.26.50',{min:1,max:4},true]]){const data={format_version:format,'minecraft:entity':{components:{'minecraft:behavior.random_hover':{hover_height:height,y_dist:8,interval:1,xz_dist:8,priority:9,y_offset:-1}}}};assert.equal(validate(data),expected,format+' '+JSON.stringify(height)+' '+JSON.stringify(validate.errors));}
+});
+
+test('stay-near-noteblock documents each reported movement parameter',()=>{
+ const schema=require('../schemas/entity.schema.json'),id='minecraft:behavior.stay_near_noteblock',rule=schema.definitions.components.properties[id];for(const key of ['speed','start_distance','stop_distance','priority','listen_time','control_flags'])assert.match(rule.properties[key].markdownDescription,/minecraftbehavior_stay_near_noteblock/);assert.equal(rule.properties.start_distance.default,10);assert.equal(rule.properties.stop_distance.default,2);
+ const validate=new(require('ajv'))({strict:false}).compile(schema);assert.ok(validate({format_version:'1.26.50','minecraft:entity':{components:{[id]:{speed:8,start_distance:16,stop_distance:4,priority:5}}}}),JSON.stringify(validate.errors));
+});
+test('breathable supports both documented timer spellings and typed block lists',()=>{
+ const schema=require('../schemas/entity.schema.json'),rule=schema.definitions.components.properties['minecraft:breathable'],validate=new(require('ajv'))({strict:false}).compile(schema);
+ for(const fields of [{suffocateTime:0,totalSupply:15},{suffocate_time:0,total_supply:15}]){const document=doc({format_version:'1.26.50','minecraft:entity':{components:{'minecraft:breathable':fields}}});assert.ok(validate(document.data),JSON.stringify(validate.errors));for(const key of Object.keys(fields)){assert.match(rule.properties[key].markdownDescription,/minecraftcomponent_breathable/);assert.match(rule.properties[key].description,/seconds|Seconds/);}}
+ const document=doc({'minecraft:entity':{components:{'minecraft:breathable':{breathe_blocks:['minecraft:water'],non_breathe_blocks:['minecraft:lava']}}}});assert.deepEqual(content.references(document).map(r=>[r.type,r.value]),[['block','minecraft:water'],['block','minecraft:lava']]);
+});
+test('can_fly describes unsupported-air pathfinding and exposes no parameters',()=>{
+ const rule=require('../schemas/entity.schema.json').definitions.components.properties['minecraft:can_fly'];assert.match(rule.description,/pathfinder/);assert.match(rule.description,/solid block/);assert.match(rule.markdownDescription,/minecraftcomponent_can_fly/);assert.deepEqual(rule.properties,{});
+});
+
+test('interaction item-transfer fields have boolean defaults and nested hover coverage',()=>{
+ const schema=require('../schemas/entity.schema.json'),component=schema.definitions.components.properties['minecraft:interact'],entry=component.properties.interactions.anyOf[0];for(const key of ['give_item','take_item']){const field=entry.properties[key];assert.equal(field.type,'boolean');assert.equal(field.default,false);assert.match(field.description,/main-hand/);assert.match(field.markdownDescription,/minecraftcomponent_interact/);}
+ const validate=new(require('ajv'))({strict:false}).compile(schema),interaction={give_item:true,take_item:true,interact_text:'action.interact.allay',on_interact:{filters:{all_of:[{test:'has_equipment',subject:'other',domain:'hand',operator:'not',value:'lead'},{test:'is_sneak_held',subject:'other',value:false}]}}};
+ for(const interactions of [[interaction],interaction]){const data={format_version:'1.26.50','minecraft:entity':{components:{'minecraft:interact':{interactions}}}};assert.ok(validate(data),JSON.stringify(validate.errors));}
+ const document=doc({'minecraft:entity':{components:{'minecraft:interact':{interactions:[{add_items:{table:'loot_tables/reward.json'},spawn_items:{table:'loot_tables/drop.json',y_offset:1}}]}}}});assert.deepEqual(content.references(document).map(r=>[r.type,r.value]),[['loot_table','loot_tables/reward.json'],['loot_table','loot_tables/drop.json']]);
+ const bad={format_version:'1.26.50','minecraft:entity':{components:{'minecraft:interact':{interactions:[{give_item:1,take_item:true}]}}}};assert.equal(validate(bad),false);
 });

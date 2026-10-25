@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+## 0.21.0 — October 25, 2026
+
+- Review all component root descriptions against Microsoft Learn, updating owned and imported hovers while preserving clearer authored guidance and compatibility notes.
+
+- Add give_item/take_item interaction hovers and defaults, plus missing adjacent interaction and nested effect fields. Cover inventory-loot references and document the version-specific swing default.
+
+- Add stay_near_noteblock parameter hovers, both breathable timer spellings and block-list hints, and a precise can_fly pathfinding description.
+
+- Add random_hover parameter hovers and fill missing standard AI-goal priority metadata. Respect the 1.26.20 hover_height range-object boundary while preserving legacy arrays.
+
+- Add both go_and_give_items delivery goals, including all documented parameters, nested throw triggers and goal-specific Learn links.
+
+- Add balloonable component/parameter hovers, numeric defaults and attach/detach event reference suggestions.
+
+- Add ambient_sound_interval nested condition/event_name hovers and completion fields, including first-match selection and fallback behavior.
+
+- Add nested hurt_on_condition rules and Learn-linked hovers for damage_conditions cause and damage_per_tick. Include the new component in hover-coverage checks.
+
 ## 0.20.0 — October 25, 2026
 
 - Extend inline translation previews to vanilla namespaced item/block references, including block items and legacy language keys from Mojang serialization metadata. Continue showing vanilla text references and respecting project translation overrides.

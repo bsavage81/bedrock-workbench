@@ -27,7 +27,7 @@ function attach(vscode, context, getProject, output) {
   }
   function markdown(value, kind, component, field) {
     const md = new vscode.MarkdownString();
-    md.appendMarkdown(reference.descriptionText(value.description) || 'Mojang component documentation.');
+    md.appendMarkdown((field?reference.descriptionText(value.description):documentation.componentDescription(kind,component,reference.descriptionText(value.description))) || 'Mojang component documentation.');
     const requirement=require('./format-versions.cjs').rule(kind,component),minimum=(field?requirement?.fields?.[field]:requirement)?.min;if(minimum)md.appendText('\n\nMinimum format version: '+minimum+'.');
     if (value.type) md.appendText(`\n\nType: ${value.type}`);
     if (value.default !== undefined) md.appendText(`\nDefault: ${JSON.stringify(value.default)}`);

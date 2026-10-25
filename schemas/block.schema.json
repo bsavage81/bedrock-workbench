@@ -230,22 +230,22 @@
           "type": "number",
           "minimum": 0,
           "maximum": 0.9,
-          "description": "Surface friction for entities moving across this block.",
-          "markdownDescription": "Surface friction for entities moving across this block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_friction?view=minecraft-bedrock-stable)"
+          "description": "Describes the friction for this block in a range of 0.0 to 0.9. Friction affects an entity's movement speed when it travels on the block. Higher values result in more friction (less sliding). The default value is 0.4, which is used by most blocks. Ice uses 0.02 for its slippery surface.",
+          "markdownDescription": "Describes the friction for this block in a range of 0.0 to 0.9. Friction affects an entity's movement speed when it travels on the block. Higher values result in more friction (less sliding). The default value is 0.4, which is used by most blocks. Ice uses 0.02 for its slippery surface.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_friction?view=minecraft-bedrock-stable)"
         },
         "minecraft:light_emission": {
           "type": "integer",
           "minimum": 0,
           "maximum": 15,
-          "description": "Light level emitted by the block.",
-          "markdownDescription": "Light level emitted by the block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_light_emission?view=minecraft-bedrock-stable)"
+          "description": "The amount of light this block will emit in a range of 0-15. Higher value means more light will be emitted. Reference values: torch (14), glowstone (15), redstone torch (7), soul torch (10). Monsters cannot spawn on blocks with light level 8 or higher.",
+          "markdownDescription": "The amount of light this block will emit in a range of 0-15. Higher value means more light will be emitted. Reference values: torch (14), glowstone (15), redstone torch (7), soul torch (10). Monsters cannot spawn on blocks with light level 8 or higher.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_light_emission?view=minecraft-bedrock-stable)"
         },
         "minecraft:light_dampening": {
           "type": "integer",
           "minimum": 0,
           "maximum": 15,
-          "description": "Amount of light blocked by the block.",
-          "markdownDescription": "Amount of light blocked by the block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_light_dampening?view=minecraft-bedrock-stable)"
+          "description": "The amount that light will be dampened when it passes through the block, in a range of 0-15. Higher value means the light will be dampened more. A value of 15 means fully opaque (like stone), while 0 means fully transparent (like glass). Leaves use 1, water uses 2.",
+          "markdownDescription": "The amount that light will be dampened when it passes through the block, in a range of 0-15. Higher value means the light will be dampened more. A value of 15 means fully opaque (like stone), while 0 means fully transparent (like glass). Leaves use 1, water uses 2.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_light_dampening?view=minecraft-bedrock-stable)"
         },
         "minecraft:destructible_by_mining": {
           "anyOf": [
@@ -307,8 +307,8 @@
               "type": "boolean"
             }
           ],
-          "description": "Mining behavior, with optional per-item speeds.",
-          "markdownDescription": "Mining behavior, with optional per-item speeds.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable)"
+          "description": "Describes the destructible by mining properties for this block. If set to true, the block will take the default number of seconds to destroy. If set to false, this block is indestructible by mining. If the component is omitted, the block will take the default number of seconds to destroy.",
+          "markdownDescription": "Describes the destructible by mining properties for this block. If set to true, the block will take the default number of seconds to destroy. If set to false, this block is indestructible by mining. If the component is omitted, the block will take the default number of seconds to destroy.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable)"
         },
         "minecraft:destructible_by_explosion": {
           "anyOf": [
@@ -327,8 +327,8 @@
               "type": "boolean"
             }
           ],
-          "description": "Explosion resistance, or a boolean switch.",
-          "markdownDescription": "Explosion resistance, or a boolean switch.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_explosion?view=minecraft-bedrock-stable)"
+          "description": "Describes the destructible by explosion properties for this block. If set to true, the block will have the default explosion resistance. If set to false, this block is indestructible by explosion. If the component is omitted, the block will have the default explosion resistance.",
+          "markdownDescription": "Describes the destructible by explosion properties for this block. If set to true, the block will have the default explosion resistance. If set to false, this block is indestructible by explosion. If the component is omitted, the block will have the default explosion resistance.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_explosion?view=minecraft-bedrock-stable)"
         },
         "minecraft:collision_box": {
           "anyOf": [
@@ -345,7 +345,7 @@
               }
             }
           ],
-          "description": "Collision bounds: true uses a full cube, false disables collision, an object defines one box, and an array defines multiple boxes. Box arrays and heights up to 24 model units are stable from format 1.26.0; earlier formats used experimental support.",
+          "description": "Defines the area of the block that collides with entities. If set to true, default values are used (a full 16x16x16 block). If set to false, the block's collision with entities is disabled, allowing entities to pass through. If this component is omitted, default values are used.\n\nCollision bounds: true uses a full cube, false disables collision, an object defines one box, and an array defines multiple boxes. Box arrays and heights up to 24 model units are stable from format 1.26.0; earlier formats used experimental support.",
           "defaultSnippets": [
             {
               "label": "Collision box array",
@@ -367,7 +367,7 @@
               "markdownDescription": "Create a list of collision boxes for a multi-part shape.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
             }
           ],
-          "markdownDescription": "Collision bounds: true uses a full cube, false disables collision, an object defines one box, and an array defines multiple boxes. Box arrays and heights up to 24 model units are stable from format 1.26.0; earlier formats used experimental support.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Defines the area of the block that collides with entities. If set to true, default values are used (a full 16x16x16 block). If set to false, the block's collision with entities is disabled, allowing entities to pass through. If this component is omitted, default values are used.\n\nCollision bounds: true uses a full cube, false disables collision, an object defines one box, and an array defines multiple boxes. Box arrays and heights up to 24 model units are stable from format 1.26.0; earlier formats used experimental support.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable)"
         },
         "minecraft:selection_box": {
           "anyOf": [
@@ -378,8 +378,8 @@
               "type": "boolean"
             }
           ],
-          "description": "Outline used when targeting the block.",
-          "markdownDescription": "Outline used when targeting the block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_selection_box?view=minecraft-bedrock-stable)"
+          "description": "Defines the area of the block that is selected by the player's cursor (the outline shown when looking at the block). If set to true, default values are used (a full 16x16x16 block). If set to false, this block is not selectable by the player's cursor. If this component is omitted, default values are used.",
+          "markdownDescription": "Defines the area of the block that is selected by the player's cursor (the outline shown when looking at the block). If set to true, default values are used (a full 16x16x16 block). If set to false, this block is not selectable by the player's cursor. If this component is omitted, default values are used.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_selection_box?view=minecraft-bedrock-stable)"
         },
         "minecraft:geometry": {
           "anyOf": [
@@ -448,8 +448,8 @@
               "markdownDescription": "Geometry identifier from a resource pack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
             }
           ],
-          "description": "Geometry and optional bone visibility/culling settings.",
-          "markdownDescription": "Geometry and optional bone visibility/culling settings.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+          "description": "The description identifier of the geometry to use to render this block. This identifier must either match an existing geometry identifier in any of the loaded resource packs or be one of the currently supported Vanilla identifiers: \"minecraft:geometry.full_block\" or \"minecraft:geometry.cross\".",
+          "markdownDescription": "The description identifier of the geometry to use to render this block. This identifier must either match an existing geometry identifier in any of the loaded resource packs or be one of the currently supported Vanilla identifiers: \"minecraft:geometry.full_block\" or \"minecraft:geometry.cross\".\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
         },
         "minecraft:material_instances": {
           "type": "object",
@@ -465,8 +465,8 @@
               }
             ]
           },
-          "description": "Maps geometry material slots or faces to textures and rendering settings.",
-          "markdownDescription": "Maps geometry material slots or faces to textures and rendering settings.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
+          "description": "The material instances for a block. Maps face or material_instance names in a geometry file to an actual material instance. Material instance can either be a full material instance or a name to another already defined instance. Limited to 64 instances.",
+          "markdownDescription": "The material instances for a block. Maps face or material_instance names in a geometry file to an actual material instance. Material instance can either be a full material instance or a name to another already defined instance. Limited to 64 instances.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
         },
         "minecraft:transformation": {
           "type": "object",
@@ -497,8 +497,8 @@
               "markdownDescription": "Pivot used for scaling.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_transformation?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Local translation, rotation, and scaling vectors.",
-          "markdownDescription": "Local translation, rotation, and scaling vectors.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_transformation?view=minecraft-bedrock-stable)"
+          "description": "The block's translation, rotation and scale with respect to the center of its world position.",
+          "markdownDescription": "The block's translation, rotation and scale with respect to the center of its world position.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_transformation?view=minecraft-bedrock-stable)"
         },
         "minecraft:map_color": {
           "anyOf": [
@@ -533,8 +533,8 @@
               }
             }
           ],
-          "description": "Map color, retaining legacy color forms.",
-          "markdownDescription": "Map color, retaining legacy color forms.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_map_color?view=minecraft-bedrock-stable)"
+          "description": "Sets the color of the block when rendered to a map. If this component is omitted, the block will not show up on the map.\n\nMap color, retaining legacy color forms.",
+          "markdownDescription": "Sets the color of the block when rendered to a map. If this component is omitted, the block will not show up on the map.\n\nMap color, retaining legacy color forms.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_map_color?view=minecraft-bedrock-stable)"
         },
         "minecraft:tick": {
           "type": "object",
@@ -556,12 +556,12 @@
               "markdownDescription": "Continue ticking after the first tick.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_tick?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Tick interval used by script-driven block behavior.",
-          "markdownDescription": "Tick interval used by script-driven block behavior.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_tick?view=minecraft-bedrock-stable)"
+          "description": "Causes the block to tick based on a regular interval equal to a number of ticks randomly chosen from the internal_range parameter. This ticking will send the onTick event to blocks with custom components subscribed for the event. Custom components listening to the onTick event that are added to a block that does not have the minecraft:tick component will cause a content error.",
+          "markdownDescription": "Causes the block to tick based on a regular interval equal to a number of ticks randomly chosen from the internal_range parameter. This ticking will send the onTick event to blocks with custom components subscribed for the event. Custom components listening to the onTick event that are added to a block that does not have the minecraft:tick component will cause a content error.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_tick?view=minecraft-bedrock-stable)"
         },
         "minecraft:random_ticking": {
           "type": "object",
-          "description": "Deprecated random tick event behavior; modern scripts use onRandomTick.",
+          "description": "Triggers the specified event randomly based on the random tick speed gamerule. The random tick speed determines how often blocks are updated. Some other examples of game mechanics that use random ticking are crop growth and fire spreading.\n\nDeprecated random tick event behavior; modern scripts use onRandomTick.",
           "properties": {
             "on_tick": {
               "type": "object",
@@ -586,18 +586,18 @@
               "markdownDescription": "Legacy event trigger. Prefer script custom component callbacks for modern blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Deprecated random tick event behavior; modern scripts use onRandomTick.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)",
+          "markdownDescription": "Triggers the specified event randomly based on the random tick speed gamerule. The random tick speed determines how often blocks are updated. Some other examples of game mechanics that use random ticking are crop growth and fire spreading.\n\nDeprecated random tick event behavior; modern scripts use onRandomTick.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)",
           "doNotSuggest": true
         },
         "minecraft:loot": {
           "type": "string",
-          "description": "Loot-table path relative to the behavior pack.",
-          "markdownDescription": "Loot-table path relative to the behavior pack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_loot?view=minecraft-bedrock-stable)"
+          "description": "Specifies the path to the loot table that determines what items are dropped when the block is destroyed. The path is relative to the behavior pack's root folder (e.g., 'loot_tables/blocks/my_block.json'). Path string is limited to 256 characters. If this component is omitted, the block drops itself.",
+          "markdownDescription": "Specifies the path to the loot table that determines what items are dropped when the block is destroyed. The path is relative to the behavior pack's root folder (e.g., 'loot_tables/blocks/my_block.json'). Path string is limited to 256 characters. If this component is omitted, the block drops itself.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_loot?view=minecraft-bedrock-stable)"
         },
         "minecraft:display_name": {
           "type": "string",
-          "description": "Display text or a localization key.",
-          "markdownDescription": "Display text or a localization key.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_display_name?view=minecraft-bedrock-stable)"
+          "description": "Specifies the language file key that maps to what text will be displayed when you hover over the block in your inventory and hotbar. If the string given can not be resolved as a loc string, the raw string given will be displayed. If this component is omitted, the name of the block will be used as the display name.",
+          "markdownDescription": "Specifies the language file key that maps to what text will be displayed when you hover over the block in your inventory and hotbar. If the string given can not be resolved as a loc string, the raw string given will be displayed. If this component is omitted, the name of the block will be used as the display name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_display_name?view=minecraft-bedrock-stable)"
         },
         "minecraft:crafting_table": {
           "type": "object",
@@ -616,8 +616,8 @@
               "markdownDescription": "Recipe tags accepted at this crafting station.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_crafting_table?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Custom crafting station name and accepted recipe tags.",
-          "markdownDescription": "Custom crafting station name and accepted recipe tags.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_crafting_table?view=minecraft-bedrock-stable)"
+          "description": "Makes your block into a custom crafting table which enables the crafting table UI and the ability to craft recipes.",
+          "markdownDescription": "Makes your block into a custom crafting table which enables the crafting table UI and the ability to craft recipes.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_crafting_table?view=minecraft-bedrock-stable)"
         },
         "minecraft:flammable": {
           "anyOf": [
@@ -648,8 +648,8 @@
               "type": "boolean"
             }
           ],
-          "description": "Fire behavior and spread modifiers.",
-          "markdownDescription": "Fire behavior and spread modifiers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flammable?view=minecraft-bedrock-stable)"
+          "description": "Describes the flammable properties for this block. If set to true, default values are used (catch: 5, destroy: 20). Note that the default value of lava_flammable is false for backwards compatibility. If set to false, or if this component is omitted, the block will not be able to catch on fire naturally from neighbors, but it can still be directly ignited.",
+          "markdownDescription": "Describes the flammable properties for this block. If set to true, default values are used (catch: 5, destroy: 20). Note that the default value of lava_flammable is false for backwards compatibility. If set to false, or if this component is omitted, the block will not be able to catch on fire naturally from neighbors, but it can still be directly ignited.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flammable?view=minecraft-bedrock-stable)"
         },
         "minecraft:placement_filter": {
           "type": "object",
@@ -729,8 +729,8 @@
               "markdownDescription": "Placement and survival conditions.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Placement and survival requirements.",
-          "markdownDescription": "Placement and survival requirements.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter?view=minecraft-bedrock-stable)"
+          "description": "Sets rules for under what conditions the block can be placed and survive. If the placement conditions are not met, the block cannot be placed. If the block is already placed and the conditions become invalid (e.g., the supporting block is removed), the block will pop off and drop as an item. If the blocks in the filter are liquid blocks, ensure that an item block is created with a 'liquid_clipped' component set to 'true' and a 'block_placer' component with 'replace_block_item' set to 'true'.",
+          "markdownDescription": "Sets rules for under what conditions the block can be placed and survive. If the placement conditions are not met, the block cannot be placed. If the block is already placed and the conditions become invalid (e.g., the supporting block is removed), the block will pop off and drop as an item. If the blocks in the filter are liquid blocks, ensure that an item block is created with a 'liquid_clipped' component set to 'true' and a 'block_placer' component with 'replace_block_item' set to 'true'.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter?view=minecraft-bedrock-stable)"
         },
         "minecraft:entity_fall_on": {
           "type": "object",
@@ -741,16 +741,16 @@
               "markdownDescription": "Fall distance needed to invoke the script callback.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_entity_fall_on?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Fall distance threshold for script callbacks.",
-          "markdownDescription": "Fall distance threshold for script callbacks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_entity_fall_on?view=minecraft-bedrock-stable)"
+          "description": "Configures what distance an entity must fall onto this block to cause the onEntityFallOn block custom component event to be sent to script. Custom components subscribed to the onEntityFallOn event on a block without the minecraft:entity_fall_on component use the default fall distance of 1 block.",
+          "markdownDescription": "Configures what distance an entity must fall onto this block to cause the onEntityFallOn block custom component event to be sent to script. Custom components subscribed to the onEntityFallOn event on a block without the minecraft:entity_fall_on component use the default fall distance of 1 block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_entity_fall_on?view=minecraft-bedrock-stable)"
         },
         "minecraft:custom_components": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Legacy custom-component ID list. Modern components use their ID directly as a component key.",
-          "markdownDescription": "Legacy custom-component ID list. Modern components use their ID directly as a component key.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_custom_components?view=minecraft-bedrock-stable)"
+          "description": "Sets an ordered list of custom component names which are bound in script to be executed upon a block event.\n\nLegacy custom-component ID list. Modern components use their ID directly as a component key.",
+          "markdownDescription": "Sets an ordered list of custom component names which are bound in script to be executed upon a block event.\n\nLegacy custom-component ID list. Modern components use their ID directly as a component key.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_custom_components?view=minecraft-bedrock-stable)"
         },
         "minecraft:tags": {
           "type": "array",
@@ -791,8 +791,8 @@
               "markdownDescription": "Whether adjacent blocks move with this block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_movable?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Piston movement behavior.",
-          "markdownDescription": "Piston movement behavior.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_movable?view=minecraft-bedrock-stable)"
+          "description": "Defines whether the block can be pushed or pulled by a piston. Use movement_type to declare the block as push_pull, push, popped, or immovable; use sticky to opt into same-block grouping similar to slime blocks.",
+          "markdownDescription": "Defines whether the block can be pushed or pulled by a piston. Use movement_type to declare the block as push_pull, push, popped, or immovable; use sticky to opt into same-block grouping similar to slime blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_movable?view=minecraft-bedrock-stable)"
         },
         "minecraft:liquid_detection": {
           "type": "object",
@@ -855,7 +855,7 @@
               "markdownDescription": "Liquid-specific interaction rules.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
             }
           },
-          "description": "Rules for interactions with liquids.",
+          "description": "The definitions for how a block behaves when detecting liquid. Only one rule definition is allowed per liquid type - if multiple are specified, the first will be used and the rest will be ignored.",
           "patternProperties": {
             "^liquid_type$": {
               "type": "string",
@@ -905,11 +905,11 @@
               "markdownDescription": "Faces that stop liquid flow.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Rules for interactions with liquids.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
+          "markdownDescription": "The definitions for how a block behaves when detecting liquid. Only one rule definition is allowed per liquid type - if multiple are specified, the first will be used and the rest will be ignored.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable)"
         },
         "minecraft:random_offset": {
           "type": "object",
-          "description": "Position-seeded offset affecting rendering, selection and collision. Requires format 1.21.100 or newer. Multi-blocks must define this at the root from 1.26.20.",
+          "description": "This component defines a random offset for the block, seeded based on the block's position and the specified range and steps. It affects the block's rendered position, outline, and collision. If the random offset causes the collision box to extend beyond the bounds of a cube, the offset range will automatically adjust to keep the collision box within the cube. Culling for this block is performed without considering the random offset.\n\nPosition-seeded offset affecting rendering, selection and collision. Requires format 1.21.100 or newer. Multi-blocks must define this at the root from 1.26.20.",
           "properties": {
             "x": {
               "type": "object",
@@ -1005,17 +1005,17 @@
               "markdownDescription": "Random displacement along this axis, in model units.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Position-seeded offset affecting rendering, selection and collision. Requires format 1.21.100 or newer. Multi-blocks must define this at the root from 1.26.20.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
+          "markdownDescription": "This component defines a random offset for the block, seeded based on the block's position and the specified range and steps. It affects the block's rendered position, outline, and collision. If the random offset causes the collision box to extend beyond the bounds of a cube, the offset range will automatically adjust to keep the collision box within the cube. Culling for this block is performed without considering the random offset.\n\nPosition-seeded offset affecting rendering, selection and collision. Requires format 1.21.100 or newer. Multi-blocks must define this at the root from 1.26.20.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable)"
         },
         "minecraft:flower_pottable": {
           "type": "object",
-          "description": "Allows this block to be placed in a flower pot. No parameters. Requires format 1.21.120; root components only from 1.26.20.",
+          "description": "When added to a block type, indicates that this block can be placed inside a flower pot.\n\nAllows this block to be placed in a flower pot. No parameters. Requires format 1.21.120; root components only from 1.26.20.",
           "properties": {},
-          "markdownDescription": "Allows this block to be placed in a flower pot. No parameters. Requires format 1.21.120; root components only from 1.26.20.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flower_pottable?view=minecraft-bedrock-stable)"
+          "markdownDescription": "When added to a block type, indicates that this block can be placed inside a flower pot.\n\nAllows this block to be placed in a flower pot. No parameters. Requires format 1.21.120; root components only from 1.26.20.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flower_pottable?view=minecraft-bedrock-stable)"
         },
         "minecraft:embedded_visual": {
           "type": "object",
-          "description": "Geometry and materials used when embedded inside another block, such as a flower pot. Requires format 1.21.120.",
+          "description": "The description identifier of the geometry and material used to render this block when it it is embedded inside of another block (for example, a flower inside of a flower pot).\n\nGeometry and materials used when embedded inside another block, such as a flower pot. Requires format 1.21.120.",
           "properties": {
             "geometry": {
               "$ref": "#/definitions/blockGeometry",
@@ -1028,11 +1028,11 @@
               "markdownDescription": "Materials of the embedded block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_embedded_visual?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Geometry and materials used when embedded inside another block, such as a flower pot. Requires format 1.21.120.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_embedded_visual?view=minecraft-bedrock-stable)"
+          "markdownDescription": "The description identifier of the geometry and material used to render this block when it it is embedded inside of another block (for example, a flower inside of a flower pot).\n\nGeometry and materials used when embedded inside another block, such as a flower pot. Requires format 1.21.120.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_embedded_visual?view=minecraft-bedrock-stable)"
         },
         "minecraft:item_visual": {
           "type": "object",
-          "description": "Geometry and materials for the inventory/held block item. Requires format 1.21.60.",
+          "description": "The description identifier of the geometry and material used to render the item of this block.\n\nGeometry and materials for the inventory/held block item. Requires format 1.21.60.",
           "properties": {
             "geometry": {
               "$ref": "#/definitions/blockGeometry",
@@ -1045,11 +1045,11 @@
               "markdownDescription": "Materials for the block item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_item_visual?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Geometry and materials for the inventory/held block item. Requires format 1.21.60.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_item_visual?view=minecraft-bedrock-stable)"
+          "markdownDescription": "The description identifier of the geometry and material used to render the item of this block.\n\nGeometry and materials for the inventory/held block item. Requires format 1.21.60.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_item_visual?view=minecraft-bedrock-stable)"
         },
         "minecraft:chest_obstruction": {
           "type": "object",
-          "description": "Controls whether this block obstructs a chest beneath it.",
+          "description": "This defines how a block reacts to a chest being opened underneath it.",
           "properties": {
             "obstruction_rule": {
               "type": "string",
@@ -1062,11 +1062,11 @@
               "markdownDescription": "Always obstruct, never obstruct, or check the block shape.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_chest_obstruction?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Controls whether this block obstructs a chest beneath it.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_chest_obstruction?view=minecraft-bedrock-stable)"
+          "markdownDescription": "This defines how a block reacts to a chest being opened underneath it.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_chest_obstruction?view=minecraft-bedrock-stable)"
         },
         "minecraft:connection_rule": {
           "type": "object",
-          "description": "Controls connections from fences, walls, panes and similar neighboring blocks.",
+          "description": "Defines whether other blocks such as fences, walls, bars, and glass panes are allowed to connect to this block.",
           "properties": {
             "accepts_connections_from": {
               "type": "string",
@@ -1095,11 +1095,11 @@
               "markdownDescription": "Cardinal directions accepting connections.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_connection_rule?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Controls connections from fences, walls, panes and similar neighboring blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_connection_rule?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Defines whether other blocks such as fences, walls, bars, and glass panes are allowed to connect to this block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_connection_rule?view=minecraft-bedrock-stable)"
         },
         "minecraft:destruction_particles": {
           "type": "object",
-          "description": "Particle appearance when this block breaks.",
+          "description": "Sets the particles that will be used when block is destroyed.",
           "properties": {
             "texture": {
               "type": "string",
@@ -1128,7 +1128,7 @@
               "markdownDescription": "Biome tint applied to the rendered color.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destruction_particles?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Particle appearance when this block breaks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destruction_particles?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Sets the particles that will be used when block is destroyed.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destruction_particles?view=minecraft-bedrock-stable)"
         },
         "minecraft:precipitation_interactions": {
           "type": "object",
@@ -1160,7 +1160,7 @@
         },
         "minecraft:redstone_conductivity": {
           "type": "object",
-          "description": "Redstone conduction and wire stair-step behavior.",
+          "description": "The basic redstone properties of a block. If the component is not provided the default values are used.",
           "properties": {
             "allows_wire_to_step_down": {
               "type": "boolean",
@@ -1173,11 +1173,11 @@
               "markdownDescription": "Allows the block to conduct redstone power.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_conductivity?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Redstone conduction and wire stair-step behavior.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_conductivity?view=minecraft-bedrock-stable)"
+          "markdownDescription": "The basic redstone properties of a block. If the component is not provided the default values are used.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_conductivity?view=minecraft-bedrock-stable)"
         },
         "minecraft:redstone_consumer": {
           "type": "object",
-          "description": "Receives redstone updates for scripts; not supported in permutations. Stable from format 1.26.0.",
+          "description": "A component describing how a block can consume and potentially propagate a redstone signal. This component is not available for block permutations.\n\nReceives redstone updates for scripts; not supported in permutations. Stable from format 1.26.0.",
           "properties": {
             "min_power": {
               "type": "integer",
@@ -1199,11 +1199,11 @@
               "markdownDescription": "Legacy spelling before format 1.26.0.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_consumer?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Receives redstone updates for scripts; not supported in permutations. Stable from format 1.26.0.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_consumer?view=minecraft-bedrock-stable)"
+          "markdownDescription": "A component describing how a block can consume and potentially propagate a redstone signal. This component is not available for block permutations.\n\nReceives redstone updates for scripts; not supported in permutations. Stable from format 1.26.0.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_consumer?view=minecraft-bedrock-stable)"
         },
         "minecraft:redstone_producer": {
           "type": "object",
-          "description": "Produces a redstone signal. Requires format 1.21.120.",
+          "description": "If added to a block, indicates that it produces a redstone signal.\n\nProduces a redstone signal. Requires format 1.21.120.",
           "properties": {
             "power": {
               "type": "integer",
@@ -1249,17 +1249,17 @@
               "markdownDescription": "Rotate powered faces with the block transformation.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_producer?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Produces a redstone signal. Requires format 1.21.120.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_producer?view=minecraft-bedrock-stable)"
+          "markdownDescription": "If added to a block, indicates that it produces a redstone signal.\n\nProduces a redstone signal. Requires format 1.21.120.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_producer?view=minecraft-bedrock-stable)"
         },
         "minecraft:replaceable": {
           "type": "object",
-          "description": "Allows another placed block to replace this block. No parameters. Stable from format 1.21.60.",
+          "description": "A block with this component can be replaced when another block is placed in the same block position. Experimental toggles required: Upcoming Creator Features (in format versions before 1.21.60).\n\nAllows another placed block to replace this block. No parameters. Stable from format 1.21.60.",
           "properties": {},
-          "markdownDescription": "Allows another placed block to replace this block. No parameters. Stable from format 1.21.60.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_replaceable?view=minecraft-bedrock-stable)"
+          "markdownDescription": "A block with this component can be replaced when another block is placed in the same block position. Experimental toggles required: Upcoming Creator Features (in format versions before 1.21.60).\n\nAllows another placed block to replace this block. No parameters. Stable from format 1.21.60.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_replaceable?view=minecraft-bedrock-stable)"
         },
         "minecraft:support": {
           "type": "object",
-          "description": "Support shape used by neighboring blocks.",
+          "description": "Defines the support shape of the block. Currently only allows for blocks to have the same shape as a Vanilla fence and Vanilla stair. To work with custom stairs, requires the use of \"minecraft:vertical_half\" and \"minecraft:cardinal_direction\" or \"minecraft:facing_direction\" which can be set through the \"minecraft:placement_direction\" block trait. Custom blocks without this component will default to unit cube support. The type of support shape for this block. Currently, the options are: \"fence\" and \"stair\".",
           "properties": {
             "shape": {
               "type": "string",
@@ -1271,11 +1271,11 @@
               "markdownDescription": "Support shape classification.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_support?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Support shape used by neighboring blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_support?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Defines the support shape of the block. Currently only allows for blocks to have the same shape as a Vanilla fence and Vanilla stair. To work with custom stairs, requires the use of \"minecraft:vertical_half\" and \"minecraft:cardinal_direction\" or \"minecraft:facing_direction\" which can be set through the \"minecraft:placement_direction\" block trait. Custom blocks without this component will default to unit cube support. The type of support shape for this block. Currently, the options are: \"fence\" and \"stair\".\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_support?view=minecraft-bedrock-stable)"
         },
         "minecraft:block_entity": {
           "type": "object",
-          "description": "Per-position metadata and optional inventory container.",
+          "description": "Adds per-instance metadata for this block.",
           "properties": {
             "dynamic_properties": {
               "type": "boolean",
@@ -1297,11 +1297,11 @@
               "markdownDescription": "Inventory container attached to this block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_entity?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Per-position metadata and optional inventory container.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_entity?view=minecraft-bedrock-stable)"
+          "markdownDescription": "Adds per-instance metadata for this block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_entity?view=minecraft-bedrock-stable)"
         },
         "minecraft:instrument_sound": {
           "type": "object",
-          "description": "Experimental note-block instrument override for the upper and lower faces.",
+          "description": "[Note: This component is currently experimental]. This defines what sound will play based on above or below relative position to a note block. An instrument can be assigned to the \"up\" and \"down\" block faces. If either face is undefined, or the component is omitted, it will use its default value (\"up\" = \"note.harp\" and \"down\" = \"note.none\"). While both faces do not need to be defined, at least one face needs to be defined for the component to be valid. \"note.none\" can be used to specify no sound for a face.\n\nExperimental note-block instrument override for the upper and lower faces.",
           "properties": {
             "up": {
               "type": "string",
@@ -1372,11 +1372,11 @@
               "markdownDescription": "Note-block sound for the down face; note.none disables sound.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_instrument_sound?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Experimental note-block instrument override for the upper and lower faces.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_instrument_sound?view=minecraft-bedrock-stable)"
+          "markdownDescription": "[Note: This component is currently experimental]. This defines what sound will play based on above or below relative position to a note block. An instrument can be assigned to the \"up\" and \"down\" block faces. If either face is undefined, or the component is omitted, it will use its default value (\"up\" = \"note.harp\" and \"down\" = \"note.none\"). While both faces do not need to be defined, at least one face needs to be defined for the component to be valid. \"note.none\" can be used to specify no sound for a face.\n\nExperimental note-block instrument override for the upper and lower faces.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_instrument_sound?view=minecraft-bedrock-stable)"
         },
         "minecraft:queued_ticking": {
           "type": "object",
-          "description": "Deprecated scheduled event behavior; use minecraft:tick and scripts for modern blocks.",
+          "description": "Triggers the specified event, either once, or at a regular interval equal to a number of ticks randomly chosen from the interval_range provided.\n\nDeprecated scheduled event behavior; use minecraft:tick and scripts for modern blocks.",
           "properties": {
             "interval_range": {
               "type": "array",
@@ -1418,62 +1418,62 @@
               "markdownDescription": "Legacy event trigger. Prefer script custom component callbacks for modern blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_ticking?view=minecraft-bedrock-stable)"
             }
           },
-          "markdownDescription": "Deprecated scheduled event behavior; use minecraft:tick and scripts for modern blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_queued_ticking?view=minecraft-bedrock-stable)",
+          "markdownDescription": "Triggers the specified event, either once, or at a regular interval equal to a number of ticks randomly chosen from the interval_range provided.\n\nDeprecated scheduled event behavior; use minecraft:tick and scripts for modern blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_queued_ticking?view=minecraft-bedrock-stable)",
           "doNotSuggest": true
         },
         "minecraft:unit_cube": {
           "type": "object",
-          "description": "Legacy full-cube geometry marker. Prefer minecraft:geometry.full_block.",
+          "description": "Specifies that a unit cube is to be used with tessellation.\n\nLegacy full-cube geometry marker. Prefer minecraft:geometry.full_block.",
           "properties": {},
-          "markdownDescription": "Legacy full-cube geometry marker. Prefer minecraft:geometry.full_block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_unit_cube?view=minecraft-bedrock-stable)",
+          "markdownDescription": "Specifies that a unit cube is to be used with tessellation.\n\nLegacy full-cube geometry marker. Prefer minecraft:geometry.full_block.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_unit_cube?view=minecraft-bedrock-stable)",
           "doNotSuggest": true
         },
         "minecraft:breathability": {
           "type": "string",
-          "description": "Legacy air/solid breathing classification.",
+          "description": "Determines whether the block is breathable by defining if the block is treated as a solid or as air. The default is solid if this component is omitted.\n\nLegacy air/solid breathing classification.",
           "enum": [
             "air",
             "solid"
           ],
-          "markdownDescription": "Legacy air/solid breathing classification.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_breathability?view=minecraft-bedrock-stable)",
+          "markdownDescription": "Determines whether the block is breathable by defining if the block is treated as a solid or as air. The default is solid if this component is omitted.\n\nLegacy air/solid breathing classification.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_breathability?view=minecraft-bedrock-stable)",
           "doNotSuggest": true
         },
         "minecraft:bone_visibility": {
           "type": "object",
-          "description": "Legacy bone visibility map. Use the geometry component for modern blocks.",
+          "description": "A JSON object that contains a list of key/value pairs that map from bone name in the specified geometry file (key) to a boolean that tells whether the bone should be visible or not (value).\n\nLegacy bone visibility map. Use the geometry component for modern blocks.",
           "additionalProperties": {
             "type": [
               "boolean",
               "string"
             ]
           },
-          "markdownDescription": "Legacy bone visibility map. Use the geometry component for modern blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_bone_visibility?view=minecraft-bedrock-stable)",
+          "markdownDescription": "A JSON object that contains a list of key/value pairs that map from bone name in the specified geometry file (key) to a boolean that tells whether the bone should be visible or not (value).\n\nLegacy bone visibility map. Use the geometry component for modern blocks.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_bone_visibility?view=minecraft-bedrock-stable)",
           "doNotSuggest": true
         },
         "minecraft:block_light_absorption": {
           "type": "integer",
-          "description": "Legacy light absorption; use minecraft:light_dampening.",
+          "description": "Legacy component (format_version < 1.19.40). The amount light is dampened when passing through this block (0-15). Use minecraft:light_dampening in newer format versions.\n\nLegacy light absorption; use minecraft:light_dampening.",
           "minimum": 0,
           "maximum": 15,
-          "markdownDescription": "Legacy light absorption; use minecraft:light_dampening.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_light_absorption?view=minecraft-bedrock-stable)",
+          "markdownDescription": "Legacy component (format_version < 1.19.40). The amount light is dampened when passing through this block (0-15). Use minecraft:light_dampening in newer format versions.\n\nLegacy light absorption; use minecraft:light_dampening.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_light_absorption?view=minecraft-bedrock-stable)",
           "doNotSuggest": true
         },
         "minecraft:block_light_emission": {
           "type": "number",
-          "description": "Legacy emitted light; use minecraft:light_emission.",
-          "markdownDescription": "Legacy emitted light; use minecraft:light_emission.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_light_emission?view=minecraft-bedrock-stable)",
+          "description": "Legacy component (format_version < 1.19.40). The amount of light this block emits (0-15). Use minecraft:light_emission in newer format versions.\n\nLegacy emitted light; use minecraft:light_emission.",
+          "markdownDescription": "Legacy component (format_version < 1.19.40). The amount of light this block emits (0-15). Use minecraft:light_emission in newer format versions.\n\nLegacy emitted light; use minecraft:light_emission.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_block_light_emission?view=minecraft-bedrock-stable)",
           "doNotSuggest": true
         },
         "minecraft:destroy_time": {
           "type": "number",
-          "description": "Legacy mining time; use minecraft:destructible_by_mining.",
-          "markdownDescription": "Legacy mining time; use minecraft:destructible_by_mining.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destroy_time?view=minecraft-bedrock-stable)",
+          "description": "Legacy component (format_version < 1.19.40). Time in seconds to destroy the block with base equipment. Use minecraft:destructible_by_mining in newer format versions.\n\nLegacy mining time; use minecraft:destructible_by_mining.",
+          "markdownDescription": "Legacy component (format_version < 1.19.40). Time in seconds to destroy the block with base equipment. Use minecraft:destructible_by_mining in newer format versions.\n\nLegacy mining time; use minecraft:destructible_by_mining.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destroy_time?view=minecraft-bedrock-stable)",
           "doNotSuggest": true
         },
         "minecraft:explosion_resistance": {
           "type": "number",
-          "description": "Legacy explosion resistance; use minecraft:destructible_by_explosion.",
-          "markdownDescription": "Legacy explosion resistance; use minecraft:destructible_by_explosion.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_explosion_resistance?view=minecraft-bedrock-stable)",
+          "description": "Legacy component (format_version < 1.19.40). The block's resistance to explosions. Use minecraft:destructible_by_explosion in newer format versions.\n\nLegacy explosion resistance; use minecraft:destructible_by_explosion.",
+          "markdownDescription": "Legacy component (format_version < 1.19.40). The block's resistance to explosions. Use minecraft:destructible_by_explosion in newer format versions.\n\nLegacy explosion resistance; use minecraft:destructible_by_explosion.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_explosion_resistance?view=minecraft-bedrock-stable)",
           "doNotSuggest": true
         }
       },
@@ -1615,8 +1615,8 @@
           "markdownDescription": "Geometry identifier from a resource pack.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
         }
       ],
-      "description": "Geometry and optional bone visibility/culling settings.",
-      "markdownDescription": "Geometry and optional bone visibility/culling settings.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
+      "description": "The description identifier of the geometry to use to render this block. This identifier must either match an existing geometry identifier in any of the loaded resource packs or be one of the currently supported Vanilla identifiers: \"minecraft:geometry.full_block\" or \"minecraft:geometry.cross\".",
+      "markdownDescription": "The description identifier of the geometry to use to render this block. This identifier must either match an existing geometry identifier in any of the loaded resource packs or be one of the currently supported Vanilla identifiers: \"minecraft:geometry.full_block\" or \"minecraft:geometry.cross\".\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)"
     },
     "blockMaterials": {
       "type": "object",
@@ -1632,8 +1632,8 @@
           }
         ]
       },
-      "description": "Maps geometry material slots or faces to textures and rendering settings.",
-      "markdownDescription": "Maps geometry material slots or faces to textures and rendering settings.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
+      "description": "The material instances for a block. Maps face or material_instance names in a geometry file to an actual material instance. Material instance can either be a full material instance or a name to another already defined instance. Limited to 64 instances.",
+      "markdownDescription": "The material instances for a block. Maps face or material_instance names in a geometry file to an actual material instance. Material instance can either be a full material instance or a name to another already defined instance. Limited to 64 instances.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable)"
     }
   }
 }

@@ -35,7 +35,7 @@ function buildIndex(bytes, tag) {
   const read = name => files[name] && JSON.parse(Buffer.from(files[name]).toString('utf8'));
   const result = { tag, engine: engine(tag), source: `https://github.com/Mojang/bedrock-samples/tree/${tag}`, components: { block: {}, entity: {}, item: {} } };
   const text = descriptionText;
-  result.intelligenceVersion = 10;
+  result.intelligenceVersion = 11;
   result.vanilla = {};result.formatVersions={};result.languages=[];result.vanillaNames={item:{},block:{}};
   for (const [file, kind] of Object.entries({ items: 'item', blocks: 'block', entities: 'entity', effects: 'effect', enchantments: 'enchantment', biomes: 'biome', dimensions: 'dimension' })) {
     result.vanilla[kind] = [...new Set((read(`metadata/vanilladata_modules/mojang-${file}.json`)?.data_items || []).map(value => value.command_name || value.name).filter(value => typeof value === 'string'))];
@@ -62,6 +62,7 @@ function buildIndex(bytes, tag) {
     active ||= kind === 'block' ? node.name === 'Block Components' : ['Components', 'AI Goals', 'Attributes', 'Properties', 'Triggers'].includes(node.name);
     if (active && /^minecraft:/.test(node.name || '')) {
       const previous=result.components[kind][node.name], next=documented(node);
+      if(kind==='entity'&&node.name.startsWith('minecraft:behavior.')&&!next.fields.priority)next.fields.priority={description:'AI goal scheduling priority. Lower numbers are considered before higher numbers.',type:'Integer',default:0};
       // Hidden duplicate nodes are cross-references, sometimes containing an
       // internal numeric ID instead of prose. Never replace a full declaration.
       if(!previous)result.components[kind][node.name]=next;
@@ -97,7 +98,7 @@ function buildIndex(bytes, tag) {
 async function loadReference(root, target, { force = false, fetchImpl = globalThis.fetch } = {}) {
   const file = await core.local(root, '.bedrock/reference/components.json');
   const cached = await fs.readFile(file, 'utf8').then(JSON.parse).then(cleanDescriptions).catch(() => null);
-  if (!force && cached?.intelligenceVersion === 10 && cached?.target === target && cached.tag && Date.now() - cached.updated < 86400000) return cached;
+  if (!force && cached?.intelligenceVersion === 11 && cached?.target === target && cached.tag && Date.now() - cached.updated < 86400000) return cached;
   const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
   async function get(url, limit) {
     const response = await fetchImpl(url, { signal: controller.signal, headers: { 'User-Agent': 'Bedrock-Workbench', Accept: 'application/vnd.github+json' } });
@@ -111,7 +112,7 @@ async function loadReference(root, target, { force = false, fetchImpl = globalTh
     const list = JSON.parse((await get(API, 4 * 1024 * 1024)).toString());
     const release = chooseRelease(list, target);
     if (!release) throw new Error(`No released Mojang samples found at or below engine ${target}`);
-    if (!force && cached?.intelligenceVersion === 10 && cached?.tag === release.tag_name) { cached.target = target; cached.updated = Date.now(); await core.writeJson(file, cached); return cached; }
+    if (!force && cached?.intelligenceVersion === 11 && cached?.tag === release.tag_name) { cached.target = target; cached.updated = Date.now(); await core.writeJson(file, cached); return cached; }
     const asset = release.assets?.find(a => a.name === `bedrock-samples-${release.tag_name}-min.zip`);
     const expected = `https://github.com/Mojang/bedrock-samples/releases/download/${release.tag_name}/${asset?.name}`;
     if (!asset || asset.browser_download_url !== expected) throw new Error('Mojang release is missing its text reference archive');
@@ -129,9 +130,10 @@ function closest(name, names) {
   return names.map(value => ({ value, distance: distance(name, value) })).filter(v => v.distance <= 2).sort((a, b) => a.distance - b.distance).slice(0, 3).map(v => v.value);
 }
 function componentSchema(index, kind, { omit = [], supplement } = {}) {
-  function valueSchema(value, component) {
-    const result = { description: descriptionText(value.description) };
-    result.markdownDescription = [descriptionText(value.description), value.type ? `Type: ${value.type}` : '', `Reference data: Mojang ${index.tag}.`, documentation.componentLink(kind, component)].filter(Boolean).join('\n\n');
+  function valueSchema(value, component, root=false) {
+    const description=root?documentation.componentDescription(kind,component,descriptionText(value.description)):descriptionText(value.description);
+    const result = { description };
+    result.markdownDescription = [description, value.type ? `Type: ${value.type}` : '', `Reference data: Mojang ${index.tag}.`, documentation.componentLink(kind, component)].filter(Boolean).join('\n\n');
     // HTML type labels with alternatives or legacy names are intentionally
     // advisory. Only unambiguous primitive types become validation rules.
     const type = { String: 'string', string: 'string', Boolean: 'boolean', boolean: 'boolean', Integer: 'integer', integer: 'integer', number: 'number', object: 'object', array: 'array' }[value.type];
@@ -139,7 +141,7 @@ function componentSchema(index, kind, { omit = [], supplement } = {}) {
     if (value.fields && Object.keys(value.fields).length) result.properties = Object.fromEntries(Object.entries(value.fields).map(([name, field]) => [name, valueSchema(field, component)]));
     return result;
   }
-  const components = { type: 'object', additionalProperties: true, properties: Object.fromEntries(Object.entries(index.components[kind]).filter(([name]) => !omit.includes(name)).map(([name, value]) => [name, valueSchema(value,name)])) };
+  const components = { type: 'object', additionalProperties: true, properties: Object.fromEntries(Object.entries(index.components[kind]).filter(([name]) => !omit.includes(name)).map(([name, value]) => [name, valueSchema(value,name,true)])) };
   if(supplement){
     const names=(node,seen=new Set())=>{if(!node||typeof node!=='object')return [];if(node.$ref?.startsWith('#/definitions/')){const name=node.$ref.slice(14);if(seen.has(name))return [];seen.add(name);return names(supplement.definitions?.[name],seen);}return [...Object.keys(node.properties||{}),...['anyOf','oneOf','allOf'].flatMap(key=>(node[key]||[]).flatMap(child=>names(child,new Set(seen))))];};
     for(const id of omit){const owned=supplement.definitions?.components?.properties?.[id],known=new Set(names(owned)),fields=Object.entries(index.components[kind][id]?.fields||{}).filter(([field])=>!known.has(field));if(!fields.length)continue;
