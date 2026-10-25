@@ -6,7 +6,7 @@ const {compareVersions}=require('./releases.cjs');
 function collector() {
   const values=new Map(),referenced=new Map();
   const add=(kind,id)=>{if(typeof id!=='string'||!id)return; if(!values.has(kind))values.set(kind,new Set());values.get(kind).add(id);};
-  const used=(kind,id)=>{if(typeof id!=='string'||!id||/[\s?()[\]{}]/.test(id))return;id=kind==='entity'?id.replace(/<[^<>]*>$/,''):kind==='item'?id.replace(/:\d+$/,''):id;if(!referenced.has(kind))referenced.set(kind,new Set());referenced.get(kind).add(id);};
+  const used=(kind,id)=>{if(typeof id!=='string'||!id||/[\s?()[\]{}]/.test(id))return;id=kind==='entity'?id.replace(/<[^<>]*>$/,''):kind==='item'?id.replace(/:\d+$/,''):id;if(['item','block','entity'].includes(kind)&&!id.includes(':'))id='minecraft:'+id;if(!referenced.has(kind))referenced.set(kind,new Set());referenced.get(kind).add(id);};
   function file(side,relative,data) {
     relative=relative.replaceAll('\\','/');
     if(side==='behavior') {
@@ -25,6 +25,12 @@ function collector() {
         }
       }
       uses(data);
+      // Use the same typed item field contexts as diagnostics. This records
+      // supported vanilla aliases/events without offering duplicate spellings.
+      if(data?.['minecraft:item']) {
+        const text=JSON.stringify(data),tree=json.parseTree(text);
+        for(const ref of require('./content.cjs').references({side,relative,text,tree}))if(ref.type!=='item_tag')used(ref.type,ref.value);
+      }
     } else {
       add('client_entity',data?.['minecraft:client_entity']?.description?.identifier);
       add('particle',data?.particle_effect?.description?.identifier);
@@ -68,7 +74,7 @@ async function local(project,{force=false}={}) {
   if(compareVersions(source.version,project.config.targetVersion)>0)throw Error(`Installed vanilla ${source.version} is newer than target ${project.config.targetVersion}; using samples instead.`);
   const cacheFile=await core.local(project.root,'.bedrock/reference/local-'+project.config.target+'.json');
   const cached=await core.readJson(cacheFile).catch(()=>null);
-  const same=cached?.indexVersion===2 && cached?.source?.folder===source.folder && cached.source.version===source.version && cached.source.channel===project.config.target;
+  const same=cached?.indexVersion===3 && cached?.source?.folder===source.folder && cached.source.version===source.version && cached.source.channel===project.config.target;
   if(!force && same && Date.now()-cached.updated<86400000)return cached;
   const root=await fs.realpath(source.folder), packs=[];
   // Inspect only expected layouts beneath the explicitly selected directory.
@@ -103,7 +109,7 @@ async function local(project,{force=false}={}) {
     }
   }
   for(const pack of packs)await walk(pack,pack.folder);
-  const result={indexVersion:2,source:{...source,channel:project.config.target},updated:Date.now(),vanilla:index.finish(),vanillaReferences:index.references(),packs:packs.length};
+  const result={indexVersion:3,source:{...source,channel:project.config.target},updated:Date.now(),vanilla:index.finish(),vanillaReferences:index.references(),packs:packs.length};
   if(!Object.keys(result.vanilla).length)throw Error('The selected packs did not contain readable vanilla identifiers');
   await core.writeJson(cacheFile,result);return result;
 }

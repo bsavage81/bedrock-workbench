@@ -197,7 +197,7 @@ function attach(vscode, context, getProject, output) {
         });
         const kind = content.referenceKind(location.path, node.value, data); if (!kind) return;
         const index = await ensure(); if (!index) return;
-        const refs = /^(item|block|entity|terrain_texture|item_texture)$/.test(kind) ? await referenceData() : index.reference;
+        const refs = /^(item|block|entity|terrain_texture|item_texture|sound)$/.test(kind) ? await referenceData() : index.reference;
         if (refs) index.reference = require('./vanilla.cjs').merge(refs,index.localReference);
         const values = content.referenceValues(index, kind, data, index.reference);
         return [...values].map(([id, files]) => {

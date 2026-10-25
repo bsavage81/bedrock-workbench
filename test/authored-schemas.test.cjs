@@ -70,6 +70,7 @@ test('audited nested constraints survive the actual cached schema routes', async
   const prepared = await runtime.prepare({ root, packs: { behavior: path.join(root, 'custom-behavior'), resource: path.join(root, 'custom-resource') }, config: { targetVersion: '1.26.50' } });
   const validate = await runtime.validator(prepared);
   assert.equal((await validate('behavior', 'recipes/nested/example.json', validRecipes[0])).length, 0);
+  assert.ok((await validate('behavior','items/nested/tool.json',{format_version:'1.26.50','minecraft:item':{description:{identifier:'test:tool'},components:{'minecraft:durability':{max_durability:'wrong'}}}})).some(e=>e.path.endsWith('/max_durability')));
   assert.ok((await validate('behavior', 'recipes/example.json', doc('shapeless', { ingredients: [{ item: 'test:ore', count: 0 }], result: 'test:ingot' }))).some(e => e.path.endsWith('/count')));
   assert.ok((await validate('resource', 'textures/item_texture.json', { texture_data: { bad: { textures: false } } })).length);
   assert.ok((await validate('resource', 'textures/terrain_texture.json', { texture_data: [] })).length);

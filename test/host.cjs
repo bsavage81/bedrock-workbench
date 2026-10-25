@@ -110,6 +110,12 @@ async function run() {
   }, 'Project geometry reference completion did not load');
   const definitions = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', clientUri, geometryPosition);
   assert.ok(definitions.some(definition => definition.uri?.fsPath.toLowerCase() === geometry.toLowerCase()), 'Project geometry definition navigation missing');
+  for(let retry=0;retry<3;retry++) {
+    const refreshing=vscode.commands.executeCommand('bedrock.refresh');
+    const duringRefresh=await vscode.commands.executeCommand('vscode.executeDefinitionProvider',clientUri,geometryPosition);
+    await refreshing;
+    assert.ok(duringRefresh.some(d=>d.uri?.fsPath.toLowerCase()===geometry.toLowerCase()),'Reference navigation disappeared during project refresh');
+  }
   const animationUri = vscode.Uri.file(path.join(root, 'RP/animations/test.json'));
   await core.writeJson(animationUri.fsPath, { format_version: '1.8.0', animations: { 'animation.host': { bones: { body: { rotation: ['math.sin(query.anim_time', 0, 0] } } } } });
   const animationDoc = await vscode.workspace.openTextDocument(animationUri); await vscode.window.showTextDocument(animationDoc);
@@ -321,7 +327,7 @@ async function run() {
   const customIds = path.join(root, 'BP/scripts/component-ids.ts'), customScript = path.join(root, 'BP/scripts/custom-components.ts');
   await fs.mkdir(path.dirname(customIds), { recursive: true });
   await fs.writeFile(customIds, "export const BLOCK_ID = 'test:host_block' as const;");
-  await fs.writeFile(customScript, "import {system} from '@minecraft/server'; import {BLOCK_ID} from './component-ids.js'; system.beforeEvents.startup.subscribe(({blockComponentRegistry: blocks, itemComponentRegistry}) => { blocks.registerCustomComponent(BLOCK_ID, {onTick(event, {params}) { if (typeof params.golden === 'boolean') {} if(typeof params.nested.label === 'string') {} }}); blocks.registerCustomComponent('test:host_itemless', {onTick() {}}); itemComponentRegistry.registerCustomComponent('test:host_item', {}); });");
+  await fs.writeFile(customScript, "import {system} from '@minecraft/server'; import {BLOCK_ID} from './component-ids.js'; system.beforeEvents.startup.subscribe(({blockComponentRegistry: blocks, itemComponentRegistry}) => { blocks.registerCustomComponent(BLOCK_ID, {onTick(event, {params}) { if (typeof params.golden === 'boolean') {} if(typeof params.nested.label === 'string') {} }}); blocks.registerCustomComponent('test:host_itemless', {onTick() {}}); itemComponentRegistry.registerCustomComponent('test:host_item', {onUse(event, {params}) {if(typeof params.enabled === 'boolean') {} if(typeof params.nested.mode === 'string') {}}}); });");
   const customUri = vscode.Uri.file(path.join(root, 'BP/blocks/custom-components.json'));
   await core.writeJson(customUri.fsPath, { format_version: '1.21.90', 'minecraft:block': { description: { identifier: 'test:host_custom' }, components: { '': {} } } });
   const customDoc = await vscode.workspace.openTextDocument(customUri); await vscode.window.showTextDocument(customDoc);
@@ -446,6 +452,63 @@ async function run() {
     const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', customUri, position);
     return completion?.items.some(item => item.label === 'test:host_updated') && !completion.items.some(item => item.label === 'test:host_block');
   }, 'Saved imported component ID changes did not refresh suggestions');
+  const authoredItemUri=vscode.Uri.file(path.join(root,'BP/items/authored-items.json'));
+  await core.writeJson(authoredItemUri.fsPath,{format_version:'1.26.50','minecraft:item':{description:{identifier:'test:authored_item'},components:{'':{}}}});
+  const authoredItemDoc=await vscode.workspace.openTextDocument(authoredItemUri);await vscode.window.showTextDocument(authoredItemDoc);
+  async function setItem(components) {
+    const edit=new vscode.WorkspaceEdit();edit.replace(authoredItemUri,new vscode.Range(authoredItemDoc.positionAt(0),authoredItemDoc.positionAt(authoredItemDoc.getText().length)),JSON.stringify({format_version:'1.26.50','minecraft:item':{description:{identifier:'test:authored_item'},components}}));assert.ok(await vscode.workspace.applyEdit(edit));
+  }
+  let itemHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('""')+1));
+  assert.ok(itemHints.items.some(i=>i.label==='minecraft:repairable'),'Authored item component completion missing');
+  assert.ok(itemHints.items.some(i=>i.label==='test:host_item'),'Script item component completion missing');
+  assert.ok(!itemHints.items.some(i=>i.label==='test:host_updated'),'Block registration leaked into item completions');
+  await setItem({'minecraft:durability':{max_durability:12,damage_chance:{}}});
+  itemHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('{}')+1));
+  assert.ok(itemHints.items.some(i=>i.label==='min')&&itemHints.items.some(i=>i.label==='max'),'Nested item damage chance completion missing');
+  const itemHover=await vscode.commands.executeCommand('vscode.executeHoverProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('max_durability')+3));
+  assert.ok(itemHover.some(h=>h.contents.some(c=>c.value?.includes('Maximum durability')&&c.value.includes('learn.microsoft.com'))),'Item field Learn hover missing');
+  const componentItemHover=await vscode.commands.executeCommand('vscode.executeHoverProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('minecraft:durability')+5));
+  assert.ok(componentItemHover.length<=1,'Duplicate item component documentation hovers');
+  for(const [component,field,label]of [['repairable','repair_items','Repair ingredient'],['shooter','ammunition','Ammunition entry'],['digger','destroy_speeds','Mining speed entry'],['durability_sensor','durability_thresholds','Durability threshold']]) {
+    await setItem({['minecraft:'+component]:{[field]:[]}});
+    const starters=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('[]')+1));
+    assert.ok(starters.items.some(i=>i.label===label),'Item array entry starter missing: '+label);
+  }
+  for(const [components,label,excluded]of [
+    [{'minecraft:block_placer':{block:''}},'minecraft:stone','minecraft:diamond'],
+    [{'minecraft:food':{using_converts_to:''}},'minecraft:diamond','minecraft:stone'],
+    [{'minecraft:repairable':{repair_items:[{items:[''],repair_amount:1}]}},'minecraft:diamond','minecraft:stone'],
+    [{'minecraft:digger':{destroy_speeds:[{block:{name:''},speed:2}]}},'minecraft:stone','minecraft:diamond']
+  ]) {
+    await setItem(components);itemHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('""')+1));
+    assert.ok(itemHints.items.some(i=>i.label===label),'Item reference choice missing: '+label);assert.ok(!itemHints.items.some(i=>i.label===excluded),'Wrong item reference kind');
+  }
+  await setItem({'test:host_item':{'':0}});
+  itemHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('""')+1));
+  assert.ok(itemHints.items.some(i=>i.label==='enabled')&&itemHints.items.some(i=>i.label==='nested'),'Custom item parameter completion missing');
+  await setItem({'test:host_item':{enabled:false,nested:{'':''}}});
+  itemHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('""')+1));
+  assert.ok(itemHints.items.some(i=>i.label==='mode'),'Nested custom item parameter missing');
+  const customItemHover=await vscode.commands.executeCommand('vscode.executeHoverProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('enabled')+2));
+  assert.ok(customItemHover.some(h=>h.contents.some(c=>c.value?.includes('boolean')&&c.value.includes('Script:'))),'Custom item parameter hover missing');
+  const customItemDefs=await vscode.commands.executeCommand('vscode.executeDefinitionProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('test:host_item')+4));
+  assert.ok(customItemDefs.some(d=>d.uri?.fsPath.toLowerCase()===customScript.toLowerCase()),'Custom item source navigation missing');
+  const itemBooleanHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('false')+2));
+  assert.ok(itemBooleanHints.items.some(i=>i.label==='true')&&itemBooleanHints.items.some(i=>i.label==='false'),'Custom item boolean values missing');
+  await setItem({'minecraft:custom_components':['']});
+  itemHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('""')+1));
+  assert.ok(itemHints.items.some(i=>i.label==='test:host_item'),'Legacy custom item registration completion missing');
+  await core.writeJson(path.join(root,'BP/items/item-tag-source.json'),{format_version:'1.26.50','minecraft:item':{description:{identifier:'test:tag_source'},components:{'minecraft:tags':{tags:['test:harvestable']}}}});
+  await setItem({'minecraft:tags':{tags:['']}});
+  await until(async()=>{const choices=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('""')+1));return choices.items.some(i=>i.label==='test:harvestable');},'Project item-tag suggestions missing');
+  await fs.writeFile(customScript,(await fs.readFile(customScript,'utf8')).replaceAll('test:host_item','test:host_item_updated'));
+  await setItem({'':{}});
+  await until(async()=>{const choices=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('""')+1));return choices.items.some(i=>i.label==='test:host_item_updated')&&!choices.items.some(i=>i.label==='test:host_item');},'Saved item component registration changes did not refresh');
+  await setItem({'test:parameterless_item':{}});
+  itemHints=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('{}')+1));assert.equal(itemHints.items.length,0,'Parameterless custom item offered unrelated suggestions');
+  await setItem({'minecraft:durability':{max_durability:'wrong'}});
+  await until(async()=>vscode.languages.getDiagnostics(authoredItemUri).some(d=>/integer|number/i.test(d.message)),'Native item structural validation missing');
+  await setItem({'minecraft:durability':{max_durability:12}});
   const syntaxUri=vscode.Uri.file(path.join(root,'RP/entity/duplicate-syntax.json'));
   await fs.writeFile(syntaxUri.fsPath,'{"format_version":"1.10.0","minecraft:client_entity":{"description":{"identifier": }}}');
   const syntaxDoc=await vscode.workspace.openTextDocument(syntaxUri);await vscode.window.showTextDocument(syntaxDoc);

@@ -108,13 +108,16 @@ function activate(context) {
     }
   };
   async function discover() {
-    project = undefined;
     const folders = vscode.workspace.workspaceFolders || [];
     const candidates = [];
     for (const folder of folders) if (folder.uri.scheme === 'file' && await core.exists(path.join(folder.uri.fsPath, 'bedrock-project.json'))) candidates.push(folder.uri.fsPath);
     if (candidates.length > 1) throw new Error('Open one Bedrock project per VS Code window in this version');
-    root = candidates[0];
-    if (root) { await core.migratePackIcons(root); project = await core.loadProject(root); }
+    const nextRoot=candidates[0];let nextProject;
+    // Keep the current valid project available to completion/hover/definition
+    // providers until its replacement is ready. Failed settings still disable it.
+    try { if(nextRoot){await core.migratePackIcons(nextRoot);nextProject=await core.loadProject(nextRoot);} }
+    catch(error){root=nextRoot;project=undefined;throw error;}
+    root=nextRoot;project=nextProject;
     status = project ? 'Ready' : 'Open a Bedrock project'; refresh();
     if (project) void editor.refresh();
     const engineKey = project && `${root}:${project.config.target}`;

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.0 — October 24, 2026
+
+- Add independently authored rules for 52 built-in/legacy item components, with nested validation, Microsoft Learn hovers, value choices, and array-entry starters.
+- Complete block selectors, item ingredients/conversions/ammunition/storage, projectile entities, icon atlas names, sounds, and existing project item tags in the appropriate fields.
+- Verify custom item component registration, nested parameter hints, boolean choices, source hovers/navigation, legacy ID arrays, and saved-script refresh; keep custom values permissive.
+- Expand vanilla reference acceptance for the new typed item contexts and refresh older caches without duplicating completion aliases.
+- Keep project navigation available during successful settings rediscovery.
+
 ## 0.14.1 — October 24, 2026
 
 - Show one JSON syntax diagnostic for open JSON/JSONC documents by deferring to VS Code's enabled JSON service.

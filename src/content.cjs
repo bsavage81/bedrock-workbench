@@ -77,6 +77,8 @@ async function indexFile(index, side, relative) {
     for (const [root, type] of [['minecraft:entity', 'entity'], ['minecraft:item', 'item'], ['minecraft:block', 'block'], ['minecraft:client_entity', 'client_entity'], ['minecraft:attachable', 'attachable']]) {
       if ((side === 'behavior') === ['entity', 'item', 'block'].includes(type)) index.add(type, data?.[root]?.description?.identifier, file);
     }
+    const itemTags=data?.['minecraft:item']?.components?.['minecraft:tags']?.tags;
+    if(side==='behavior'&&Array.isArray(itemTags))for(const tag of itemTags)index.add('item_tag',tag,file);
     if (side === 'resource') {
       index.add('particle', data?.particle_effect?.description?.identifier, file);
       for (const id of Object.keys(data?.sound_definitions || {})) index.add('sound', id, file);
@@ -124,7 +126,27 @@ function referenceKind(keys, value, document) {
       if (tail[0] === 'material_instances' && tail.length === 3 && key === 'texture') return 'terrain_texture';
     }
   }
-  if (root === 'minecraft:item' && component === 'minecraft:icon' && (!tail.length || (tail.length === 1 && key === 'texture') || (tail.length === 2 && tail[0] === 'textures'))) return 'item_texture';
+  if (root === 'minecraft:item' && depth) {
+    if(component === 'minecraft:icon' && (!tail.length || (tail.length === 1 && key === 'texture') || (tail.length === 2 && tail[0] === 'textures'))) return 'item_texture';
+    const descriptor=(path)=>tail.length===path.length&&path.every((part,index)=>part==='*'?typeof tail[index]==='number':part===tail[index]);
+    const blockSelector=prefix=>descriptor(prefix)||descriptor([...prefix,'name']);
+    if(component==='minecraft:tags'&&descriptor(['tags','*']))return 'item_tag';
+    if(component==='minecraft:block_placer' && (blockSelector(['block'])||blockSelector(['use_on','*'])))return 'block';
+    if(component==='minecraft:entity_placer') {
+      if(descriptor(['entity']))return 'entity';
+      if(blockSelector(['use_on','*'])||blockSelector(['dispense_on','*']))return 'block';
+    }
+    if(component==='minecraft:digger' && blockSelector(['destroy_speeds','*','block']))return 'block';
+    if(component==='minecraft:seed' && (descriptor(['crop_result'])||descriptor(['plant_at'])||descriptor(['plant_at','*'])))return 'block';
+    if(component==='minecraft:food' && (descriptor(['using_converts_to'])||descriptor(['using_converts_to','*'])))return 'item';
+    if(component==='minecraft:repairable' && (descriptor(['repair_items','*'])||descriptor(['repair_items','*','items'])||descriptor(['repair_items','*','items','name'])||descriptor(['repair_items','*','items','*'])||descriptor(['repair_items','*','items','*','name'])))return 'item';
+    if(component==='minecraft:shooter' && (descriptor(['ammunition','*','item'])||descriptor(['ammunition','*','item','*'])))return 'item';
+    if(component==='minecraft:storage_item' && (descriptor(['allowed_items'])||descriptor(['allowed_items','*'])||descriptor(['banned_items'])||descriptor(['banned_items','*'])))return 'item';
+    if(component==='minecraft:projectile' && descriptor(['projectile_entity']))return 'entity';
+    if(component==='minecraft:use_modifiers' && descriptor(['start_sound']))return 'sound';
+    if(component==='minecraft:swing_sounds' && tail.length===1&&['attack_critical_hit','attack_hit','attack_miss'].includes(key))return 'sound';
+    if(component==='minecraft:durability_sensor' && (descriptor(['sound_event'])||descriptor(['durability_thresholds','*','sound_event'])))return 'sound';
+  }
   if (document.side === 'resource') {
     if (document.relative === 'blocks.json' && ((keys.length === 2 && key === 'textures') || (keys.length === 3 && parent === 'textures'))) return 'terrain_texture';
     if (document.relative === 'textures/flipbook_textures.json' && keys.length === 2) {
@@ -163,6 +185,7 @@ function referenceDefinitions(index, kind, id) {
       const geometries = json.findNodeAtLocation(document.tree, ['minecraft:geometry']);
       node = geometries?.children?.map(g => json.findNodeAtLocation(g, ['description', 'identifier'])).find(n => n?.value === id) || json.findNodeAtLocation(document.tree, [id])?.parent?.children[0];
     }
+      if(document&&kind==='item_tag')node=json.findNodeAtLocation(document.tree,['minecraft:item','components','minecraft:tags','tags'])?.children?.find(child=>child.value===id);
     const before = document?.text.slice(0, node?.offset || 0) || '', lines = before.split('\n');
     return { file, line: lines.length - 1, column: lines.at(-1).length };
   });
@@ -210,6 +233,7 @@ function references(document) {
 function referenceIssues(index, document, {includeIgnored=false}={}) {
   const issues=references(document).filter(ref => {
     if(!ref.value||/[?()[\]{}]/.test(ref.value))return false;
+    if(ref.type==='item_tag')return false; // Tags declare names; new custom tags are valid.
     const values=referenceValues(index,ref.type,document), accepted=new Set(index.reference?.vanillaReferences?.[ref.type]||[]);
     const id=ref.type==='entity'?ref.value.replace(/<[^<>]*>$/,''):ref.type==='item'?ref.value.replace(/:\d+$/,''):ref.value;
     const candidates=[id];if(['item','block','entity'].includes(ref.type)&&!id.includes(':'))candidates.push('minecraft:'+id);
