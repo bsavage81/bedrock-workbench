@@ -1,0 +1,698 @@
+{
+  "source": "https://github.com/MicrosoftDocs/minecraft-creator",
+  "updated": "2026-10-25",
+  "components": {
+    "block": {
+      "minecraft:chest_obstruction": {
+        "min": "1.26.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_chest_obstruction?view=minecraft-bedrock-stable"
+      },
+      "minecraft:collision_box": {
+        "min": "1.19.50",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_collision_box?view=minecraft-bedrock-stable"
+      },
+      "minecraft:connection_rule": {
+        "min": "1.21.130",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_connection_rule?view=minecraft-bedrock-stable"
+      },
+      "minecraft:crafting_table": {
+        "min": "1.19.50",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_crafting_table?view=minecraft-bedrock-stable"
+      },
+      "minecraft:destructible_by_mining": {
+        "min": "1.21.50",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destructible_by_mining?view=minecraft-bedrock-stable"
+      },
+      "minecraft:destruction_particles": {
+        "min": "1.21.80",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_destruction_particles?view=minecraft-bedrock-stable"
+      },
+      "minecraft:display_name": {
+        "min": "1.19.60",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_display_name?view=minecraft-bedrock-stable"
+      },
+      "minecraft:embedded_visual": {
+        "min": "1.21.120",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_embedded_visual?view=minecraft-bedrock-stable"
+      },
+      "minecraft:flammable": {
+        "fields": {
+          "lava_flammable": {
+            "min": "1.26.30"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flammable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:flower_pottable": {
+        "min": "1.21.120",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flower_pottable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:geometry": {
+        "min": "1.19.40",
+        "fields": {
+          "bone_visibility": {
+            "min": "1.19.80"
+          },
+          "culling": {
+            "min": "1.20.60"
+          },
+          "culling_shape": {
+            "min": "1.26.30"
+          },
+          "n_way_visual_rotation": {
+            "min": "1.26.30"
+          },
+          "uv_lock": {
+            "min": "1.21.100"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable"
+      },
+      "minecraft:item_visual": {
+        "min": "1.21.60",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_item_visual?view=minecraft-bedrock-stable"
+      },
+      "minecraft:liquid_detection": {
+        "min": "1.21.60",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_liquid_detection?view=minecraft-bedrock-stable"
+      },
+      "minecraft:map_color": {
+        "fields": {
+          "tint_method": {
+            "min": "1.21.80"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_map_color?view=minecraft-bedrock-stable"
+      },
+      "minecraft:material_instances": {
+        "min": "1.19.40",
+        "fields": {
+          "isotropic": {
+            "min": "1.21.80",
+            "path": [
+              "*",
+              "isotropic"
+            ]
+          },
+          "tint_method": {
+            "min": "1.21.80",
+            "path": [
+              "*",
+              "tint_method"
+            ]
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_material_instances?view=minecraft-bedrock-stable"
+      },
+      "minecraft:movable": {
+        "min": "1.21.100",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_movable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:placement_filter": {
+        "min": "1.19.60",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_placement_filter?view=minecraft-bedrock-stable"
+      },
+      "minecraft:precipitation_interactions": {
+        "min": "1.21.120",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_precipitation_interactions?view=minecraft-bedrock-stable"
+      },
+      "minecraft:random_offset": {
+        "min": "1.21.100",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_random_offset?view=minecraft-bedrock-stable"
+      },
+      "minecraft:redstone_conductivity": {
+        "min": "1.21.40",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_conductivity?view=minecraft-bedrock-stable"
+      },
+      "minecraft:redstone_consumer": {
+        "min": "1.21.130",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_consumer?view=minecraft-bedrock-stable"
+      },
+      "minecraft:redstone_producer": {
+        "min": "1.21.120",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_redstone_producer?view=minecraft-bedrock-stable"
+      },
+      "minecraft:replaceable": {
+        "min": "1.21.70",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_replaceable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:selection_box": {
+        "min": "1.19.60",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_selection_box?view=minecraft-bedrock-stable"
+      },
+      "minecraft:support": {
+        "min": "1.21.130",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_support?view=minecraft-bedrock-stable"
+      },
+      "minecraft:transformation": {
+        "min": "1.19.80",
+        "fields": {
+          "rotation_pivot": {
+            "min": "1.21.0"
+          },
+          "scale_pivot": {
+            "min": "1.21.0"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_transformation?view=minecraft-bedrock-stable"
+      }
+    },
+    "item": {
+      "minecraft:allow_off_hand": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_allow_off_hand?view=minecraft-bedrock-stable"
+      },
+      "minecraft:block_placer": {
+        "min": "1.21.50",
+        "fields": {
+          "aligned_placement": {
+            "min": "1.26.10"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_block_placer?view=minecraft-bedrock-stable"
+      },
+      "minecraft:bundle_interaction": {
+        "min": "1.21.40",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_bundle_interaction?view=minecraft-bedrock-stable"
+      },
+      "minecraft:can_destroy_in_creative": {
+        "min": "1.20.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_can_destroy_in_creative?view=minecraft-bedrock-stable"
+      },
+      "minecraft:compostable": {
+        "min": "1.21.60",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_compostable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:cooldown": {
+        "min": "1.20.10",
+        "fields": {
+          "type": {
+            "min": "1.21.130"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_cooldown?view=minecraft-bedrock-stable"
+      },
+      "minecraft:damage": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_damage?view=minecraft-bedrock-stable"
+      },
+      "minecraft:damage_absorption": {
+        "min": "1.21.20",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_damage_absorption?view=minecraft-bedrock-stable"
+      },
+      "minecraft:digger": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_digger?view=minecraft-bedrock-stable"
+      },
+      "minecraft:display_name": {
+        "min": "1.20.0",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_display_name?view=minecraft-bedrock-stable"
+      },
+      "minecraft:durability": {
+        "min": "1.20.0",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_durability?view=minecraft-bedrock-stable"
+      },
+      "minecraft:durability_sensor": {
+        "min": "1.21.20",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_durability_sensor?view=minecraft-bedrock-stable"
+      },
+      "minecraft:dyeable": {
+        "min": "1.21.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_dyeable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:enchantable": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_enchantable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:entity_placer": {
+        "min": "1.20.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_entity_placer?view=minecraft-bedrock-stable"
+      },
+      "minecraft:food": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_food?view=minecraft-bedrock-stable"
+      },
+      "minecraft:fuel": {
+        "min": "1.20.0",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_fuel?view=minecraft-bedrock-stable"
+      },
+      "minecraft:glint": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_glint?view=minecraft-bedrock-stable"
+      },
+      "minecraft:hand_equipped": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_hand_equipped?view=minecraft-bedrock-stable"
+      },
+      "minecraft:hover_text_color": {
+        "min": "1.20.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_hover_text_color?view=minecraft-bedrock-stable"
+      },
+      "minecraft:icon": {
+        "min": "1.20.0",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_icon?view=minecraft-bedrock-stable"
+      },
+      "minecraft:kinetic_weapon": {
+        "min": "1.21.130",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_kinetic_weapon?view=minecraft-bedrock-stable"
+      },
+      "minecraft:liquid_clipped": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_liquid_clipped?view=minecraft-bedrock-stable"
+      },
+      "minecraft:max_stack_size": {
+        "min": "1.20.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_max_stack_size?view=minecraft-bedrock-stable"
+      },
+      "minecraft:piercing_weapon": {
+        "min": "1.21.130",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_piercing_weapon?view=minecraft-bedrock-stable"
+      },
+      "minecraft:projectile": {
+        "min": "1.20.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_projectile?view=minecraft-bedrock-stable"
+      },
+      "minecraft:rarity": {
+        "min": "1.21.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_rarity?view=minecraft-bedrock-stable"
+      },
+      "minecraft:record": {
+        "min": "1.20.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_record?view=minecraft-bedrock-stable"
+      },
+      "minecraft:repairable": {
+        "min": "1.20.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_repairable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:seed": {
+        "min": "1.10.0",
+        "fields": {
+          "plant_at_any_solid_surface": {
+            "min": "1.16.0"
+          },
+          "plant_at_face": {
+            "min": "1.16.0"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_seed?view=minecraft-bedrock-stable"
+      },
+      "minecraft:shooter": {
+        "min": "1.20.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_shooter?view=minecraft-bedrock-stable"
+      },
+      "minecraft:should_despawn": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_should_despawn?view=minecraft-bedrock-stable"
+      },
+      "minecraft:stacked_by_data": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_stacked_by_data?view=minecraft-bedrock-stable"
+      },
+      "minecraft:storage_item": {
+        "min": "1.21.40",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_storage_item?view=minecraft-bedrock-stable"
+      },
+      "minecraft:storage_weight_limit": {
+        "min": "1.21.110",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_storage_weight_limit?view=minecraft-bedrock-stable"
+      },
+      "minecraft:storage_weight_modifier": {
+        "min": "1.21.110",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_storage_weight_modifier?view=minecraft-bedrock-stable"
+      },
+      "minecraft:swing_duration": {
+        "min": "1.21.120",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_swing_duration?view=minecraft-bedrock-stable"
+      },
+      "minecraft:swing_sounds": {
+        "min": "1.21.130",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_swing_sounds?view=minecraft-bedrock-stable"
+      },
+      "minecraft:tags": {
+        "min": "1.20.50",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_tags?view=minecraft-bedrock-stable"
+      },
+      "minecraft:throwable": {
+        "min": "1.20.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_throwable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:use_animation": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_use_animation?view=minecraft-bedrock-stable"
+      },
+      "minecraft:use_modifiers": {
+        "min": "1.20.50",
+        "fields": {
+          "start_using": {
+            "min": "1.26.30"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_use_modifiers?view=minecraft-bedrock-stable"
+      },
+      "minecraft:wearable": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_wearable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:chargeable": {
+        "min": "1.20.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_chargeable?view=minecraft-bedrock-stable"
+      }
+    },
+    "entity": {
+      "minecraft:addrider": {
+        "min": "1.8.0",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_addrider?view=minecraft-bedrock-stable"
+      },
+      "minecraft:ageable": {
+        "fields": {
+          "pause_growth_items": {
+            "min": "1.26.10"
+          },
+          "reset_growth_items": {
+            "min": "1.26.10"
+          },
+          "pause_growth": {
+            "min": "1.26.10"
+          },
+          "reset_growth": {
+            "min": "1.26.10"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:apply_knockback_rules": {
+        "min": "1.26.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_apply_knockback_rules?view=minecraft-bedrock-stable"
+      },
+      "minecraft:area_attack": {
+        "fields": {
+          "use_self_as_damage_source": {
+            "min": "1.26.30"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_area_attack?view=minecraft-bedrock-stable"
+      },
+      "minecraft:body_rotation_always_follows_head": {
+        "min": "1.21.90",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_body_rotation_always_follows_head?view=minecraft-bedrock-stable"
+      },
+      "minecraft:body_rotation_blocked": {
+        "min": "1.20.80",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_body_rotation_blocked?view=minecraft-bedrock-stable"
+      },
+      "minecraft:breathable": {
+        "fields": {
+          "can_dehydrate": {
+            "min": "1.21.130"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_breathable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:breedable": {
+        "fields": {
+          "combine_parent_colors": {
+            "min": "1.21.60"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_breedable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:buoyant": {
+        "fields": {
+          "can_auto_step_from_liquid": {
+            "min": "1.26.10"
+          },
+          "movement_type": {
+            "min": "1.26.10"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_buoyant?view=minecraft-bedrock-stable"
+      },
+      "minecraft:burns_in_daylight": {
+        "fields": {
+          "protection_slot": {
+            "min": "1.21.130"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_burns_in_daylight?view=minecraft-bedrock-stable"
+      },
+      "minecraft:cannot_be_attacked": {
+        "min": "1.21.50",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_cannot_be_attacked?view=minecraft-bedrock-stable"
+      },
+      "minecraft:dash": {
+        "min": "1.20.40",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_dash?view=minecraft-bedrock-stable"
+      },
+      "minecraft:dimension_bound": {
+        "min": "1.21.40",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_dimension_bound?view=minecraft-bedrock-stable"
+      },
+      "minecraft:exhaustion_values": {
+        "fields": {
+          "lunge": {
+            "min": "1.21.130"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_exhaustion_values?view=minecraft-bedrock-stable"
+      },
+      "minecraft:explode": {
+        "fields": {
+          "allow_underwater": {
+            "min": "1.21.40"
+          },
+          "knockback_scaling": {
+            "min": "1.21.40"
+          },
+          "negates_fall_damage": {
+            "min": "1.21.40"
+          },
+          "particle_effect": {
+            "min": "1.21.40"
+          },
+          "sound_effect": {
+            "min": "1.21.40"
+          },
+          "toggles_blocks": {
+            "min": "1.21.40"
+          },
+          "damage_scaling": {
+            "min": "1.21.40"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_explode?view=minecraft-bedrock-stable"
+      },
+      "minecraft:home": {
+        "fields": {
+          "restriction_type": {
+            "min": "1.21.40"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_home?view=minecraft-bedrock-stable"
+      },
+      "minecraft:ignore_cannot_be_attacked": {
+        "min": "1.21.50",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ignore_cannot_be_attacked?view=minecraft-bedrock-stable"
+      },
+      "minecraft:input_air_controlled": {
+        "min": "1.21.90",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_input_air_controlled?view=minecraft-bedrock-stable"
+      },
+      "minecraft:jump.dynamic": {
+        "fields": {
+          "fast_skip_data": {
+            "min": "1.26.0"
+          },
+          "regular_skip_data": {
+            "min": "1.26.0"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_jump.dynamic?view=minecraft-bedrock-stable"
+      },
+      "minecraft:leashable": {
+        "fields": {
+          "can_be_cut": {
+            "min": "1.21.90"
+          },
+          "unleash_on_removal": {
+            "min": "1.26.30"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:leashable_to": {
+        "min": "1.21.90",
+        "fields": {
+          "unleash_on_removal": {
+            "min": "1.26.30"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable_to?view=minecraft-bedrock-stable"
+      },
+      "minecraft:mob_effect": {
+        "fields": {
+          "ambient": {
+            "min": "1.21.130"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_mob_effect?view=minecraft-bedrock-stable"
+      },
+      "minecraft:projectile": {
+        "fields": {
+          "isolated_physics": {
+            "min": "1.26.20"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_projectile?view=minecraft-bedrock-stable"
+      },
+      "minecraft:pushable_by_block": {
+        "min": "1.26.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_pushable_by_block?view=minecraft-bedrock-stable"
+      },
+      "minecraft:pushable_by_entity": {
+        "min": "1.26.10",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_pushable_by_entity?view=minecraft-bedrock-stable"
+      },
+      "minecraft:remove_in_peaceful": {
+        "min": "1.21.90",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_remove_in_peaceful?view=minecraft-bedrock-stable"
+      },
+      "minecraft:rideable": {
+        "fields": {
+          "on_rider_enter_event": {
+            "min": "1.21.80"
+          },
+          "on_rider_exit_event": {
+            "min": "1.21.80"
+          },
+          "dismount_mode": {
+            "min": "1.21.80"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_rideable?view=minecraft-bedrock-stable"
+      },
+      "minecraft:rotation_locked_to_vehicle": {
+        "min": "1.21.130",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_rotation_locked_to_vehicle?view=minecraft-bedrock-stable"
+      },
+      "minecraft:shooter": {
+        "fields": {
+          "power": {
+            "min": "1.19.60"
+          },
+          "magic": {
+            "min": "1.19.60"
+          },
+          "projectiles": {
+            "min": "1.19.60"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_shooter?view=minecraft-bedrock-stable"
+      },
+      "minecraft:spawn_on_death": {
+        "min": "1.26.20",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_spawn_on_death?view=minecraft-bedrock-stable"
+      },
+      "minecraft:transient": {
+        "min": "1.21.40",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_transient?view=minecraft-bedrock-stable"
+      },
+      "minecraft:uses_legacy_friction": {
+        "min": "1.26.20",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_uses_legacy_friction?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.fire_at_target": {
+        "min": "1.21.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_fire_at_target?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.float": {
+        "fields": {
+          "chance_per_tick_to_float": {
+            "min": "1.21.130"
+          },
+          "time_under_water_to_dismount_passengers": {
+            "min": "1.21.130"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_float?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.follow_target_leader": {
+        "min": "1.26.20",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_follow_target_leader?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.jump_around_target": {
+        "min": "1.21.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_jump.around_target?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.move_around_target": {
+        "min": "1.21.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_move_around_target?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "fields": {
+          "target_acquisition_probability": {
+            "min": "1.21.130"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_nearest_attackable_target?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.pickup_items": {
+        "fields": {
+          "on_pickup_item_end": {
+            "min": "1.26.20"
+          },
+          "on_pickup_item_start": {
+            "min": "1.26.20"
+          },
+          "stop_if_holding_item": {
+            "min": "1.26.30"
+          }
+        },
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_pickup_items?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.random_search_and_dig": {
+        "min": "1.20.40",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_random_search_and_dig?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.summon_entity": {
+        "min": "1.21.50",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_summon_entity?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.swim_up_for_breath": {
+        "min": "1.21.20",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_swim_up_for_breath?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.take_block": {
+        "min": "1.21.100",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_take_block?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.teleport_to_owner": {
+        "min": "1.21.20",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_teleport_to_owner?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.timer_flag_1": {
+        "min": "1.20.40",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_timer_flag_1?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.timer_flag_2": {
+        "min": "1.20.40",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_timer_flag_2?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.timer_flag_3": {
+        "min": "1.20.40",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_timer_flag_3?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.use_kinetic_weapon": {
+        "min": "1.21.130",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_use_kinetic_weapon?view=minecraft-bedrock-stable"
+      },
+      "minecraft:on_equipment_changed": {
+        "min": "1.26.20",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitytriggers/minecrafttrigger_on_equipment_changed?view=minecraft-bedrock-stable"
+      },
+      "minecraft:behavior.jump.around_target": {
+        "min": "1.21.30",
+        "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_jump.around_target?view=minecraft-bedrock-stable"
+      }
+    }
+  }
+}

@@ -55,6 +55,10 @@ const { unzipSync } = require('fflate');
       assert.ok((await validate('resource', 'textures/item_texture.json', { texture_data: { invalid: { textures: false } } })).length);
       assert.ok((await validate('resource', 'sounds/sound_definitions.json', { sound_definitions: { invalid: { sounds: [{ name: 42 }] } } })).length);
     }
+    const formats=require(path.join(unpacked,'extension/src/format-versions.cjs'));
+    assert.equal(formats.supported('block','minecraft:random_offset','1.21.90','1.26.50'),false);
+    assert.equal(formats.supported('block','minecraft:random_offset','1.26.50','1.26.50'),true);
+    assert.equal(formats.rule('block','minecraft:flammable').fields.lava_flammable.min,'1.26.30');
     const molang = require(path.join(unpacked, 'extension/src/vendor/molang.cjs'));
     const components = require(path.join(unpacked, 'extension/src/script-components.cjs'));
     assert.equal(components.analyze(new Map([[path.join(isolatedSample, 'BP/scripts/test.ts'), "event.blockComponentRegistry.registerCustomComponent('test:packaged', {});"]]))[0]?.id, 'test:packaged');

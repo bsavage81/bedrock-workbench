@@ -57,7 +57,7 @@ function attach(vscode, context, getProject, output) {
     if (disposed) return;
     const data = documentData(document);
     if (!data) { diagnostics.delete(document.uri); return; }
-    const issues = [...content.molangIssues(data), ...(cached ? [...content.referenceIssues(cached, data), ...content.customComponentIssues(cached, data)] : [])];
+    const issues = [...require('./format-versions.cjs').issues(data,getProject()), ...content.molangIssues(data), ...(cached ? [...content.referenceIssues(cached, data), ...content.customComponentIssues(cached, data)] : [])];
     diagnostics.set(document.uri, issues.map(issue => diagnostic(document, issue)));
   }
   const selector = [{ language: 'json', scheme: 'file' }, { language: 'jsonc', scheme: 'file' }];
@@ -83,6 +83,7 @@ function attach(vscode, context, getProject, output) {
   }
   function parameterAt(document, position) {
     const data = documentData(document); if (!data) return;
+    const format=json.findNodeAtLocation(data.tree,['format_version'])?.value;if(!require('./format-versions.cjs').directCustom(format))return;
     const state = parameters.context(data, document.offsetAt(position)); if (state) return { ...state, data };
   }
   function parameterMarkdown(id, value, index) {
@@ -152,6 +153,8 @@ function attach(vscode, context, getProject, output) {
         const index = await ensure(); if (!index) return;
         const parent = json.findNodeAtLocation(state.data.tree, state.location.path.slice(0, -1));
         const existing = new Set(parent?.children?.filter(n => n.type === 'property').map(n => n.children[0].value));
+        const format=json.findNodeAtLocation(state.data.tree,['format_version'])?.value;
+        if(state.mode==='key'&&!require('./format-versions.cjs').directCustom(format))return [];
         return [...index.values(state.kind + '_component')].filter(([id]) => !existing.has(id) || state.id === id).map(([id, files]) => {
           const item = new vscode.CompletionItem(id, state.mode === 'key' ? vscode.CompletionItemKind.Property : vscode.CompletionItemKind.Reference);
           item.detail = `Project ${state.kind} custom component`;
@@ -195,6 +198,10 @@ function attach(vscode, context, getProject, output) {
           const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Function); item.detail = 'Mojang Molang reference'; item.documentation = value.description;
           item.range = new vscode.Range(document.positionAt(offset - prefix.length), position); item.insertText = name; return item;
         });
+        if(location.path.length===1&&location.path[0]==='format_version'&&data.relative!=='manifest.json'){
+          const index=await ensure();if(!index)return;
+          return require('./format-versions.cjs').choices(index,data,getProject()).map(value=>{const item=new vscode.CompletionItem(value,vscode.CompletionItemKind.Value);completeValue(item,document,state,position,value);item.detail='Document format version';item.documentation='Selects this file’s syntax and component availability. Older formats are preserved; changing the format can change behavior.';return item;});
+        }
         const kind = content.referenceKind(location.path, node.value, data); if (!kind) return;
         const index = await ensure(); if (!index) return;
         const refs = /^(item|block|entity|terrain_texture|item_texture|sound)$/.test(kind) ? await referenceData() : index.reference;

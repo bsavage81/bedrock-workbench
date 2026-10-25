@@ -339,7 +339,7 @@ async function run() {
   }, 'Imported script-registered block component completion missing');
   async function setCustomBlock(components, permutations) {
     const edit = new vscode.WorkspaceEdit();
-    edit.replace(customUri, new vscode.Range(customDoc.positionAt(0), customDoc.positionAt(customDoc.getText().length)), JSON.stringify({ format_version: '1.21.90', 'minecraft:block': { description: { identifier: 'test:host_custom' }, components, ...(permutations ? { permutations } : {}) } }));
+    edit.replace(customUri, new vscode.Range(customDoc.positionAt(0), customDoc.positionAt(customDoc.getText().length)), JSON.stringify({ format_version: '1.26.50', 'minecraft:block': { description: { identifier: 'test:host_custom' }, components, ...(permutations ? { permutations } : {}) } }));
     assert.ok(await vscode.workspace.applyEdit(edit));
   }
   await setCustomBlock({'minecraft:collision_box':null});
@@ -514,6 +514,39 @@ async function run() {
   await fs.writeFile(catalogUri.fsPath,JSON.stringify({format_version:'1.21.60','minecraft:crafting_items_catalog':{categories:[{category_name:'equipment',groups:[{group_identifier:{name:'test:tools',icon:'minecraft:iron_sword'},items:['minecraft:iron_sword']}]}]}}));
   const groupEdit=new vscode.WorkspaceEdit();groupEdit.replace(authoredItemUri,new vscode.Range(authoredItemDoc.positionAt(0),authoredItemDoc.positionAt(authoredItemDoc.getText().length)),JSON.stringify({format_version:'1.26.50','minecraft:item':{description:{identifier:'test:host_owned',menu_category:{category:'equipment',group:''}},components:{}}}));assert.ok(await vscode.workspace.applyEdit(groupEdit));
   await until(async()=>{const choices=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',authoredItemUri,authoredItemDoc.positionAt(authoredItemDoc.getText().indexOf('""')+1));return choices.items.some(i=>i.label==='test:tools')&&choices.items.some(i=>i.label==='minecraft:itemGroup.name.sword');},'Vanilla/custom menu group suggestions missing');
+  const formatUri=vscode.Uri.file(path.join(root,'BP/blocks/format-versions.json'));
+  await core.writeJson(formatUri.fsPath,{format_version:'1.21.90','minecraft:block':{description:{identifier:'test:version_block'},components:{}}});
+  const formatDoc=await vscode.workspace.openTextDocument(formatUri);await vscode.window.showTextDocument(formatDoc);
+  async function setFormatData(data){const edit=new vscode.WorkspaceEdit();edit.replace(formatUri,new vscode.Range(formatDoc.positionAt(0),formatDoc.positionAt(formatDoc.getText().length)),JSON.stringify(data));assert.ok(await vscode.workspace.applyEdit(edit));}
+  const blockFormat=(format,components)=>({format_version:format,'minecraft:block':{description:{identifier:'test:version_block'},components}});
+  let formatChoices=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',formatUri,formatDoc.positionAt(formatDoc.getText().lastIndexOf('{}')+1));
+  assert.ok(!formatChoices.items.some(i=>String(i.label).includes('minecraft:random_offset')),'New component leaked into older block format');
+  await setFormatData(blockFormat('1.26.50',{}));
+  await until(async()=>{const choices=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',formatUri,formatDoc.positionAt(formatDoc.getText().lastIndexOf('{}')+1));return choices.items.some(i=>String(i.label).includes('minecraft:random_offset'));},'Format change did not refresh native component choices');
+  await setFormatData(blockFormat('1.21.90',{'minecraft:random_offset':{}}));
+  await until(async()=>vscode.languages.getDiagnostics(formatUri).some(d=>d.code==='bedrock.formatVersion'&&d.message.includes('1.21.100')),'Format minimum diagnostic missing');
+  await setFormatData(blockFormat('1.26.50',{'minecraft:random_offset':{}}));
+  await until(async()=>!vscode.languages.getDiagnostics(formatUri).some(d=>d.code==='bedrock.formatVersion'),'Format warning did not clear');
+  await setFormatData(blockFormat('1.21.90',{'minecraft:flammable':{}}));
+  formatChoices=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',formatUri,formatDoc.positionAt(formatDoc.getText().lastIndexOf('{}')+1));
+  assert.ok(!formatChoices.items.some(i=>String(i.label).includes('lava_flammable')),'New field leaked into older block format');
+  await setFormatData(blockFormat('1.26.50',{'minecraft:flammable':{}}));
+  formatChoices=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',formatUri,formatDoc.positionAt(formatDoc.getText().lastIndexOf('{}')+1));
+  assert.ok(formatChoices.items.some(i=>String(i.label).includes('lava_flammable')),'Supported field was hidden');
+  await setFormatData(blockFormat('',{}));
+  formatChoices=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',formatUri,formatDoc.positionAt(formatDoc.getText().indexOf('""')+1));
+  assert.ok(formatChoices.items.some(i=>i.label==='1.26.50'),'format_version value suggestions missing');
+  await setFormatData(blockFormat('1.26.50',{}));
+  const entityFormatUri=vscode.Uri.file(path.join(root,'BP/entities/format-versions.json'));
+  await fs.mkdir(path.dirname(entityFormatUri.fsPath),{recursive:true});
+  const entityFormatData=version=>({format_version:version,'minecraft:entity':{description:{identifier:'test:version_entity'},component_groups:{'test:group':{}}}});
+  await core.writeJson(entityFormatUri.fsPath,entityFormatData('1.21.90'));
+  const entityFormatDoc=await vscode.workspace.openTextDocument(entityFormatUri);await vscode.window.showTextDocument(entityFormatDoc);
+  let entityFormatChoices=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',entityFormatUri,entityFormatDoc.positionAt(entityFormatDoc.getText().indexOf('{}')+1));
+  assert.ok(!entityFormatChoices.items.some(i=>String(i.label).includes('minecraft:pushable_by_entity')),'New entity component leaked into an old component group');
+  const entityVersionEdit=new vscode.WorkspaceEdit();entityVersionEdit.replace(entityFormatUri,new vscode.Range(entityFormatDoc.positionAt(0),entityFormatDoc.positionAt(entityFormatDoc.getText().length)),JSON.stringify(entityFormatData('1.26.50')));assert.ok(await vscode.workspace.applyEdit(entityVersionEdit));
+  entityFormatChoices=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',entityFormatUri,entityFormatDoc.positionAt(entityFormatDoc.getText().indexOf('{}')+1));
+  assert.ok(entityFormatChoices.items.some(i=>String(i.label).includes('minecraft:pushable_by_entity')),'Supported entity component missing from component group');
   const syntaxUri=vscode.Uri.file(path.join(root,'RP/entity/duplicate-syntax.json'));
   await fs.writeFile(syntaxUri.fsPath,'{"format_version":"1.10.0","minecraft:client_entity":{"description":{"identifier": }}}');
   const syntaxDoc=await vscode.workspace.openTextDocument(syntaxUri);await vscode.window.showTextDocument(syntaxDoc);

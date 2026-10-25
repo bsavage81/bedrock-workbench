@@ -44,9 +44,9 @@ test('incremental index refresh removes renamed identifiers, deleted textures, a
   await content.update(index, file); assert.ok(!index.issues.some(issue => issue.file === file)); assert.ok(index.values('item').has('test:fixed'));
   await fs.rm(file); await content.update(index, file); assert.ok(!index.values('item').has('test:fixed'));
 });
-test('bundled schemas do not attach to targets older than their published engine version', async t => {
+test('older targets receive version-aware owned schemas without newer Mojang fallback routes', async t => {
   const project = await fixture(t); project.config.targetVersion = '1.21.0';
-  assert.deepEqual((await schemas.prepare(project)).associations, []);
+  const prepared=await schemas.prepare(project);assert.ok(prepared.associations.length);assert.ok(prepared.routes.some(r=>r.relative==='bp/blocks/index.schema.json'));assert.ok(!prepared.routes.some(r=>r.relative==='rp/entity/index.schema.json'));assert.ok(!prepared.routes.some(r=>r.relative==='bp/features/index.schema.json'));
 });
 test('content indexing supplies identifiers, textures, geometry and reference diagnostics without treating vanilla IDs as missing', async t => {
   const project = await fixture(t);

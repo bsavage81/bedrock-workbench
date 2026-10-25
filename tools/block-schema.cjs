@@ -30,7 +30,7 @@ const componentProperties = {
   'minecraft:loot': { ...string(), description: 'Loot-table path relative to the behavior pack.' },
   'minecraft:display_name': { ...string(), description: 'Display text or a localization key.' },
   'minecraft:crafting_table': { ...object({ table_name: string(), crafting_tags: array(string()) }), description: 'Custom crafting station name and accepted recipe tags.' },
-  'minecraft:flammable': { ...boolOr(object({ catch_chance_modifier: { type: 'integer' }, destroy_chance_modifier: { type: 'integer' } })), description: 'Fire behavior and spread modifiers.' },
+  'minecraft:flammable': { ...boolOr(object({ lava_flammable: {type:['boolean','string'],description:'Whether adjacent lava can ignite this block; requires format 1.26.30.'}, catch_chance_modifier: { type: 'integer' }, destroy_chance_modifier: { type: 'integer' } })), description: 'Fire behavior and spread modifiers.' },
   'minecraft:placement_filter': { ...object({ conditions: array(object({ allowed_faces: array(choices(['up', 'down', 'north', 'south', 'east', 'west', 'side', 'all'])), block_filter: array({ anyOf: [string(), object({ tags: string(), states: { type: 'object' } })] }) })) }), description: 'Placement and survival requirements.' },
   'minecraft:entity_fall_on': { ...object({ minimum_fall_distance: { type: 'number' } }), description: 'Fall distance threshold for script callbacks.' },
   'minecraft:custom_components': { ...array(string()), description: 'Legacy custom-component ID list. Modern components use their ID directly as a component key.' },

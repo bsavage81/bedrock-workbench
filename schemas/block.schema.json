@@ -641,6 +641,14 @@
             {
               "type": "object",
               "properties": {
+                "lava_flammable": {
+                  "type": [
+                    "boolean",
+                    "string"
+                  ],
+                  "description": "Whether adjacent lava can ignite this block; requires format 1.26.30.",
+                  "markdownDescription": "Whether adjacent lava can ignite this block; requires format 1.26.30.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_flammable?view=minecraft-bedrock-stable)"
+                },
                 "catch_chance_modifier": {
                   "type": "integer",
                   "description": "Chance modifier for catching fire; zero prevents spreading fire onto this block.",

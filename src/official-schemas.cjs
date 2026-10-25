@@ -8,11 +8,12 @@ const VERSION = require(path.join(PACKAGE, 'package.json')).version;
 const catalog = require('@minecraft/bedrock-schemas/catalog.json');
 const documentation = require('./documentation.cjs');
 const documentationCatalog = require('./documentation-links.json');
-const BUILD = 14;
+const BUILD = 15;
 // Independent Workbench replacements. Broader Mojang routes remain fallbacks.
 const OWNED = {
   'bp/item_catalog/index.schema.json': require('../schemas/creative-catalog.schema.json'),
   'bp/blocks/index.schema.json': require('../schemas/block.schema.json'),
+  'bp/entities/index.schema.json': require('../schemas/entity.schema.json'),
   'bp/items/index.schema.json': require('../schemas/item.schema.json'),
   'bp/loot_tables/index.schema.json': require('../schemas/loot-table.schema.json'),
   'bp/recipes/index.schema.json': require('../schemas/recipe.schema.json'),
@@ -47,6 +48,13 @@ function adapt(schema, relative) {
     const fileId=/^(?:entity|item|block)_minecraft_(.+)\.schema\.json$/.exec(path.posix.basename(relative))?.[1];
     const component=fileId && Object.keys(documentationCatalog.components[kind]).find(id=>id.slice(10).replaceAll('.','_')===fileId);
     linkComponents(schema,component);
+    // The version-aware reference entry supplies these keys. Keeping the broad
+    // fallback copies would leak newer components/fields into older documents.
+    if(kind==='entity'){
+      const rules=require('./format-requirements.json').components.entity;
+      function suppress(node){if(!node||typeof node!=='object')return;if(node.properties)for(const name of Object.keys(node.properties))if(rules[name]||rules[component]?.fields?.[name])delete node.properties[name];for(const child of Object.values(node))if(Array.isArray(child))child.forEach(suppress);else if(child&&typeof child==='object')suppress(child);}
+      suppress(schema);
+    }
   }
   if (relative === 'bp/recipes/index.schema.json') {
     const kinds = ['shaped', 'shapeless', 'furnace', 'brewing_mix', 'brewing_container', 'smithing_transform', 'smithing_trim', 'material_reduction'];
@@ -120,31 +128,32 @@ function glob(pattern) {
 }
 function match(route, file) { return route.patterns.some(p => !p.startsWith('!') && glob(p).test(file)) && !route.patterns.some(p => p.startsWith('!') && glob(p.slice(1)).test(file)); }
 async function prepare(project) {
-  if (compareVersions(project.config.targetVersion, VERSION) < 0) return { version: VERSION, directory: null, associations: [], routes: [] };
+  const legacyTarget=compareVersions(project.config.targetVersion, VERSION)<0;
   const directory = await core.local(project.root, `.bedrock/reference/official-${VERSION}`);
-  const cacheKey = JSON.stringify([directory, project.packs]);
+  const cacheKey = JSON.stringify([directory, project.packs,project.config.targetVersion]);
   if (!preparing.has(cacheKey)) preparing.set(cacheKey, (async () => {
     const marker = path.join(directory, 'ready.json');
     const ready = await core.readJson(marker).catch(() => null);
-    if (ready?.build !== BUILD) {
-      for await (const file of core.files(path.join(PACKAGE, 'schemas'))) {
+    if (ready?.build !== BUILD || ready?.target!==project.config.targetVersion) {
+      if(!legacyTarget)for await (const file of core.files(path.join(PACKAGE, 'schemas'))) {
         if (!file.endsWith('.json')) continue;
         const destination = await core.local(project.root, path.relative(project.root, path.join(directory, file)));
         const schema = JSON.parse(await fs.readFile(path.join(PACKAGE, 'schemas', file), 'utf8'));
         const relative = file.replaceAll(path.sep, '/');
-        const owned = OWNED[relative];
-        const next = owned || adapt(schema, relative);
+        const owned = relative==='bp/entities/index.schema.json'?undefined:OWNED[relative];
+        const kind=/^bp\/(blocks|items|entities)\/index.schema.json$/.exec(relative)?.[1];
+        const next = kind ? require('./format-versions.cjs').apply(owned || adapt(schema, relative),{blocks:'block',items:'item',entities:'entity'}[kind],project.config.targetVersion) : owned || adapt(schema,relative);
         const current = await core.readJson(destination).catch(() => null);
         // Schema revisions usually replace only a few entry points. Avoid
         // flooding file watchers by rewriting every unchanged cached file.
         if (JSON.stringify(current) !== JSON.stringify(next)) await core.writeJson(destination, next);
       }
       await core.writeJson(await core.local(project.root, path.relative(project.root, path.join(directory, 'common/expression.schema.json'))), { anyOf: [{ type: 'string' }, { type: 'number' }], description: 'Molang expression: a string expression or numeric literal.' });
-      for(const [relative,schema]of Object.entries(OWNED))await core.writeJson(await core.local(project.root,path.relative(project.root,path.join(directory,relative))),schema);
-      await core.writeJson(marker, { build: BUILD, version: VERSION });
+      for(const [relative,schema]of Object.entries(OWNED)){if(relative==='bp/entities/index.schema.json'&&!legacyTarget)continue;const kind={blocks:'block',items:'item',entities:'entity'}[relative.split('/')[1]];await core.writeJson(await core.local(project.root,path.relative(project.root,path.join(directory,relative))),kind?require('./format-versions.cjs').apply(schema,kind,project.config.targetVersion):schema);}
+      await core.writeJson(marker, { build: BUILD, version: VERSION,target:project.config.targetVersion });
     }
-    const mappings = routes();
-    return { version: VERSION, directory, routes: mappings, associations: mappings.map(route => ({ fileMatch: route.patterns.map(p => (p.startsWith('!') ? '!' : '') + path.join(project.packs[route.side], p.replace(/^!/, '')).replaceAll(path.sep, '/')), url: pathToFileURL(path.join(directory, route.relative)).href })) };
+    const mappings = routes().filter(route=>!legacyTarget||Object.hasOwn(OWNED,route.relative));
+    return { version: VERSION, ownedOnly:legacyTarget, directory, routes: mappings, associations: mappings.map(route => ({ fileMatch: route.patterns.map(p => (p.startsWith('!') ? '!' : '') + path.join(project.packs[route.side], p.replace(/^!/, '')).replaceAll(path.sep, '/')), url: pathToFileURL(path.join(directory, route.relative)).href })) };
   })().catch(error => { preparing.delete(cacheKey); throw error; }));
   return preparing.get(cacheKey);
 }

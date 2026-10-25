@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.16.0 — October 24, 2026
+
+- Add shared format-version checks for document/engine compatibility, block/item/entity component and field minima, permutations, component groups, and custom-component syntax.
+- Apply version-aware native schemas and metadata suggestions without overlapping unversioned static BP schemas. Keep owned authoring available for older targets.
+- Suggest formats from compatible sample documents and matching saved project files, while preserving existing document versions and numeric manifest schema versions.
+- Add an explicit refresh tool for official documentation requirements and regression tests distinguishing field minima from component minima. Unknown historical/experimental requirements remain permissive.
+
 ## 0.15.1 — October 24, 2026
 
 - Suggest vanilla creative inventory groups and saved custom catalog groups for block and item menu categories, using legacy spelling for older format versions.

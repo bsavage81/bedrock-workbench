@@ -45,6 +45,7 @@ async function validateProject(root, {vanillaSource}={}) {
         if (!unavailable.has(folder)) { unavailable.add(folder); issues.push(at(document, [], `Official schema check unavailable for ${folder}: ${error.message}`, 'information')); }
       }
     }
+    issues.push(...require('./format-versions.cjs').issues(document,project));
     issues.push(...content.referenceIssues(index, document,{includeIgnored:true}), ...content.customComponentIssues(index, document), ...content.molangIssues(document));
   }
   for (const type of ['entity', 'item', 'block', 'client_entity', 'geometry', 'animation', 'animation_controller', 'render_controller']) for (const [id, files] of index.values(type)) {
@@ -57,6 +58,6 @@ async function validateProject(root, {vanillaSource}={}) {
     for (const duplicates of groups.values()) if (duplicates.length > 1) for (const file of duplicates) issues.push({ file, offset: 0, length: 1, severity: 'warning', message: `Duplicate ${type.replaceAll('_', ' ')} identifier '${id}' in this pack.` });
   }
   const filtered=require('./validation-ignores.cjs').partition(project,issues);
-  return { files: index.documents.size, schemaVersion: prepared.directory ? schemas.VERSION : null, vanillaSources:[...(index.reference?.tag?[{type:'samples',tag:index.reference.tag,engine:index.reference.engine}]:[]),...(index.localReference?[{type:'installed',...index.localReference.source}]:[])],referenceWarning:index.referenceWarning, issues:filtered.active,suppressedIssues:filtered.suppressed };
+  return { files: index.documents.size, schemaVersion: prepared.directory && !prepared.ownedOnly ? schemas.VERSION : null, vanillaSources:[...(index.reference?.tag?[{type:'samples',tag:index.reference.tag,engine:index.reference.engine}]:[]),...(index.localReference?[{type:'installed',...index.localReference.source}]:[])],referenceWarning:index.referenceWarning, issues:filtered.active,suppressedIssues:filtered.suppressed };
 }
 module.exports = { validateProject };

@@ -19,15 +19,16 @@ function attach(vscode, context, getProject, output) {
     const kind = { blocks: 'block', items: 'item', entities: 'entity' }[rel.split('/')[0]];
     if (!kind) return;
     const text = document.getText(), location = json.getLocation(text, document.offsetAt(position));
-    const keys = location.path, c = keys.lastIndexOf('components');
+    const keys = location.path, c = kind==='entity'&&keys[1]==='component_groups'?2:keys.lastIndexOf('components');
     if (c < 0 || keys[0] !== `minecraft:${kind}`) return;
-    if (c !== 1 && !(c === 3 && ((keys[1] === 'permutations' && typeof keys[2] === 'number') || (kind === 'entity' && keys[1] === 'component_groups')))) return;
+    if (c !== 1 && !(kind==='entity'&&c===2&&keys[1]==='component_groups') && !(c === 3 && ((keys[1] === 'permutations' && typeof keys[2] === 'number') || (kind === 'entity' && keys[1] === 'component_groups')))) return;
     const components = index.components[kind];
     return { text, location, keys, c, kind, components };
   }
-  function markdown(value, kind, component) {
+  function markdown(value, kind, component, field) {
     const md = new vscode.MarkdownString();
     md.appendMarkdown(value.description || 'Mojang component documentation.');
+    const requirement=require('./format-versions.cjs').rule(kind,component),minimum=(field?requirement?.fields?.[field]:requirement)?.min;if(minimum)md.appendText('\n\nMinimum format version: '+minimum+'.');
     if (value.type) md.appendText(`\n\nType: ${value.type}`);
     if (value.default !== undefined) md.appendText(`\nDefault: ${JSON.stringify(value.default)}`);
     md.appendText(`\n\nReference data: Mojang ${index.tag}.`);
@@ -52,9 +53,10 @@ function attach(vscode, context, getProject, output) {
         const parent = json.findNodeAtLocation(json.parseTree(data.text), data.keys.slice(0, -1));
         const existing = new Set(parent?.children?.map(n => n.children?.[0]?.value));
         const previous = data.location.previousNode;
-        return Object.entries(values).filter(([name]) => !existing.has(name) || name === data.keys.at(-1)).map(([name, value]) => {
+        const format=json.findNodeAtLocation(json.parseTree(data.text),['format_version'])?.value;
+        return Object.entries(values).filter(([name])=>require('./format-versions.cjs').supported(data.kind,level===1?name:data.keys[data.c+1],format,getProject()?.config.targetVersion,level===2?name:undefined)).filter(([name]) => !existing.has(name) || name === data.keys.at(-1)).map(([name, value]) => {
           const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Property);
-          item.documentation = markdown(value, data.kind, level === 1 ? name : data.keys[data.c + 1]); item.detail = `Mojang ${index.tag}`;
+          item.documentation = markdown(value, data.kind, level === 1 ? name : data.keys[data.c + 1],level===2?name:undefined); item.detail = `Mojang ${index.tag}`;
           // Replace only the content inside existing quotes; JSON service handles values.
           if (previous?.type === 'property' && previous.offset <= document.offsetAt(position)) {
             item.range = new vscode.Range(document.positionAt(previous.offset + 1), document.positionAt(previous.offset + previous.length - 1)); item.insertText = name;

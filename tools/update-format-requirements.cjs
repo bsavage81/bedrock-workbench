@@ -1,0 +1,3 @@
+// Explicit refresh: extract facts from Microsoft's documentation source, not schema implementations.
+const fs=require('node:fs/promises');const {extract}=require('./extract-format-requirements.cjs');
+(async()=>{const response=await fetch('https://codeload.github.com/MicrosoftDocs/minecraft-creator/zip/refs/heads/main',{signal:AbortSignal.timeout(60000)});if(!response.ok)throw Error('Documentation archive: '+response.status);const output=extract(new Uint8Array(await response.arrayBuffer()));await fs.writeFile('src/format-requirements.json',JSON.stringify(output,null,2)+'\n');console.log(Object.fromEntries(Object.entries(output.components).map(([k,v])=>[k,Object.keys(v).length])));})().catch(e=>{console.error(e);process.exitCode=1;});

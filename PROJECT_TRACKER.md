@@ -232,3 +232,12 @@ Remaining: general function argument flow, external package types, unsaved scrip
 - [x] Vanilla and saved custom catalog group suggestions for block/item menu categories, with legacy spelling by format version.
 - [x] Original crafting catalog schema, group starters, icon/content item references, custom group navigation, and refresh on catalog changes.
 - [x] New/custom group names remain valid, including names supplied by other packs.
+
+### Format compatibility
+
+- [x] A shared format engine checks declared JSON document versions against the target engine and uses explicit official component/field minima for block/item/entity suggestions and warnings.
+- [x] Check root components, block permutations and entity component groups; distinguish field requirements from whole-component requirements, including material instance nesting.
+- [x] Apply native JSON schema conditionals to audited shapes and filter metadata/script completions; legacy direct custom-component syntax gets migration warnings.
+- [x] Suggest document formats from matching compatible samples, saved files of the same family, and documented BP component boundaries. Keep manifests' numeric schema versions separate.
+- [x] Remove unversioned static BP schema overlap and preserve owned schema authoring for older targets without attaching the newer Mojang fallback catalog.
+- [ ] Continue auditing historical removals, shape changes, experiment-specific exceptions and unsupported document families. Unknown requirements remain permissive.
