@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.23.1 — October 25, 2026
+
+- Add the supplied Bedrock Workbench logo as the extension icon and include a tester installation guide with the release.
+
 ## 0.23.0 — October 25, 2026
 
 - Add a Create New Project wizard for project name/location, Release/Preview target, pack icon, experiments and JavaScript/TypeScript with stable or beta Script APIs. Generate BP/RP folders, linked manifests, distinct beta/stable identities and optional matching typings. Rename the existing setup command to Initialize Existing Project.

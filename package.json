@@ -2,7 +2,8 @@
   "name": "bedrock-workbench",
   "displayName": "Bedrock Workbench",
   "description": "Build, deploy and export Minecraft Bedrock add-ons with separate beta and stable profiles.",
-  "version": "0.23.0",
+  "version": "0.23.1",
+  "icon": "media/bedrock-workbench.png",
   "publisher": "bsavage81",
   "license": "UNLICENSED",
   "engines": {

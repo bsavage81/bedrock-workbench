@@ -1,4 +1,5 @@
 projects/**
+dist/**
 test/**
 tools/**
 .git/**

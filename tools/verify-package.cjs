@@ -7,6 +7,13 @@ const { unzipSync } = require('fflate');
   const archive = unzipSync(await fs.readFile(`bedrock-workbench-win32-x64-${version}.vsix`));
   assert.match(Buffer.from(archive['extension.vsixmanifest']).toString(), /TargetPlatform="win32-x64"/);
   assert.ok(!Object.keys(archive).some(file => file.startsWith('extension/projects/')));
+  assert.ok(!Object.keys(archive).some(file => file.startsWith('extension/dist/')));
+  const extensionPackage=JSON.parse(Buffer.from(archive['extension/package.json']).toString());
+  assert.equal(extensionPackage.icon,'media/bedrock-workbench.png');
+  const logo=archive['extension/'+extensionPackage.icon];assert.ok(logo,'Extension logo missing from VSIX');
+  assert.deepEqual(Buffer.from(logo),await fs.readFile(extensionPackage.icon),'Packaged logo differs from the supplied image');
+  const dimensions=require('pngjs').PNG.sync.read(Buffer.from(logo));assert.ok(dimensions.width>=128&&dimensions.width===dimensions.height);
+  assert.ok(archive['extension/TESTING.md'],'Tester guide missing from VSIX');
   const base = path.resolve('.test-temp'); await fs.mkdir(base, { recursive: true });
   const unpacked = await fs.mkdtemp(path.join(base, 'packaged-'));
   for (const [relative, bytes] of Object.entries(archive)) {

@@ -14,6 +14,8 @@ This is completion assistance rather than a full command validator. Runtime-gene
 
 ## Start
 
+For a shareable test build, give testers the Windows `.vsix` release file or the tester ZIP containing that file and [installation instructions](TESTING.md). Installing from VSIX does not require access to this private repository.
+
 1. Install the local `.vsix` using VS Code's **Extensions: Install from VSIX** command.
 2. Run **Bedrock: Create New Project** to create a new add-on, or open an existing project containing `bedrock-project.json`. For an existing standard add-on with `BP` and `RP`, run **Bedrock: Initialize Existing Project** once.
 3. Open the Bedrock activity-bar sidebar. Choose **Build beta** to compile without deploying.
