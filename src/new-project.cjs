@@ -1,4 +1,5 @@
 const fs=require('node:fs/promises'),path=require('node:path'),{randomUUID}=require('node:crypto'),{PNG}=require('pngjs');
+const {COPYFILE_EXCL}=require('node:fs').constants;
 const core=require('./core.cjs'),scripts=require('./scripts.cjs');
 function validateName(name){return typeof name!=='string'||!name.trim()?'Enter a project name.':name.trim().length>100?'Use a project name of 100 characters or fewer.':/[\x00-\x1f]/.test(name)?'Project names cannot contain control characters.':undefined;}
 function folderName(name){let value=name.trim().replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').replace(/[. ]+$/,'');if(!value||/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(value))value='Project_'+value;return value;}
@@ -7,6 +8,14 @@ function validateScript(selection,config){const parsed=scripts.variant(selection
 async function selectScript(config,{fetchImpl=globalThis.fetch}={}){const response=await fetchImpl('https://registry.npmjs.org/%40minecraft%2Fserver',{headers:{Accept:'application/json'},signal:AbortSignal.timeout(10000)});if(!response.ok)throw new Error('Script API registry returned HTTP '+response.status);const metadata=await response.json();if(metadata.name&&metadata.name!=='@minecraft/server')throw new Error('Unexpected Script API metadata.');const selected=scripts.selectVersion(metadata,config);validateScript(selected,config);return {...selected,peers:metadata.versions[selected.version]?.peerDependencies||{}};}
 function placeholderIcon(){const icon=new PNG({width:128,height:128});for(let y=0;y<128;y++)for(let x=0;x<128;x++){const offset=(y*128+x)*4,edge=x<8||y<8||x>119||y>119,top=y<45;icon.data.set(edge?[30,43,51,255]:top?[87,174,106,255]:((x>>4)+(y>>4))%2?[112,79,53,255]:[133,94,62,255],offset);}return PNG.sync.write(icon);}
 const folders={BP:['blocks','entities','items','recipes','loot_tables','functions','spawn_rules','trading','animations','animation_controllers'],RP:['entity','attachables','models/entity','textures/blocks','textures/items','texts','animations','animation_controllers','render_controllers','particles','sounds','ui']};
+async function copyIntoClaimedDirectory(source,destination){
+ for(const entry of await fs.readdir(source,{withFileTypes:true})){
+  const from=path.join(source,entry.name),to=path.join(destination,entry.name);
+  if(entry.isDirectory()){await fs.mkdir(to);await copyIntoClaimedDirectory(from,to);}
+  else if(entry.isFile())await fs.copyFile(from,to,COPYFILE_EXCL);
+  else throw new Error('Unexpected non-file in generated project: '+from);
+ }
+}
 async function create(options){
  const name=options.name?.trim(),invalid=validateName(name);if(invalid)throw new Error(invalid);
  const root=path.resolve(options.root),target=options.target||'release',targetVersion=core.parseVersion(options.targetVersion).join('.'),language=options.scripting||'none';
@@ -41,7 +50,7 @@ async function create(options){
   await core.loadProject(stage);
   // Claim the destination exclusively, even if another process creates it while
   // the wizard is open. Copies must never replace an existing source file.
-  await fs.mkdir(root);claimed=true;await fs.cp(stage,root,{recursive:true,force:false,errorOnExist:true});
+  await fs.mkdir(root);claimed=true;await copyIntoClaimedDirectory(stage,root);
   return await core.loadProject(root);
  }catch(error){if(claimed)throw new Error('Project creation could not finish. Created files are preserved at '+root+'. '+error.message,{cause:error});throw error;}
  finally{if(core.inside(parent,stage)&&path.basename(stage).startsWith('.bedrock-new-'))await fs.rm(stage,{recursive:true,force:true});}
