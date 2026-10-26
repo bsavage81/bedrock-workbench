@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.24.0 — October 26, 2026
+
+- Add an independently authored client-entity schema with Learn-linked field hovers, legacy/modern layouts and a documentation/sample coverage audit.
+- Complete client links to materials, geometry, texture images, spawn-egg atlas entries, animations, particles, sounds and behavior definitions. Scope animation suggestions to BP/RP, and support owned particle/sound aliases in controllers and animation timelines.
+
 ## 0.23.1 — October 25, 2026
 
 - Add the supplied Bedrock Workbench logo as the extension icon and include a tester installation guide with the release.

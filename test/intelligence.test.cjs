@@ -46,11 +46,12 @@ test('incremental index refresh removes renamed identifiers, deleted textures, a
 });
 test('older targets receive version-aware owned schemas without newer Mojang fallback routes', async t => {
   const project = await fixture(t); project.config.targetVersion = '1.21.0';
-  const prepared=await schemas.prepare(project);assert.ok(prepared.associations.length);assert.ok(prepared.routes.some(r=>r.relative==='bp/blocks/index.schema.json'));assert.ok(!prepared.routes.some(r=>r.relative==='rp/entity/index.schema.json'));assert.ok(!prepared.routes.some(r=>r.relative==='bp/features/index.schema.json'));
+  const prepared=await schemas.prepare(project);assert.ok(prepared.associations.length);assert.ok(prepared.routes.some(r=>r.relative==='bp/blocks/index.schema.json'));assert.ok(prepared.routes.some(r=>r.relative==='rp/entity/index.schema.json'));assert.ok(!prepared.routes.some(r=>r.relative==='rp/attachables/index.schema.json'));assert.ok(!prepared.routes.some(r=>r.relative==='bp/features/index.schema.json'));
 });
 test('content indexing supplies identifiers, textures, geometry and reference diagnostics without treating vanilla IDs as missing', async t => {
   const project = await fixture(t);
   await core.writeJson(path.join(project.packs.behavior, 'items/custom.json'), { format_version: '1.26.50', 'minecraft:item': { description: { identifier: 'test:item' }, components: {} } });
+  await core.writeJson(path.join(project.packs.behavior,'entities/custom.json'),{format_version:'1.26.50','minecraft:entity':{description:{identifier:'test:mob'}}});
   await core.writeJson(path.join(project.packs.resource, 'models/entity/custom.geo.json'), { format_version: '1.12.0', 'minecraft:geometry': [{ description: { identifier: 'geometry.test' }, bones: [] }] });
   await fs.mkdir(path.join(project.packs.resource, 'textures/entity'), { recursive: true }); await fs.writeFile(path.join(project.packs.resource, 'textures/entity/test.png'), 'image');
   await core.writeJson(path.join(project.packs.resource, 'entity/custom.json'), { format_version: '1.10.0', 'minecraft:client_entity': { description: { identifier: 'test:mob', textures: { default: 'textures/entity/test', missing: 'textures/entity/other' }, geometry: { default: 'geometry.test' } } } });

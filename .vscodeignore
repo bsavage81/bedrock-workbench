@@ -5,6 +5,8 @@ tools/**
 .git/**
 .vscode/**
 *.vsix
+*.7z
+*.zip
 COPY_VERIFICATION.json
 HOST_VERIFICATION.json
 package-lock.json

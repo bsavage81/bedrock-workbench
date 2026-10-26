@@ -268,3 +268,12 @@ Remaining: general function argument flow, external package types, unsaved scrip
 - [x] Filter experiment choices by lifecycle and channel; record requirements and keep Minecraft world settings separate.
 - [x] Generate BP/RP folders, linked manifests, stable/beta UUID profiles, icons, language files and starter code with version 1.0.0.
 - [x] Review before writing, cancellation without creating files, exclusive destination ownership and preservation of existing folders.
+
+### Resource-pack client entities
+
+- [x] Independent client-entity schema with Learn field hovers and legacy/current layouts.
+- [x] Audit 39 documented fields and 217 vanilla/project client payloads, including detection of newly documented or sampled fields.
+- [x] Material declarations, spawn-egg atlas keys, effect references, exact declaration navigation and bidirectional BP/client links.
+- [x] BP/RP-scoped animation suggestions, ownership-based sound/particle aliases and legacy controller bindings.
+- [x] Reuse Molang assistance in render controllers.
+- [ ] Extend independent payload schemas and field inventories to full animation, animation-controller, render-controller and attachable documents.

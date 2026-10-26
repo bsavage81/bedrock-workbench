@@ -1,0 +1,56 @@
+{
+  "revision": "4432fb62a8e0ce5c785bd2bf02a6f981dcffbbe8",
+  "sources": [
+    {
+      "path": "creator/Reference/Content/VisualReference/actor_resource_definition.v1.10.0.md",
+      "sha": "70975063bc480f0c929a8d87e9650997fc81ec50",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.10.0?view=minecraft-bedrock-stable"
+    },
+    {
+      "path": "creator/Reference/Content/VisualReference/actor_resource_definition.v1.26.0.md",
+      "sha": "7010c6e52e475b8eff87155f42f7954329d7e906",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable"
+    }
+  ],
+  "fields": [
+    "format_version",
+    "minecraft:client_entity",
+    "minecraft:client_entity/description",
+    "minecraft:client_entity/description/animations",
+    "minecraft:client_entity/description/enable_attachables",
+    "minecraft:client_entity/description/geometry",
+    "minecraft:client_entity/description/held_item_ignores_lighting",
+    "minecraft:client_entity/description/hide_armor",
+    "minecraft:client_entity/description/identifier",
+    "minecraft:client_entity/description/item",
+    "minecraft:client_entity/description/materials",
+    "minecraft:client_entity/description/min_engine_version",
+    "minecraft:client_entity/description/particle_effects",
+    "minecraft:client_entity/description/particle_emitters",
+    "minecraft:client_entity/description/queryable_geometry",
+    "minecraft:client_entity/description/render_controllers",
+    "minecraft:client_entity/description/scripts",
+    "minecraft:client_entity/description/scripts/animate",
+    "minecraft:client_entity/description/scripts/hide_held_items",
+    "minecraft:client_entity/description/scripts/initialize",
+    "minecraft:client_entity/description/scripts/parent_setup",
+    "minecraft:client_entity/description/scripts/pre_animation",
+    "minecraft:client_entity/description/scripts/scale",
+    "minecraft:client_entity/description/scripts/scaleX",
+    "minecraft:client_entity/description/scripts/scaleY",
+    "minecraft:client_entity/description/scripts/scaleZ",
+    "minecraft:client_entity/description/scripts/scalex",
+    "minecraft:client_entity/description/scripts/scaley",
+    "minecraft:client_entity/description/scripts/scalez",
+    "minecraft:client_entity/description/scripts/should_update_bones_and_effects_offscreen",
+    "minecraft:client_entity/description/scripts/should_update_effects_offscreen",
+    "minecraft:client_entity/description/scripts/variables",
+    "minecraft:client_entity/description/sound_effects",
+    "minecraft:client_entity/description/spawn_egg",
+    "minecraft:client_entity/description/spawn_egg/base_color",
+    "minecraft:client_entity/description/spawn_egg/overlay_color",
+    "minecraft:client_entity/description/spawn_egg/texture",
+    "minecraft:client_entity/description/spawn_egg/texture_index",
+    "minecraft:client_entity/description/textures"
+  ]
+}

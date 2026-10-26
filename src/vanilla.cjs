@@ -4,9 +4,10 @@ const json=require('jsonc-parser');
 const core=require('./core.cjs');
 const {compareVersions}=require('./releases.cjs');
 function collector() {
-  const values=new Map(),referenced=new Map(),nameKeys={item:{},block:{}};
+  const values=new Map(),referenced=new Map(),nameKeys={item:{},block:{}},bySide={behavior:new Map(),resource:new Map()};
   const add=(kind,id)=>{if(typeof id!=='string'||!id)return; if(!values.has(kind))values.set(kind,new Set());values.get(kind).add(id);};
   const used=(kind,id)=>{if(typeof id!=='string'||!id||/[\s?()[\]{}]/.test(id))return;id=kind==='entity'?id.replace(/<[^<>]*>$/,''):kind==='item'?id.replace(/:\d+$/,''):id;if(['item','block','entity'].includes(kind)&&!id.includes(':'))id='minecraft:'+id;if(!referenced.has(kind))referenced.set(kind,new Set());referenced.get(kind).add(id);};
+  const bindings=value=>typeof value==='string'?[value]:Object.values(value||{});
   function file(side,relative,data) {
     relative=relative.replaceAll('\\','/');
     if(side==='behavior') {
@@ -36,6 +37,7 @@ function collector() {
     } else {
       add('client_entity',data?.['minecraft:client_entity']?.description?.identifier);
       add('particle',data?.particle_effect?.description?.identifier);
+      if(relative.startsWith('materials/'))for(const [id,value]of Object.entries(data?.materials||{}))if(id!=='version'&&value&&typeof value==='object')add('material',id.split(':')[0]);
       for(const geometry of Array.isArray(data?.['minecraft:geometry'])?data['minecraft:geometry']:[]) add('geometry',geometry?.description?.identifier);
       for(const id of Object.keys(data||{})) if(id.startsWith('geometry.'))add('geometry',id);
       for(const kind of ['terrain_texture','item_texture']) if(relative==='textures/'+kind+'.json') for(const [id,value]of Object.entries(data?.texture_data||{})) {
@@ -46,19 +48,23 @@ function collector() {
       for(const id of Object.keys(data?.sound_definitions||{}))add('sound',id);
       if(/^textures\/.*\.(png|tga|jpe?g)$/i.test(relative))add('texture',relative.replace(/\.[^.]+$/,''));
       const description=(data?.['minecraft:client_entity']||data?.['minecraft:attachable'])?.description;
+      for(const id of bindings(description?.materials))used('material',id);
+      for(const id of bindings(description?.geometry))used('geometry',id);
+      for(const [key,kind]of [['sound_effects','sound'],['particle_effects','particle'],['particle_emitters','animation']])for(const id of bindings(description?.[key]))used(kind,id);
       const particleTexture=data?.particle_effect?.description?.basic_render_parameters?.texture;
       if(typeof particleTexture==='string'&&particleTexture.startsWith('textures/'))used('texture',particleTexture.replace(/\.(png|tga|jpe?g)$/i,''));
-      for(const texture of Object.values(description?.textures||{}))if(typeof texture==='string'&&texture.startsWith('textures/'))used('texture',texture.replace(/\.(png|tga|jpe?g)$/i,''));
-      for(const id of Object.values(description?.animations||{}))if(typeof id==='string') {
+      for(const texture of bindings(description?.textures))if(typeof texture==='string'&&texture.startsWith('textures/'))used('texture',texture.replace(/\.(png|tga|jpe?g)$/i,''));
+      for(const id of bindings(description?.animations))if(typeof id==='string') {
         if(id.startsWith('animation.'))used('animation',id);
         if(id.startsWith('controller.animation.'))used('animation_controller',id);
       }
-      for(const entry of description?.render_controllers||[])for(const id of typeof entry==='string'?[entry]:Object.keys(entry||{}))if(id.startsWith('controller.render.'))used('render_controller',id);
+      for(const entry of Array.isArray(description?.animation_controllers)?description.animation_controllers:[])for(const id of bindings(entry))used('animation_controller',id);
+      for(const entry of typeof description?.render_controllers==='string'?[description.render_controllers]:description?.render_controllers||[])for(const id of typeof entry==='string'?[entry]:Object.keys(entry||{}))if(id.startsWith('controller.render.'))used('render_controller',id);
     }
-    for(const [key,kind]of [['animations','animation'],['animation_controllers','animation_controller'],['render_controllers','render_controller']])for(const id of Object.keys(data?.[key]||{}))add(kind,id);
+    for(const [key,kind]of [['animations','animation'],['animation_controllers','animation_controller'],['render_controllers','render_controller']]){if(!bySide[side].has(kind))bySide[side].set(kind,new Set());for(const id of Object.keys(data?.[key]||{})){add(kind,id);bySide[side].get(kind).add(id);}}
   }
   const finish=map=>Object.fromEntries([...map].map(([kind,ids])=>[kind,[...ids].sort()]));
-  return {add,file,names:()=>nameKeys,finish:()=>finish(values),references:()=>finish(referenced)};
+  return {add,file,names:()=>nameKeys,finish:()=>finish(values),references:()=>finish(referenced),bySide:()=>Object.fromEntries(Object.entries(bySide).map(([side,entries])=>[side,finish(entries)]))};
 }
 function merge(reference,local) {
   if(!local)return reference;
@@ -66,9 +72,10 @@ function merge(reference,local) {
   for(const [kind,ids]of Object.entries(local.vanilla||{}))vanilla[kind]=[...new Set([...(vanilla[kind]||[]),...ids])];
   const vanillaReferences={...reference?.vanillaReferences};
   for(const [kind,ids]of Object.entries(local.vanillaReferences||{}))vanillaReferences[kind]=[...new Set([...(vanillaReferences[kind]||[]),...ids])];
-  return {...reference,vanilla,vanillaReferences,languages:[...(reference?.languages||[]),...(local.languages||[])],vanillaNames:Object.fromEntries(['item','block'].map(kind=>[kind,Object.fromEntries([...new Set([...Object.keys(reference?.vanillaNames?.[kind]||{}),...Object.keys(local.vanillaNames?.[kind]||{})])].map(id=>[id,[...new Set([...(local.vanillaNames?.[kind]?.[id]||[]),...(reference?.vanillaNames?.[kind]?.[id]||[])])]]))])),localSource:local.source};
+  const vanillaBySide=Object.fromEntries(['behavior','resource'].map(side=>[side,Object.fromEntries([...new Set([...Object.keys(reference?.vanillaBySide?.[side]||{}),...Object.keys(local.vanillaBySide?.[side]||{})])].map(kind=>[kind,[...new Set([...(reference?.vanillaBySide?.[side]?.[kind]||[]),...(local.vanillaBySide?.[side]?.[kind]||[])])]]))]));
+  return {...reference,vanilla,vanillaReferences,vanillaBySide,languages:[...(reference?.languages||[]),...(local.languages||[])],vanillaNames:Object.fromEntries(['item','block'].map(kind=>[kind,Object.fromEntries([...new Set([...Object.keys(reference?.vanillaNames?.[kind]||{}),...Object.keys(local.vanillaNames?.[kind]||{})])].map(id=>[id,[...new Set([...(local.vanillaNames?.[kind]?.[id]||[]),...(reference?.vanillaNames?.[kind]?.[id]||[])])]]))])),localSource:local.source};
 }
-const allowed=(side,relative)=>side==='behavior'? /^(blocks|items|entities|loot_tables|functions|recipes|trading)\//.test(relative) : /^(texts|models|entity|attachables|animations|animation_controllers|render_controllers|particles|textures|sounds)\//.test(relative);
+const allowed=(side,relative)=>side==='behavior'? /^(blocks|items|entities|loot_tables|functions|recipes|trading)\//.test(relative) : /^(texts|models|entity|attachables|animations|animation_controllers|render_controllers|particles|textures|sounds|materials)\//.test(relative);
 async function local(project,{force=false}={}) {
   const source=project.vanillaSource;
   if(!source)return;
@@ -76,7 +83,7 @@ async function local(project,{force=false}={}) {
   if(compareVersions(source.version,project.config.targetVersion)>0)throw Error(`Installed vanilla ${source.version} is newer than target ${project.config.targetVersion}; using samples instead.`);
   const cacheFile=await core.local(project.root,'.bedrock/reference/local-'+project.config.target+'.json');
   const cached=await core.readJson(cacheFile).catch(()=>null);
-  const same=cached?.indexVersion===6 && cached?.source?.folder===source.folder && cached.source.version===source.version && cached.source.channel===project.config.target;
+  const same=cached?.indexVersion===7 && cached?.source?.folder===source.folder && cached.source.version===source.version && cached.source.channel===project.config.target;
   if(!force && same && Date.now()-cached.updated<86400000)return cached;
   const root=await fs.realpath(source.folder), packs=[];
   // Inspect only expected layouts beneath the explicitly selected directory.
@@ -104,7 +111,7 @@ async function local(project,{force=false}={}) {
       if(entry.isDirectory()){if(allowed(pack.side,rel+'/'))await walk(pack,file,rel);continue;}
       if(!entry.isFile()||!allowed(pack.side,rel))continue;
       if(pack.side==='resource'&&/^texts\/[^/]+\.lang$/.test(rel)){const stat=await fs.stat(file);if(stat.size>2*1024*1024)continue;bytes+=stat.size;if(bytes>128*1024*1024)throw Error('Vanilla reference data exceeds the size limit');languages.push(require('./localization.cjs').vanillaDocument(await fs.readFile(file,'utf8'),file));continue;}
-      if(!/\.json$/i.test(rel)){index.file(pack.side,rel);continue;}
+      if(!/\.(json|material)$/i.test(rel)){index.file(pack.side,rel);continue;}
       const stat=await fs.stat(file);if(stat.size>8*1024*1024)continue;
       bytes+=stat.size;if(bytes>128*1024*1024)throw Error('Vanilla JSON reference data exceeds the size limit');
       const errors=[],data=json.parse((await fs.readFile(file,'utf8')).replace(/^\uFEFF/,''),errors,{allowTrailingComma:true});
@@ -112,7 +119,7 @@ async function local(project,{force=false}={}) {
     }
   }
   for(const pack of packs)await walk(pack,pack.folder);
-  const result={indexVersion:6,source:{...source,channel:project.config.target},updated:Date.now(),languages,vanillaNames:index.names(),vanilla:index.finish(),vanillaReferences:index.references(),packs:packs.length};
+  const result={indexVersion:7,source:{...source,channel:project.config.target},updated:Date.now(),languages,vanillaNames:index.names(),vanilla:index.finish(),vanillaReferences:index.references(),vanillaBySide:index.bySide(),packs:packs.length};
   if(!Object.keys(result.vanilla).length)throw Error('The selected packs did not contain readable vanilla identifiers');
   await core.writeJson(cacheFile,result);return result;
 }

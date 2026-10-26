@@ -5,6 +5,13 @@ const path=require('node:path');
 const json=require('jsonc-parser');
 const vanilla=require('../src/vanilla.cjs');
 const content=require('../src/content.cjs');
+
+test('vanilla resource suggestions include used materials and preserve BP/RP animation scopes',()=>{
+ const index=vanilla.collector();index.file('behavior','animations/server.json',{animations:{'animation.server_only':{}}});index.file('resource','animations/client.json',{animations:{'animation.client_only':{}}});index.file('resource','materials/test.material',{materials:{version:'1.0.0','custom:entity':{}}});index.file('resource','entity/client.json',{'minecraft:client_entity':{description:{materials:{default:'entity_alphatest'},geometry:{default:'geometry.engine'},sound_effects:{step:'engine.step'}}}});
+ const source={vanilla:index.finish(),vanillaReferences:index.references(),vanillaBySide:index.bySide()},project={packs:{behavior:path.resolve('BP'),resource:path.resolve('RP')}},state=new content.ContentIndex(project);state.reference=source;
+ const values=content.referenceValues(state,'animation',{side:'resource'});assert.ok(values.has('animation.client_only'));assert.ok(!values.has('animation.server_only'));assert.ok(content.referenceValues(state,'material',{side:'resource'}).has('entity_alphatest'));assert.ok(content.referenceValues(state,'material',{side:'resource'}).has('custom'));
+ const merged=vanilla.merge(source,{vanilla:{},vanillaBySide:{resource:{animation:['animation.installed']}},source:{}});assert.deepEqual(merged.vanillaBySide.resource.animation,['animation.client_only','animation.installed']);assert.deepEqual(merged.vanillaBySide.behavior.animation,['animation.server_only']);
+});
 test('vanilla identifiers are checked when cataloged, with unknowns informational and aliases accepted',()=>{
   const text=JSON.stringify({'minecraft:recipe_shapeless':{ingredients:[{item:'minecraft:diamond'},{item:'diamond'},{item:'minecraft:diamnod'},{item:'other:external'}]}});
   const document={side:'behavior',relative:'recipes/test.json',file:'test.json',text,tree:json.parseTree(text)};

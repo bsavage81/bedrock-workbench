@@ -17,6 +17,31 @@ test('language parser preserves values, embedded equals, comments, offsets and l
  const index={project:{packs:{resource:path.resolve('RP')}},languages:new Map([['de',lang.parse('key=Fisch','de_DE.lang')],['en',lang.parse('key=Fish','en_US.lang')]])};assert.deepEqual(lang.lookup(index,'key').map(e=>e.locale),['en_US','de_DE']);assert.equal(lang.resolve(index,'%key')[0].entries[0].value,'Fish');
 });
 async function fixture(t){await fs.mkdir('.test-temp',{recursive:true});const root=await fs.mkdtemp(path.resolve('.test-temp/entity-authoring-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));const packs={behavior:path.join(root,'BP'),resource:path.join(root,'RP')};for(const relative of ['BP/entities','BP/scripts','RP/entity','RP/texts','RP/ui'])await fs.mkdir(path.join(root,relative),{recursive:true});const write=(relative,data)=>fs.writeFile(path.join(root,relative),typeof data==='string'?data:JSON.stringify(data));return {root,packs,write};}
+
+test('client resources resolve materials, spawn-egg atlas entries, effects and accurate definition positions',async t=>{
+ const f=await fixture(t);for(const folder of ['RP/materials','RP/models','RP/textures','RP/sounds','RP/particles','BP/animations','RP/animations'])await fs.mkdir(path.join(f.root,folder),{recursive:true});
+ await f.write('BP/entities/fish.json',{'minecraft:entity':{description:{identifier:'test:fish'}}});
+ await f.write('RP/materials/fish.material',{materials:{version:'1.0.0','fish:entity_alphatest':{}}});
+ await f.write('RP/models/fish.json',{'minecraft:geometry':[{description:{identifier:'geometry.test.fish'}}]});
+ await f.write('RP/textures/item_texture.json',{texture_data:{fish_egg:{textures:'textures/fish'}}});await fs.writeFile(path.join(f.root,'RP/textures/fish.png'),'texture fixture');
+ await f.write('RP/sounds/sound_definitions.json',{sound_definitions:{'test:swim':{sounds:[]}}});await f.write('RP/particles/wake.json',{particle_effect:{description:{identifier:'test:wake'}}});
+ await f.write('BP/animations/server.json',{animations:{'animation.test.server':{}}});await f.write('RP/animations/client.json',{animations:{'animation.test.client':{}}});
+ await f.write('RP/entity/fish.json',{'minecraft:client_entity':{description:{identifier:'test:fish',materials:{default:'fish'},geometry:{default:'geometry.test.fish'},textures:{default:'textures/fish.png'},animations:{swim:'animation.test.client'},particle_effects:{wake:'test:wake'},sound_effects:{swim:'test:swim'},spawn_egg:{texture:'fish_egg'}}}});
+ const index=await content.scan({...f,config:{}}),client=index.documents.get(path.join(f.root,'RP/entity/fish.json')),refs=content.references(client);for(const type of ['entity','material','geometry','texture','animation','particle','sound','item_texture'])assert.ok(refs.some(ref=>ref.type===type),type);assert.deepEqual(content.referenceIssues(index,client),[]);
+ for(const ref of refs){const result=content.referenceDefinitions(index,ref.type,ref.value,client);assert.equal(result.length,1,ref.type);if(ref.type!=='texture')assert.ok(result[0].column>0,ref.type+' definition position');}
+ assert.ok(content.referenceValues(index,'animation',client).has('animation.test.client'));assert.ok(!content.referenceValues(index,'animation',client).has('animation.test.server'));
+ const broken=doc({'minecraft:client_entity':{description:{identifier:'test:missing',textures:{default:'textures/missing'}}}});Object.assign(broken,{side:'resource',relative:'entity/missing.json'});assert.equal(content.referenceIssues(index,broken).length,2);
+});
+
+test('legacy controller bindings and animation effects keep alias ownership and scoped rename',()=>{
+ const linked=require('../src/linked-entities.cjs');function resource(file,data){return {...doc(data),side:'resource',file,relative:'entity/'+file};}
+ const client=resource('client.json',{'minecraft:client_entity':{description:{identifier:'test:fish',animation_controllers:[{main:'controller.animation.fish'}],animations:{swim:'animation.fish.swim'},particle_effects:{wake:'test:wake'},sound_effects:{swim:'test:swim'},scripts:{animate:['main']}}}});
+ const controller=resource('controller.json',{animation_controllers:{'controller.animation.fish':{states:{default:{animations:['swim'],particle_effects:[{effect:'wake'}],sound_effects:[{effect:'swim'}]}}}}});
+ const animation=resource('animation.json',{animations:{'animation.fish.swim':{particle_effects:{'0.0':{effect:'wake'}}}}});
+ const index={documents:new Map([client,controller,animation].map(d=>[d.file,d])),languages:new Map(),scriptSources:new Map(),values:()=>new Map()};
+ assert.deepEqual(entity.issues(client),[]);assert.deepEqual(linked.issues(index,controller),[]);assert.equal(linked.references(index,controller).filter(ref=>['particle_alias','sound_alias'].includes(ref.kind)).length,2);assert.equal(linked.references(index,animation).length,1);
+ const alias=entity.symbols(client).find(ref=>ref.kind==='particle_alias');const edits=symbols.plan(index,{...alias,local:true},'splash');assert.equal(edits.length,3);assert.ok(edits.every(edit=>edit.text==='"splash"'));
+});
 test('project rename updates owned entity identifiers, typed references, translation keys and static script translations',async t=>{
  const f=await fixture(t);await f.write('BP/entities/fish.json',{'minecraft:entity':{description:{identifier:'test:fish'},component_groups:{wet:{}},events:{done:{add:{component_groups:['wet']}}}}});await f.write('BP/entities/other.json',{'minecraft:entity':{description:{identifier:'test:other'},components:{'minecraft:spawn_entity':{entities:[{spawn_entity:'test:fish<done>'}]}},component_groups:{wet:{}},events:{done:{add:{component_groups:['wet']}}}}});await f.write('RP/entity/fish.json',{'minecraft:client_entity':{description:{identifier:'test:fish'}}});
  await f.write('RP/texts/en_US.lang','entity.test:fish.name=Fish\nitem.spawn_egg.entity.test:fish.name=Spawn Fish\n');await f.write('RP/texts/de_DE.lang','entity.test:fish.name=Fisch\n');await f.write('RP/ui/test.json',{rawtext:[{translate:'entity.test:fish.name'}]});await f.write('BP/scripts/main.ts',"const text = { translate: 'entity.test:fish.name' }; const unrelated = 'test:fish';");const index=await content.scan({...f,config:{}});

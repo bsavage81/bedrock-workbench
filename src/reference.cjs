@@ -27,7 +27,7 @@ function buildIndex(bytes, tag) {
   const files = unzipSync(bytes, { filter: entry => {
     const pack=/^(behavior_pack|resource_pack)\/(.*)$/.exec(entry.name);
     if(pack && /\.(?:png|tga|jpe?g|mcfunction)$/i.test(pack[2])) { vanilla.file(pack[1]==='behavior_pack'?'behavior':'resource',pack[2]);return false; }
-    if (!/^resource_pack\/texts\/[^/]+\.lang$/.test(entry.name) && !/^metadata\/(doc_modules|json_schemas|command_modules|vanilladata_modules)\/.*\.json$/.test(entry.name) && !/^(?:behavior_pack\/(?:blocks|items|entities|loot_tables|recipes|trading|animations|animation_controllers)|resource_pack\/(?:models|entity|attachables|animations|animation_controllers|render_controllers|particles|sounds|textures))\/.*\.json$/.test(entry.name)) return false;
+    if (!/^resource_pack\/materials\/.*\.material$/.test(entry.name) && !/^resource_pack\/texts\/[^/]+\.lang$/.test(entry.name) && !/^metadata\/(doc_modules|json_schemas|command_modules|vanilladata_modules)\/.*\.json$/.test(entry.name) && !/^(?:behavior_pack\/(?:blocks|items|entities|loot_tables|recipes|trading|animations|animation_controllers)|resource_pack\/(?:models|entity|attachables|animations|animation_controllers|render_controllers|particles|sounds|textures))\/.*\.json$/.test(entry.name)) return false;
     expanded += entry.originalSize;
     if (entry.originalSize > 8 * 1024 * 1024 || expanded > 96 * 1024 * 1024) throw new Error('Mojang reference archive exceeds expanded size limit');
     return true;
@@ -35,7 +35,7 @@ function buildIndex(bytes, tag) {
   const read = name => files[name] && JSON.parse(Buffer.from(files[name]).toString('utf8'));
   const result = { tag, engine: engine(tag), source: `https://github.com/Mojang/bedrock-samples/tree/${tag}`, components: { block: {}, entity: {}, item: {} } };
   const text = descriptionText;
-  result.intelligenceVersion = 11;
+  result.intelligenceVersion = 12;
   result.vanilla = {};result.formatVersions={};result.languages=[];result.vanillaNames={item:{},block:{}};
   for (const [file, kind] of Object.entries({ items: 'item', blocks: 'block', entities: 'entity', effects: 'effect', enchantments: 'enchantment', biomes: 'biome', dimensions: 'dimension' })) {
     result.vanilla[kind] = [...new Set((read(`metadata/vanilladata_modules/mojang-${file}.json`)?.data_items || []).map(value => value.command_name || value.name).filter(value => typeof value === 'string'))];
@@ -53,7 +53,7 @@ function buildIndex(bytes, tag) {
     if(!errors.length){const side=match[1]==='behavior_pack'?'behavior':'resource';vanilla.file(side,match[2],data);if(require('./format-versions.cjs').version(data?.format_version)){const family=side+':'+match[2].split('/')[0];const values=result.formatVersions[family]||=[];if(!values.includes(data.format_version))values.push(data.format_version);}}
   }
   for(const [kind,ids]of Object.entries(vanilla.finish()))result.vanilla[kind]=[...new Set([...(result.vanilla[kind]||[]),...ids])];
-  result.vanillaReferences=vanilla.references();for(const kind of ['item','block'])for(const [id,keys]of Object.entries(vanilla.names()[kind]))result.vanillaNames[kind][id]=[...new Set([...keys,...(result.vanillaNames[kind][id]||[])])];
+  result.vanillaBySide=vanilla.bySide();result.vanillaReferences=vanilla.references();for(const kind of ['item','block'])for(const [id,keys]of Object.entries(vanilla.names()[kind]))result.vanillaNames[kind][id]=[...new Set([...keys,...(result.vanillaNames[kind][id]||[])])];
   function documented(node) {
     return { description: text(node.description), type: node.type, default: node.default,
       fields: Object.fromEntries((node.nodes || []).filter(n => n.name && !n.name.includes(' ')).map(n => [n.name, { description: text(n.description), type: n.type, default: n.default }])) };
@@ -98,7 +98,7 @@ function buildIndex(bytes, tag) {
 async function loadReference(root, target, { force = false, fetchImpl = globalThis.fetch } = {}) {
   const file = await core.local(root, '.bedrock/reference/components.json');
   const cached = await fs.readFile(file, 'utf8').then(JSON.parse).then(cleanDescriptions).catch(() => null);
-  if (!force && cached?.intelligenceVersion === 11 && cached?.target === target && cached.tag && Date.now() - cached.updated < 86400000) return cached;
+  if (!force && cached?.intelligenceVersion === 12 && cached?.target === target && cached.tag && Date.now() - cached.updated < 86400000) return cached;
   const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
   async function get(url, limit) {
     const response = await fetchImpl(url, { signal: controller.signal, headers: { 'User-Agent': 'Bedrock-Workbench', Accept: 'application/vnd.github+json' } });
@@ -112,7 +112,7 @@ async function loadReference(root, target, { force = false, fetchImpl = globalTh
     const list = JSON.parse((await get(API, 4 * 1024 * 1024)).toString());
     const release = chooseRelease(list, target);
     if (!release) throw new Error(`No released Mojang samples found at or below engine ${target}`);
-    if (!force && cached?.intelligenceVersion === 11 && cached?.tag === release.tag_name) { cached.target = target; cached.updated = Date.now(); await core.writeJson(file, cached); return cached; }
+    if (!force && cached?.intelligenceVersion === 12 && cached?.tag === release.tag_name) { cached.target = target; cached.updated = Date.now(); await core.writeJson(file, cached); return cached; }
     const asset = release.assets?.find(a => a.name === `bedrock-samples-${release.tag_name}-min.zip`);
     const expected = `https://github.com/Mojang/bedrock-samples/releases/download/${release.tag_name}/${asset?.name}`;
     if (!asset || asset.browser_download_url !== expected) throw new Error('Mojang release is missing its text reference archive');

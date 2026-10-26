@@ -46,8 +46,9 @@ function attach(vscode, context, getProject, output) {
   function at(document, position) {
     const data = documentData(document); if (!data?.tree) return;
     const offset = document.offsetAt(position), location = json.getLocation(data.text, offset), node = json.findNodeAtOffset(data.tree, offset, true);
-    if (!node || node.type !== 'string' || (node.parent?.type === 'property' && node.parent.children[0] === node)) return;
-    return { data, node, location, offset };
+    const keys=location.path,renderKey=data.side==='resource'&&['minecraft:client_entity','minecraft:attachable'].includes(keys[0])&&keys[1]==='description'&&keys[2]==='render_controllers'&&typeof keys[3]==='number'&&keys.length===5&&location.isAtPropertyKey;
+    if (!node || node.type !== 'string'&&!renderKey || node.parent?.type === 'property' && node.parent.children[0] === node&&!renderKey) return;
+    return { data, node, location, offset,renderKey };
   }
   function diagnostic(document, issue) {
     const result = new vscode.Diagnostic(new vscode.Range(document.positionAt(issue.offset), document.positionAt(issue.offset + issue.length)), issue.message, issue.severity === 'warning' ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Information);
@@ -204,13 +205,13 @@ function attach(vscode, context, getProject, output) {
           const index=await ensure();if(!index)return;
           return require('./format-versions.cjs').choices(index,data,getProject()).map(value=>{const item=new vscode.CompletionItem(value,vscode.CompletionItemKind.Value);completeValue(item,document,state,position,value);item.detail='Document format version';item.documentation='Selects this file’s syntax and component availability. Older formats are preserved; changing the format can change behavior.';return item;});
         }
-        const kind = content.referenceKind(location.path, node.value, data); if (!kind) return;
+        const kind = state.renderKey?'render_controller':content.referenceKind(location.path, node.value, data); if (!kind) return;
         const index = await ensure(); if (!index) return;
-        const refs = /^(item|block|entity|terrain_texture|item_texture|sound)$/.test(kind) ? await referenceData() : index.reference;
+        const refs = /^(item|block|entity|terrain_texture|item_texture|sound|geometry|texture|material|animation|animation_controller|render_controller|particle)$/.test(kind) ? await referenceData() : index.reference;
         if (refs) index.reference = require('./vanilla.cjs').merge(refs,index.localReference);
         const values = content.referenceValues(index, kind, data, index.reference);
         return [...values].map(([id, files]) => {
-          const item = new vscode.CompletionItem(id, vscode.CompletionItemKind.Reference); completeValue(item,document,state,position,id);
+          const item = new vscode.CompletionItem(id, vscode.CompletionItemKind.Reference);if(state.renderKey)completeKey(item,document,{...state,node:node.type==='string'?node:undefined},id,'"${1:1.0}"',position);else completeValue(item,document,state,position,id);
           const local=index.localReference?.vanilla?.[kind]?.includes(id),builtin=kind==='geometry' && content.builtinGeometries(data,index.project).includes(id);
           if(kind==='creative_group'&&!files.length) {item.detail='Vanilla creative group';item.documentation=require('./creative-groups.cjs').source;return item;}
           item.detail = files.length ? `Project ${kind.replaceAll('_', ' ')}` : local ? `Installed vanilla ${index.localReference.source.version}` : builtin ? 'Vanilla block geometry' : `Minecraft ${index.reference?.tag || 'reference'}`;
@@ -230,7 +231,7 @@ function attach(vscode, context, getProject, output) {
           if (reference) return new vscode.Hover(`${reference.name}: ${reference.description}${reference.syntax ? '\n\n' + reference.syntax : ''}`);
         }
         const kind = content.referenceKind(location.path, node.value, data); if (!kind) return;
-        const index = await ensure(), files = index?.values(kind).get(node.value);
+        const index = await ensure(), files = index?.values(kind).get(kind==='texture'?node.value.replace(/\.(png|tga|jpe?g)$/i,''):node.value);
         if(kind==='creative_group')return new vscode.Hover(`${node.value}\n\n${files?.length?files.map(file=>path.relative(getProject().root,file)).join('\n'):'Vanilla creative group'}\n\n[Microsoft Learn](${require('./creative-groups.cjs').source})`);
         if (files?.length) return new vscode.Hover(`Project ${kind.replaceAll('_', ' ')}: ${node.value}\n\n${files.map(file => path.relative(getProject().root, file)).join('\n')}`);
       }
@@ -239,7 +240,7 @@ function attach(vscode, context, getProject, output) {
       async provideDefinition(document, position) {
         const state = at(document, position); if (!state) return;
         const kind = content.referenceKind(state.location.path, state.node.value, state.data); if (!kind) return;
-        const index = await ensure(); return index && content.referenceDefinitions(index, kind, state.node.value).map(value => new vscode.Location(vscode.Uri.file(value.file), new vscode.Position(value.line, value.column)));
+        const index = await ensure(); return index && content.referenceDefinitions(index, kind, state.node.value,state.data).map(value => new vscode.Location(vscode.Uri.file(value.file), new vscode.Position(value.line, value.column)));
       }
     }),
     vscode.workspace.onDidOpenTextDocument(document => { validate(document); void ensure().then(() => validate(document)); }),

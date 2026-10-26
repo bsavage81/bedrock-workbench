@@ -8,9 +8,10 @@ const VERSION = require(path.join(PACKAGE, 'package.json')).version;
 const catalog = require('@minecraft/bedrock-schemas/catalog.json');
 const documentation = require('./documentation.cjs');
 const documentationCatalog = require('./documentation-links.json');
-const BUILD = 36;
+const BUILD = 37;
 // Independent Workbench replacements. Broader Mojang routes remain fallbacks.
 const OWNED = {
+  'rp/entity/index.schema.json': require('../schemas/client-entity.schema.json'),
   'bp/item_catalog/index.schema.json': require('../schemas/creative-catalog.schema.json'),
   'bp/blocks/index.schema.json': require('../schemas/block.schema.json'),
   'bp/entities/index.schema.json': require('../schemas/entity.schema.json'),

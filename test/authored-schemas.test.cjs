@@ -7,6 +7,24 @@ const atlas = ajv.compile(require('../schemas/texture-atlas.schema.json'));
 const sounds = ajv.compile(require('../schemas/sound-definitions.schema.json'));
 const loot = ajv.compile(require('../schemas/loot-table.schema.json'));
 const lootDoc = functions => ({ pools: [{ entries: [{ type: 'item', name: 'minecraft:iron_sword', functions }] }] });
+
+test('client entity schema documents Learn fields and preserves legacy and modern layouts',()=>{
+ const schema=require('../schemas/client-entity.schema.json'),validate=ajv.compile(schema),audit=require('../tools/audit-client-entities.cjs');
+ assert.deepEqual(audit.coverage(schema).missing,[]);assert.deepEqual(audit.coverage(schema).missingHovers,[]);
+ const description={identifier:'test:fish',min_engine_version:'1.8.0',textures:{default:'textures/entity/fish'},materials:{default:'entity_alphatest'},geometry:{default:'geometry.test.fish'},animations:{swim:'animation.test.swim'},animation_controllers:[{main:'controller.animation.test.fish'}],render_controllers:['controller.render.test.fish',{'controller.render.overlay':'query.is_baby'}],particle_effects:{wake:'test:wake'},sound_effects:{swim:'mob.fish.swim'},scripts:{animate:['swim',{main:'1.0'}],initialize:['variable.size=1;'],pre_animation:['variable.speed=query.modified_move_speed;'],scaleX:'1',hide_held_items:'0',variables:{'variable.size':'public'}},spawn_egg:{texture:'fish_egg',texture_index:0,base_color:'#00AAFF'},locators:{lead:{head:[0,2,0]}},enable_attachables:true};
+ for(const format of ['1.8.0','1.10.0','1.26.0'])assert.ok(validate({format_version:format,'minecraft:client_entity':{description}}),JSON.stringify(validate.errors));
+ const broken=structuredClone(description);broken.spawn_egg.texture_index='bad';assert.equal(validate({format_version:'1.10.0','minecraft:client_entity':{description:broken}}),false);
+ const schemaMissing=structuredClone(schema);delete schemaMissing.properties['minecraft:client_entity'].properties.description.properties.scripts.properties.hide_held_items;assert.ok(audit.coverage(schemaMissing).missing.some(path=>path.endsWith('/hide_held_items')));
+ const future={format_version:'1.26.0','minecraft:client_entity':{description:{identifier:'test:new',future_field:{enabled:true}}}};assert.ok(validate(future));assert.ok(audit.audit([{file:'future.json',data:future}]).undocumentedFields.some(entry=>entry.field.endsWith('/future_field')));
+ const report=audit.audit([{file:'client.json',data:{format_version:'1.10.0','minecraft:client_entity':{description}}}]);assert.deepEqual(report.invalid,[]);assert.deepEqual(report.undocumentedFields,[]);
+});
+
+test('client entity documentation extraction preserves case variants and detects new documented fields',()=>{
+ const {fields}=require('../tools/update-client-entity-reference.cjs');
+ const result=fields('**JSON path:** `minecraft:attachable > description > scripts`\n\n|Name|Type|\n|:---|:---|\n| scale[xX] | Molang |\n| future_setting | Boolean |');
+ assert.ok(result.includes('minecraft:client_entity/description/scripts/scalex'));assert.ok(result.includes('minecraft:client_entity/description/scripts/scaleX'));assert.ok(result.includes('minecraft:client_entity/description/scripts/future_setting'));
+ assert.deepEqual(require('../tools/audit-client-entities.cjs').coverage(require('../schemas/client-entity.schema.json'),{fields:['minecraft:client_entity/description/scripts/future_setting']}).missing,['minecraft:client_entity/description/scripts/future_setting']);
+});
 test('loot conditions work on pools, entries and functions, including tool predicates and extensions', () => {
   const conditions = [{ condition: 'random_chance', chance: 0.5 }, { condition: 'match_tool', count: 1, durability: { range_min: 1 }, enchantments: [{ enchantment: 'sharpness', levels: { range_max: 6 } }], 'minecraft:match_tool_filter_any': ['minecraft:is_tool'] }, { condition: 'custom:requirement', custom: true }];
   assert.ok(loot({ pools: [{ conditions, entries: [{ conditions, functions: [{ function: 'furnace_smelt', conditions: [{ condition: 'entity_properties', entity: 'this', properties: { on_fire: true } }] }] }] }] }));

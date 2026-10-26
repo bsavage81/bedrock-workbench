@@ -13,6 +13,8 @@ function archive() {
     'resource_pack/models/entity/test.geo.json':json({'minecraft:geometry':[{description:{identifier:'geometry.vanilla_test'}}]}),
     'resource_pack/texts/en_US.lang':strToU8('item.apple.name=Apple\n'),
     'resource_pack/animations/test.json':json({animations:{'animation.vanilla_test':{}}}),
+    'behavior_pack/animations/server.json':json({animations:{'animation.server_only':{}}}),
+    'resource_pack/materials/test.material':strToU8('{// custom material\n"materials":{"version":"1.0.0","vanilla_material:entity":{}}}'),
     'resource_pack/textures/terrain_texture.json': strToU8('{// atlas\n"texture_data":{"stone":{"textures":"textures/blocks/stone"}}}'),
     'resource_pack/textures/item_texture.json': json({texture_data: {apple: {textures: 'textures/items/apple'}}}),
     'metadata/doc_modules/blocks.json': json({ name: 'Blocks', nodes: [{ name: 'Block Components', nodes: [{ name: 'minecraft:friction', type: 'number', description: ['Controls friction.'], nodes: [] }] }] }),
@@ -24,8 +26,9 @@ function archive() {
 }
 test('Mojang documentation and schema references supply component and field descriptions without beta content', () => {
   const index = buildIndex(archive(), 'v1.26.50.4');
-  assert.deepEqual(index.vanillaNames.item['minecraft:cod'],['item.fish.name','item.fish']);assert.deepEqual(index.vanillaNames.block['minecraft:stone'],['tile.stone.stone.name','tile.stone.stone']);assert.equal(index.intelligenceVersion, 11);assert.deepEqual(index.languages[0].values,[['item.apple.name','Apple',0]]);
+  assert.deepEqual(index.vanillaNames.item['minecraft:cod'],['item.fish.name','item.fish']);assert.deepEqual(index.vanillaNames.block['minecraft:stone'],['tile.stone.stone.name','tile.stone.stone']);assert.equal(index.intelligenceVersion, 12);assert.deepEqual(index.languages[0].values,[['item.apple.name','Apple',0]]);
   assert.deepEqual(index.vanilla.terrain_texture, ['stone']);
+  assert.ok(index.vanilla.material.includes('vanilla_material'));assert.ok(index.vanillaBySide.resource.animation.includes('animation.vanilla_test'));assert.ok(!index.vanillaBySide.resource.animation.includes('animation.server_only'));
   assert.deepEqual(index.vanilla.item_texture, ['apple']);
   assert.ok(index.vanilla.item.includes('minecraft:apple'));
   assert.ok(index.vanilla.block.includes('minecraft:stone'));

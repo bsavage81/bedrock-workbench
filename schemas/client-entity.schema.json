@@ -1,0 +1,522 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bedrock Workbench client entity",
+  "type": "object",
+  "required": [
+    "format_version",
+    "minecraft:client_entity"
+  ],
+  "properties": {
+    "format_version": {
+      "type": "string",
+      "description": "Client entity syntax version. Preserve older formats unless intentionally upgrading their behavior.",
+      "markdownDescription": "Client entity syntax version. Preserve older formats unless intentionally upgrading their behavior.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+    },
+    "minecraft:client_entity": {
+      "type": "object",
+      "description": "Client-side rendering and animation bindings for a behavior-pack entity.",
+      "properties": {
+        "description": {
+          "type": "object",
+          "description": "The entity identifier and named resources used to render it.",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "description": "Entity identifier matching the behavior-pack entity. Use Go to Definition to find the behavior definition.",
+              "markdownDescription": "Entity identifier matching the behavior-pack entity. Use Go to Definition to find the behavior definition.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "min_engine_version": {
+              "description": "Minimum resource-pack engine version for choosing this client definition. For duplicate identifiers Minecraft selects the closest eligible definition; this differs from file format_version.",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "markdownDescription": "Minimum resource-pack engine version for choosing this client definition. For duplicate identifiers Minecraft selects the closest eligible definition; this differs from file format_version.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "materials": {
+              "description": "Material aliases used by Material.<alias> in render controllers.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Rendering material identifier.",
+                  "markdownDescription": "Rendering material identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string",
+                    "description": "Rendering material identifier.",
+                    "markdownDescription": "Rendering material identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                  }
+                }
+              ],
+              "markdownDescription": "Material aliases used by Material.<alias> in render controllers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "textures": {
+              "description": "Texture aliases used by Texture.<alias> in render controllers.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Resource-pack texture image path, normally without its extension.",
+                  "markdownDescription": "Resource-pack texture image path, normally without its extension.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string",
+                    "description": "Resource-pack texture image path, normally without its extension.",
+                    "markdownDescription": "Resource-pack texture image path, normally without its extension.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                  }
+                }
+              ],
+              "markdownDescription": "Texture aliases used by Texture.<alias> in render controllers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "geometry": {
+              "description": "Geometry aliases used by Geometry.<alias> in render controllers.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Geometry identifier from a model file.",
+                  "markdownDescription": "Geometry identifier from a model file.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string",
+                    "description": "Geometry identifier from a model file.",
+                    "markdownDescription": "Geometry identifier from a model file.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                  }
+                }
+              ],
+              "markdownDescription": "Geometry aliases used by Geometry.<alias> in render controllers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "animations": {
+              "description": "Short aliases for animation or animation-controller identifiers.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Animation or animation-controller identifier.",
+                  "markdownDescription": "Animation or animation-controller identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string",
+                    "description": "Animation or animation-controller identifier.",
+                    "markdownDescription": "Animation or animation-controller identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                  }
+                }
+              ],
+              "markdownDescription": "Short aliases for animation or animation-controller identifiers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "animation_controllers": {
+              "type": "array",
+              "description": "Legacy named animation-controller list. Newer layouts declare these aliases in animations.",
+              "items": {
+                "type": "object",
+                "description": "Named animation-controller binding.",
+                "additionalProperties": {
+                  "type": "string",
+                  "description": "Animation-controller identifier.",
+                  "markdownDescription": "Animation-controller identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                "markdownDescription": "Named animation-controller binding.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+              },
+              "markdownDescription": "Legacy named animation-controller list. Newer layouts declare these aliases in animations.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "render_controllers": {
+              "description": "Render controllers selecting geometry, materials and textures, optionally gated by Molang.",
+              "anyOf": [
+                {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Legacy render-controller expression.",
+                  "markdownDescription": "Legacy render-controller expression.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "array",
+                  "description": "Render-controller identifiers or conditional entries.",
+                  "items": {
+                    "description": "Render-controller entry.",
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "description": "Render-controller identifier.",
+                        "markdownDescription": "Render-controller identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": [
+                            "string",
+                            "number"
+                          ],
+                          "description": "Molang condition controlling this entry.",
+                          "markdownDescription": "Molang condition controlling this entry.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                        }
+                      }
+                    ],
+                    "markdownDescription": "Render-controller entry.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                  },
+                  "markdownDescription": "Render-controller identifiers or conditional entries.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Render controllers selecting geometry, materials and textures, optionally gated by Molang.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "particle_effects": {
+              "description": "Particle aliases available to entity animations and controllers.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Particle effect identifier.",
+                  "markdownDescription": "Particle effect identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string",
+                    "description": "Particle effect identifier.",
+                    "markdownDescription": "Particle effect identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                  }
+                }
+              ],
+              "markdownDescription": "Particle aliases available to entity animations and controllers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "particle_emitters": {
+              "description": "Legacy particle-emitter animation bindings.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Animation identifier driving a legacy emitter.",
+                  "markdownDescription": "Animation identifier driving a legacy emitter.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string",
+                    "description": "Animation identifier driving a legacy emitter.",
+                    "markdownDescription": "Animation identifier driving a legacy emitter.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                  }
+                }
+              ],
+              "markdownDescription": "Legacy particle-emitter animation bindings.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "sound_effects": {
+              "description": "Sound aliases available to entity animations and controllers.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Sound event identifier.",
+                  "markdownDescription": "Sound event identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string",
+                    "description": "Sound event identifier.",
+                    "markdownDescription": "Sound event identifier.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                  }
+                }
+              ],
+              "markdownDescription": "Sound aliases available to entity animations and controllers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "scripts": {
+              "type": "object",
+              "description": "Client Molang initialization, per-frame calculations and animation playback.",
+              "properties": {
+                "initialize": {
+                  "type": "array",
+                  "description": "Molang evaluated when the client entity is initialized. Brace-scope script delimiters require client format 1.26.0 or newer.",
+                  "items": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Initialization Molang expression.",
+                    "markdownDescription": "Initialization Molang expression.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                  },
+                  "markdownDescription": "Molang evaluated when the client entity is initialized. Brace-scope script delimiters require client format 1.26.0 or newer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "pre_animation": {
+                  "type": "array",
+                  "description": "Molang evaluated before animations each frame. Brace-scope script delimiters require client format 1.26.0 or newer.",
+                  "items": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Per-frame Molang expression.",
+                    "markdownDescription": "Per-frame Molang expression.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                  },
+                  "markdownDescription": "Molang evaluated before animations each frame. Brace-scope script delimiters require client format 1.26.0 or newer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "animate": {
+                  "description": "Animation aliases to play, optionally controlled by Molang conditions.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "description": "Legacy animation expression.",
+                      "markdownDescription": "Legacy animation expression.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                    },
+                    {
+                      "type": "array",
+                      "description": "Animation aliases and conditional aliases.",
+                      "items": {
+                        "description": "Animation alias or conditional animation entry.",
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "description": "Alias declared in animations or legacy animation_controllers.",
+                            "markdownDescription": "Alias declared in animations or legacy animation_controllers.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": [
+                                "string",
+                                "number"
+                              ],
+                              "description": "Molang condition controlling this entry.",
+                              "markdownDescription": "Molang condition controlling this entry.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                            }
+                          }
+                        ],
+                        "markdownDescription": "Animation alias or conditional animation entry.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                      },
+                      "markdownDescription": "Animation aliases and conditional aliases.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                    }
+                  ],
+                  "markdownDescription": "Animation aliases to play, optionally controlled by Molang conditions.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "parent_setup": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Molang setup evaluated for the parent attachment context.",
+                  "markdownDescription": "Molang setup evaluated for the parent attachment context.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "scale": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Overall model scale computed with Molang.",
+                  "markdownDescription": "Overall model scale computed with Molang.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "scalex": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Molang scale multiplier for the X axis.",
+                  "markdownDescription": "Molang scale multiplier for the X axis.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "scaley": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Molang scale multiplier for the Y axis.",
+                  "markdownDescription": "Molang scale multiplier for the Y axis.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "scalez": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Molang scale multiplier for the Z axis.",
+                  "markdownDescription": "Molang scale multiplier for the Z axis.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "scaleX": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Molang scale multiplier for the X axis.",
+                  "markdownDescription": "Molang scale multiplier for the X axis.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "scaleY": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Molang scale multiplier for the Y axis.",
+                  "markdownDescription": "Molang scale multiplier for the Y axis.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "scaleZ": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Molang scale multiplier for the Z axis.",
+                  "markdownDescription": "Molang scale multiplier for the Z axis.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "hide_held_items": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Hide held items when this Molang expression is nonzero, overriding attachable rendering.",
+                  "markdownDescription": "Hide held items when this Molang expression is nonzero, overriding attachable rendering.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "should_update_effects_offscreen": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Keep particle and sound effects updating offscreen when nonzero. Bone updates can also enable this.",
+                  "markdownDescription": "Keep particle and sound effects updating offscreen when nonzero. Bone updates can also enable this.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "should_update_bones_and_effects_offscreen": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Keep bone transforms and effects updating offscreen when nonzero.",
+                  "markdownDescription": "Keep bone transforms and effects updating offscreen when nonzero.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                },
+                "variables": {
+                  "type": "object",
+                  "description": "Visibility declarations for client Molang variables.",
+                  "additionalProperties": {
+                    "type": "string",
+                    "description": "Public variables can be read from another entity using the Molang arrow operator.",
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "public"
+                        ]
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "markdownDescription": "Public variables can be read from another entity using the Molang arrow operator.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                  },
+                  "markdownDescription": "Visibility declarations for client Molang variables.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+                }
+              },
+              "markdownDescription": "Client Molang initialization, per-frame calculations and animation playback.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_resource_definition.v1.26.0?view=minecraft-bedrock-stable)"
+            },
+            "spawn_egg": {
+              "type": "object",
+              "description": "Spawn egg appearance using colors or an item texture atlas entry.",
+              "properties": {
+                "base_color": {
+                  "type": "string",
+                  "description": "Base spawn egg color as a hexadecimal color.",
+                  "markdownDescription": "Base spawn egg color as a hexadecimal color.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                "overlay_color": {
+                  "type": "string",
+                  "description": "Overlay spawn egg color as a hexadecimal color.",
+                  "markdownDescription": "Overlay spawn egg color as a hexadecimal color.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                "texture": {
+                  "type": "string",
+                  "description": "Entry name from textures/item_texture.json.",
+                  "markdownDescription": "Entry name from textures/item_texture.json.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                "texture_index": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Zero-based texture variant index within the atlas entry.",
+                  "default": 0,
+                  "markdownDescription": "Zero-based texture variant index within the atlas entry.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                }
+              },
+              "markdownDescription": "Spawn egg appearance using colors or an item texture atlas entry.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "enable_attachables": {
+              "type": "boolean",
+              "description": "Allow attached armor, held items and other attachable rendering.",
+              "markdownDescription": "Allow attached armor, held items and other attachable rendering.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "held_item_ignores_lighting": {
+              "type": "boolean",
+              "description": "Render held items fully lit instead of using surrounding lighting.",
+              "markdownDescription": "Render held items fully lit instead of using surrounding lighting.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "held_item_scale": {
+              "type": "number",
+              "description": "Scale of rendered held items; also present in vanilla client definitions.",
+              "markdownDescription": "Scale of rendered held items; also present in vanilla client definitions.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "hide_armor": {
+              "type": "boolean",
+              "description": "Hide equipped armor even when attachable rendering is enabled.",
+              "markdownDescription": "Hide equipped armor even when attachable rendering is enabled.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "queryable_geometry": {
+              "type": "string",
+              "description": "Geometry binding used for geometry-related client queries.",
+              "markdownDescription": "Geometry binding used for geometry-related client queries.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "locators": {
+              "type": "object",
+              "description": "Legacy named locator offsets, expressed in model space.",
+              "additionalProperties": {
+                "type": "object",
+                "description": "Bone names mapped to model-space offsets for this locator.",
+                "additionalProperties": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number"
+                  },
+                  "description": "X, Y and Z model-space offset.",
+                  "markdownDescription": "X, Y and Z model-space offset.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                "markdownDescription": "Bone names mapped to model-space offsets for this locator.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+              },
+              "markdownDescription": "Legacy named locator offsets, expressed in model space.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            },
+            "item": {
+              "description": "Item association used by the shared actor-resource layout, principally for attachables.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Item identifier or Molang expression.",
+                  "markdownDescription": "Item identifier or Molang expression.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Molang condition for an item association.",
+                    "markdownDescription": "Molang condition for an item association.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+                  }
+                }
+              ],
+              "markdownDescription": "Item association used by the shared actor-resource layout, principally for attachables.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+            }
+          },
+          "required": [
+            "identifier"
+          ],
+          "markdownDescription": "The entity identifier and named resources used to render it.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "markdownDescription": "Client-side rendering and animation bindings for a behavior-pack entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/cliententitydocumentation/cliententitydocumentationintroduction?view=minecraft-bedrock-stable)"
+    }
+  }
+}

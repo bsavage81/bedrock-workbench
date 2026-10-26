@@ -2,6 +2,7 @@ const json=require('jsonc-parser');
 function symbols(document){const result=[];const add=(kind,node,scope='entity')=>{if(node?.type==='object')for(const p of node.children||[])result.push({kind,id:p.children[0].value,node:p.children[0],value:p.children[1],scope,file:document.file});};
  const root=json.findNodeAtLocation(document.tree,['minecraft:entity']);if(root){add('entity_group',json.findNodeAtLocation(root,['component_groups']));add('entity_event',json.findNodeAtLocation(root,['events']));add('entity_property',json.findNodeAtLocation(root,['description','properties']));}
  for(const type of ['minecraft:entity','minecraft:client_entity','minecraft:attachable'])for(const [key,kind]of [['animations','animation_alias'],['geometry','geometry_alias'],['textures','texture_alias'],['materials','material_alias']])add(kind,json.findNodeAtLocation(document.tree,[type,'description',key]),type);
+ for(const type of ['minecraft:client_entity','minecraft:attachable']){for(const [key,kind]of [['particle_effects','particle_alias'],['sound_effects','sound_alias']])add(kind,json.findNodeAtLocation(document.tree,[type,'description',key]),type);for(const entry of json.findNodeAtLocation(document.tree,[type,'description','animation_controllers'])?.children||[])add('animation_alias',entry,type);}
  for(const controller of json.findNodeAtLocation(document.tree,['animation_controllers'])?.children||[])add('controller_state',json.findNodeAtLocation(controller.children[1],['states']),controller.children[0].value);
  return result;
 }

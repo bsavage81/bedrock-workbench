@@ -74,10 +74,11 @@ async function indexFile(index, side, relative) {
     }
     if (side === 'resource' && /^textures\/.*\.(png|tga|jpe?g)$/i.test(rel)) index.add('texture', rel.replace(/\.[^.]+$/, ''), file);
     if (side === 'behavior' && /^loot_tables\/.*\.json$/i.test(rel)) index.add('loot_table', rel, file);
-    if (!rel.endsWith('.json') || (await fs.stat(file)).size > 2 * 1024 * 1024) return;
+    if (!(rel.endsWith('.json')||side==='resource'&&/^materials\/.*\.material$/i.test(rel)) || (await fs.stat(file)).size > 2 * 1024 * 1024) return;
     const text = await fs.readFile(file, 'utf8'), errors = [], tree = json.parseTree(text.replace(/^\uFEFF/, ' '), errors, { allowTrailingComma: true });
     if (errors.length) { index.issues.push({ code:'bedrock.jsonSyntax',file, offset: errors[0].offset, length: errors[0].length, severity: 'error', message: `JSON: ${json.printParseErrorCode(errors[0].error)}` }); return; }
     const data = json.getNodeValue(tree); index.documents.set(file, { file, side, relative: rel, text, tree, data });
+    if(side==='resource'&&rel.startsWith('materials/'))for(const [name,value]of Object.entries(data?.materials||{}))if(name!=='version'&&value&&typeof value==='object')index.add('material',name.split(':')[0],file);
     for (const [root, type] of [['minecraft:entity', 'entity'], ['minecraft:item', 'item'], ['minecraft:block', 'block'], ['minecraft:client_entity', 'client_entity'], ['minecraft:attachable', 'attachable']]) {
       if ((side === 'behavior') === ['entity', 'item', 'block'].includes(type)) index.add(type, data?.[root]?.description?.identifier, file);
     }
@@ -117,10 +118,19 @@ function referenceKind(keys, value, document) {
     if(type==='loot_table'||type==='minecraft:loot_table')return 'loot_table';
   }
   if (document.side === 'resource' && ['minecraft:client_entity', 'minecraft:attachable'].includes(root) && keys[1] === 'description') {
+    if(root==='minecraft:client_entity'&&keys.length===3&&key==='identifier')return 'entity';
+    if(keys.length===3&&['geometry','textures','materials','animations','sound_effects','particle_effects','particle_emitters'].includes(key))return {geometry:'geometry',textures:'texture',materials:'material',animations:value?.startsWith('controller.animation.')?'animation_controller':'animation',sound_effects:'sound',particle_effects:'particle',particle_emitters:'animation'}[key];
+    if(keys[2]==='materials'&&keys.length===4)return 'material';
+    if(keys[2]==='sound_effects'&&keys.length===4)return 'sound';
+    if(keys[2]==='particle_effects'&&keys.length===4)return 'particle';
+    if(keys[2]==='particle_emitters'&&keys.length===4)return 'animation';
+    if(keys[2]==='spawn_egg'&&keys.length===4&&key==='texture')return 'item_texture';
+    if(keys[2]==='animation_controllers'&&keys.length===5&&typeof keys[3]==='number')return 'animation_controller';
+    if(keys[2]==='render_controllers'&&keys.length===3&&(!value||value.startsWith('controller.render.')))return 'render_controller';
     if (keys[2] === 'textures' && keys.length === 4) return 'texture';
     if (keys[2] === 'geometry' && keys.length === 4) return 'geometry';
     if (keys[2] === 'animations' && keys.length === 4) return value?.startsWith('controller.animation.') ? 'animation_controller' : 'animation';
-    if (keys[2] === 'render_controllers' && (keys.length === 4||keys.length===5&&typeof keys[3]==='number'&&key===value&&value?.startsWith('controller.render.'))) return 'render_controller';
+    if (keys[2] === 'render_controllers' && (keys.length === 4||keys.length===5&&typeof keys[3]==='number'&&key===value&&(!value||value.startsWith('controller.render.')))) return 'render_controller';
   }
   if(root==='minecraft:entity'&&keys[1]==='description'&&keys[2]==='animations'&&keys.length===4)return value?.startsWith('controller.animation.')?'animation_controller':'animation';
   const depth = root==='minecraft:entity'&&keys[1]==='component_groups'?3:keys[1] === 'components' ? 2 : keys[1] === 'permutations' && typeof keys[2] === 'number' && keys[3] === 'components' ? 4 : 0;
@@ -193,21 +203,28 @@ function builtinGeometries(document, project) {
 }
 function referenceValues(index, kind, document, reference = index.reference) {
   const values = new Map(index.values(kind));
+  if(['animation','animation_controller'].includes(kind))for(const [id,files]of values){const same=files.filter(file=>{const side=index.documents?.get(file)?.side||(index.project?.packs&&fileKind(index.project,file)?.side);return !side||side===document.side;});if(files.length&&!same.length)values.delete(id);else values.set(id,same);}
   if(kind==='creative_group') {
     const format=(document.data || (document.tree&&json.getNodeValue(document.tree)))?.format_version;
     const legacy=typeof format==='string'&&require('./releases.cjs').compareVersions(format,'1.21.60')<0;
     for(const name of require('./creative-groups.cjs').vanilla)values.set(legacy?name.slice(10):name,[]);
   }
   if (kind === 'item') for (const entry of index.values('block')) if (!values.has(entry[0])) values.set(...entry);
-  if (kind === 'animation') for (const entry of index.values('animation_controller')) if (!values.has(entry[0])) values.set(...entry);
-  const vanilla = reference?.vanilla?.[kind];
+  if (kind === 'animation') for (const entry of referenceValues(index,'animation_controller',document,reference)) if (!values.has(entry[0])) values.set(...entry);
+  const vanilla = reference?.vanillaBySide?.[document.side]?.[kind]||reference?.vanilla?.[kind];
   for (const id of Array.isArray(vanilla) ? vanilla : []) if (typeof id === 'string' && !values.has(id)) values.set(id, []);
+  if(document.side==='resource'&&['geometry','texture','material','animation','animation_controller','render_controller','particle','sound','item_texture','terrain_texture'].includes(kind))for(const id of reference?.vanillaReferences?.[kind]||[])if(!values.has(id))values.set(id,[]);
   if (kind === 'geometry') for (const id of builtinGeometries(document, index.project)) if (!values.has(id)) values.set(id, []);
   return values;
 }
-function referenceDefinitions(index, kind, id) {
-  return (index.values(kind).get(id) || []).map(file => {
+function referenceDefinitions(index, kind, id, context) {
+  if(kind==='texture')id=id.replace(/\.(png|tga|jpe?g)$/i,'');
+  return (index.values(kind).get(id) || []).filter(file=>!context||!['animation','animation_controller'].includes(kind)||index.documents.get(file)?.side===context.side).map(file => {
     const document = index.documents.get(file); let node;
+    const actor={entity:'minecraft:entity',client_entity:'minecraft:client_entity',item:'minecraft:item',block:'minecraft:block',attachable:'minecraft:attachable'}[kind];if(document&&actor)node=json.findNodeAtLocation(document.tree,[actor,'description','identifier']);
+    if(document&&['animation','animation_controller','render_controller','sound'].includes(kind))node=json.findNodeAtLocation(document.tree,[{animation:'animations',animation_controller:'animation_controllers',render_controller:'render_controllers',sound:'sound_definitions'}[kind],id])?.parent?.children[0];
+    if(document&&kind==='particle')node=json.findNodeAtLocation(document.tree,['particle_effect','description','identifier']);
+    if(document&&kind==='material')node=json.findNodeAtLocation(document.tree,['materials'])?.children?.find(property=>property.children[0].value.split(':')[0]===id)?.children[0];
     if (document && ['terrain_texture', 'item_texture'].includes(kind)) node = json.findNodeAtLocation(document.tree, ['texture_data', id])?.parent?.children[0];
     if (document && kind === 'geometry') {
       const geometries = json.findNodeAtLocation(document.tree, ['minecraft:geometry']);
@@ -266,7 +283,7 @@ function referenceIssues(index, document, {includeIgnored=false}={}) {
     if(!ref.value||/[?()[\]{}]/.test(ref.value))return false;
     if(['item_tag','creative_group'].includes(ref.type))return false; // Tags declare names; new custom tags are valid.
     const values=referenceValues(index,ref.type,document), accepted=new Set(index.reference?.vanillaReferences?.[ref.type]||[]);
-    const id=ref.type==='entity'?ref.value.replace(/<[^<>]*>$/,''):ref.type==='item'?ref.value.replace(/:\d+$/,''):ref.value;
+    const id=ref.type==='entity'?ref.value.replace(/<[^<>]*>$/,''):ref.type==='item'?ref.value.replace(/:\d+$/,''):ref.type==='texture'?ref.value.replace(/\.(png|tga|jpe?g)$/i,''):ref.value;
     const candidates=[id];if(['item','block','entity'].includes(ref.type)&&!id.includes(':'))candidates.push('minecraft:'+id);
     if(candidates.some(id=>values.has(id)||accepted.has(id)))return false;
     if(ref.value.startsWith('minecraft:')&&!index.reference?.vanilla?.[ref.type]?.length)return false;
@@ -275,7 +292,7 @@ function referenceIssues(index, document, {includeIgnored=false}={}) {
   return includeIgnored?issues:issues.filter(issue=>!require('./validation-ignores.cjs').match(index.project,issue));
 }
 function molangNodes(document) {
-  if (!/^(?:animations|animation_controllers|particles|entity|attachables)\//.test(document.relative)) return [];
+  if (!/^(?:animations|animation_controllers|render_controllers|particles|entity|attachables)\//.test(document.relative)) return [];
   const result = [];
   function walk(node) {
     if (node.type === 'string' && node.value.length <= 16384 && !(node.parent?.type === 'property' && node.parent.children[0] === node) && /\b(?:query|q|variable|v|temp|t|context|c|math)\.|^\s*(?:return|loop|for_each)\b/i.test(node.value)) result.push(node);
