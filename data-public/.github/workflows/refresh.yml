@@ -1,12 +1,19 @@
 name: Build reviewed authoring data
 on:
+  schedule:
+    - cron: '23 */6 * * *'
   workflow_dispatch:
     inputs:
       channel:
         type: choice
-        options: [stable, preview]
+        options: [stable, preview, both]
         default: stable
       publish:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        channel: ${{ fromJSON((github.event_name == 'schedule' || inputs.channel == 'both') && '["stable","preview"]' || format('["{0}"]', inputs.channel)) }}
         description: Publish the candidate if its fingerprint has been reviewed
         type: boolean
         default: false
@@ -25,6 +32,11 @@ concurrency:
   cancel-in-progress: false
 jobs:
   verify:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        channel: ${{ fromJSON((github.event_name == 'schedule' || inputs.channel == 'both') && '["stable","preview"]' || format('["{0}"]', inputs.channel)) }}
     runs-on: windows-latest
     outputs:
       source_revision: ${{ steps.source.outputs.revision }}
@@ -56,17 +68,17 @@ jobs:
         run: node tools/fetch-authoring-inputs.cjs .test-temp/data-inputs
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          BEDROCK_DATA_CHANNEL: ${{ inputs.channel }}
+          BEDROCK_DATA_CHANNEL: ${{ matrix.channel }}
           BEDROCK_DATA_SOURCE_TAG: ${{ inputs.source_tag }}
           BEDROCK_DATA_STABLE_TAG: ${{ inputs.stable_comparison_tag }}
       - name: Generate and verify reviewed candidate
         working-directory: workbench
-        run: node tools/build-authoring-data.cjs .test-temp/data-inputs .test-temp/data-output ${{ inputs.channel }} run-${{ github.run_id }}-${{ github.run_attempt }}-${{ inputs.channel }}
+        run: node tools/build-authoring-data.cjs .test-temp/data-inputs .test-temp/data-output ${{ matrix.channel }} run-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.channel }}
       - name: Report candidate review hashes when verification is held
         if: failure()
         working-directory: workbench
         env:
-          DATA_CHANNEL: ${{ inputs.channel }}
+          DATA_CHANNEL: ${{ matrix.channel }}
         run: |
           $report = ".test-temp/data-output/$env:DATA_CHANNEL/verification.json"
           if (Test-Path -LiteralPath $report) {
@@ -74,11 +86,11 @@ jobs:
           }
       - uses: actions/upload-artifact@v4
         with:
-          name: reviewed-candidate-${{ inputs.channel }}
-          path: workbench/.test-temp/data-output/${{ inputs.channel }}/
+          name: reviewed-candidate-${{ matrix.channel }}
+          path: workbench/.test-temp/data-output/${{ matrix.channel }}/
   publish:
     needs: verify
-    if: inputs.publish == true
+    if: github.event_name == 'schedule' || inputs.publish == true
     runs-on: windows-latest
     permissions:
       contents: write
@@ -91,7 +103,7 @@ jobs:
           node-version: '24'
       - uses: actions/download-artifact@v4
         with:
-          name: reviewed-candidate-${{ inputs.channel }}
+          name: reviewed-candidate-${{ matrix.channel }}
           path: candidate
       - name: Publish immutable data after owner-fingerprint verification
         run: node .github/scripts/publish.cjs

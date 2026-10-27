@@ -27,3 +27,8 @@ Maintenance and review instructions are in the source repository's
 passing tests and source/fixture coverage audits, and immutable releases enabled
 on this repository. Preview absence is reported;
 Stable content is never relabeled as Preview.
+
+Scheduled data checks are enabled every six hours (at minute 23 UTC). Both Stable
+and Preview are built and tested. Only previously reviewed fingerprints publish;
+new or incompatible content remains held for review. Manual dispatch supports
+`both` to exercise the same two-channel path.

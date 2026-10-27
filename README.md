@@ -186,3 +186,8 @@ Client bindings offer project and known vanilla geometry, materials, textures, a
 Schemas, Learn descriptions, Molang/filter catalogs and declarative compatibility facts can refresh independently from the public [authoring-data repository](https://github.com/bsavage81/bedrock-workbench-data). The Bedrock settings sidebar shows the active data version/channel/source and update state. Use **Bedrock: Authoring Data Status**, **Refresh Authoring Data**, or **Roll Back Authoring Data**. Background checks run on trusted project open and every six hours; `bedrock.authoringData.autoUpdate` disables them. Bundled and last-known-good data support offline editing. Downloads do not require GitHub sign-in.
 
 Stable and Preview public feeds are live. Compatible projects download reviewed snapshots automatically; bundled data remains the fallback for unsupported targets or offline recovery. See [AUTHORING_DATA.md](AUTHORING_DATA.md) for generation, verification, historical target/format handling, attribution, maintenance and current limitations.
+
+Scheduled data checks are enabled every six hours (at minute 23 UTC). Both Stable
+and Preview are built and tested. Only previously reviewed fingerprints publish;
+new or incompatible content remains held for review. Manual dispatch supports
+`both` to exercise the same two-channel path.

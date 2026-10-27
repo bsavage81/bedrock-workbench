@@ -193,3 +193,8 @@ release checks and anonymous asset checksums. Native VS Code loaded both feeds
 without GitHub sign-in. Scheduled publication remains disabled. Raw Learn HTML
 hashes are retained in `inputAudit`; review binds extracted content and pinned
 source revisions, so unrelated page chrome does not invalidate reviewed data.
+
+Scheduled data checks are enabled every six hours (at minute 23 UTC). Both Stable
+and Preview are built and tested. Only previously reviewed fingerprints publish;
+new or incompatible content remains held for review. Manual dispatch supports
+`both` to exercise the same two-channel path.
