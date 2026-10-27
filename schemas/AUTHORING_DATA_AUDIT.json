@@ -6,7 +6,7 @@
   "dataFormatVersion": 1,
   "syntaxChecksPassed": true,
   "workflowYamlParsed": true,
-  "scheduleEnabled": false,
+  "scheduleEnabled": true,
   "publicationEnabled": true,
   "immutableReleasesEnabled": true,
   "unitSuite": {
@@ -295,5 +295,7 @@
   "sourcePublicRequested": true,
   "sourcePublic": true,
   "approvalMethod": "Owner-reviewed content and compatibility fingerprint",
-  "publicationMethod": "Manual Actions dispatch with automatic owner-fingerprint verification"
+  "publicationMethod": "Manual Actions dispatch with automatic owner-fingerprint verification",
+  "schedule": "23 */6 * * *",
+  "scheduleTestRun": "https://github.com/bsavage81/bedrock-workbench-data/actions/runs/40595303902"
 }

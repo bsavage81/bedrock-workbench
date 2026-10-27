@@ -7,7 +7,7 @@ JSON snapshots, versioned manifests and attribution belong in the public repo.
 Snapshots are published only after the owner reviews and commits their exact
 content and compatibility fingerprints in the source repository. The data
 repository workflow uses its own GitHub token; no cross-repository secret is
-needed. Scheduled publication is disabled until specifically requested.
+needed. Scheduled publication runs every six hours for reviewed fingerprints.
 
 When enabled, `feeds/stable.json` and `feeds/preview.json` retain an index of
 compatible historical releases. Each entry points to the immutable release
