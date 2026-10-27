@@ -44,7 +44,8 @@ async function publish(directory, sourceRevision) {
   check(old.channel === entry.channel && old.dataFormatVersion === 1 && Array.isArray(old.snapshots) && old.snapshots.length < 300, 'Invalid or full feed');
   if (old.snapshots.some(item => item.reviewFingerprint === fingerprint)) { console.log(`Reviewed ${entry.channel} data is already published; no duplicate release.`); return; }
   check(!old.snapshots.some(item => item.id === entry.id), 'Snapshot ID already exists');
-  const immutable = JSON.parse(gh(['api','-H','X-GitHub-Api-Version: 2026-03-10',`repos/${repository}/immutable-releases`])); check(immutable.enabled === true, 'Immutable releases are not enabled');
+  // The scoped Actions token cannot read repository administration settings.
+  // Require GitHub's release-level immutable flag before advancing any feed.
   const tag = `data-${entry.id}`;
   gh(['release','create',tag,'--repo',repository,'--draft','--title',`Authoring data ${entry.id}`,'--notes',`Reviewed ${entry.channel} declarative data. Attribution and licenses are in snapshot.json.`,...(entry.channel === 'preview' ? ['--prerelease'] : [])]);
   gh(['release','upload',tag,path.join(directory,'snapshot.json'),path.join(directory,'manifest.json'),'--repo',repository]);
