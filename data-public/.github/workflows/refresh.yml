@@ -62,6 +62,16 @@ jobs:
       - name: Generate and verify reviewed candidate
         working-directory: workbench
         run: node tools/build-authoring-data.cjs .test-temp/data-inputs .test-temp/data-output ${{ inputs.channel }} run-${{ github.run_id }}-${{ github.run_attempt }}-${{ inputs.channel }}
+      - name: Report candidate review hashes when verification is held
+        if: failure()
+        working-directory: workbench
+        env:
+          DATA_CHANNEL: ${{ inputs.channel }}
+        run: |
+          $report = ".test-temp/data-output/$env:DATA_CHANNEL/verification.json"
+          if (Test-Path -LiteralPath $report) {
+            node -e "const r=require('./'+process.argv[1]);console.log(JSON.stringify({sources:r.sources,generatedFileHashes:r.generatedFileHashes,reviewHashes:r.reviewHashes,previewReview:r.previewReview,fixtureFailures:r.fixtureFailures.length,fallbackFailures:r.fallbackFailures.length,missingPages:r.missingPages.length,projectRegressionsPassed:r.projectRegressionsPassed,reviewFingerprint:r.reviewFingerprint},null,2))" $report
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: reviewed-candidate-${{ inputs.channel }}

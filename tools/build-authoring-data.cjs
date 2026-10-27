@@ -58,7 +58,8 @@ async function build(directory, output, channel, id) {
   for (const name of ['previewGeometry', 'previewOwners', 'previewControllers', 'languages']) delete reference[name];
   const licenses = Object.fromEntries(Object.entries(unzipSync(archive, { filter: e => /^(LICENSE|LICENSE.md)$/i.test(e.name) })).map(([name, bytes]) => [name, Buffer.from(bytes).toString()]));
   const learnLicense = Object.entries(unzipSync(docsZip, { filter: e => /\/LICENSE$/.test(e.name) })).map(([, bytes]) => Buffer.from(bytes).toString()).join('\n');
-  const snapshot = { dataFormatVersion: 1, id, channel, sources, files, reference, notices: { authored: await fs.readFile(path.join(__dirname, '../data-public/LICENSE'), 'utf8'), samples: licenses, learn: learnLicense, creator: await fs.readFile(path.join(directory, 'creator-license.txt'), 'utf8') } };
+  const authoredLicense = (await fs.readFile(path.join(__dirname, '../data-public/LICENSE'), 'utf8')).replace(/\r\n/g, '\n');
+  const snapshot = { dataFormatVersion: 1, id, channel, sources, files, reference, notices: { authored: authoredLicense, samples: licenses, learn: learnLicense, creator: await fs.readFile(path.join(directory, 'creator-license.txt'), 'utf8') } };
   const bytes = Buffer.from(JSON.stringify(snapshot));
   const entry = { dataFormatVersion: 1, id, channel, generatedAt, extension: { min: require('../package.json').version, max: require('../package.json').version }, minecraft: { min: engine(source.tag), max: engine(source.tag) }, sources, url: '', sha256: updates.sha256(bytes), bytes: bytes.length }; entry.url = updates.artifactUrl(entry);
   updates.validateManifest({ dataFormatVersion: 1, channel, generatedAt, snapshots: [entry] }, channel); updates.validateSnapshot(snapshot, entry);
@@ -79,7 +80,7 @@ async function build(directory, output, channel, id) {
       if (!validate(jsonc.parse(Buffer.from(raw).toString()))) fallbackFailures.push({ file, errors: validate.errors });
     }
   }
-  const report = { channel, id, sources, coverage, missingPages, previewReview, fallbackFailures, vanillaDocuments: Object.keys(vanilla).length, fixtureFailures: fixtures, generatedFileHashes: Object.fromEntries(Object.entries(files).map(([file, content]) => [file, updates.sha256(Buffer.from(JSON.stringify(content)))])) };
+  const report = { channel, id, sources, coverage, missingPages, previewReview, fallbackFailures, vanillaDocuments: Object.keys(vanilla).length, fixtureFailures: fixtures, generatedFileHashes: Object.fromEntries(Object.entries(files).map(([file, content]) => [file, updates.sha256(Buffer.from(JSON.stringify(content)))])), reviewHashes: { reference: updates.sha256(Buffer.from(JSON.stringify(reference))), notices: Object.fromEntries(Object.entries(snapshot.notices).map(([name, value]) => [name, updates.sha256(Buffer.from(JSON.stringify(value)))])) } };
   const destination = path.join(output, channel); await fs.mkdir(destination, { recursive: true });
   await fs.writeFile(path.join(destination, 'snapshot.json'), bytes); await fs.writeFile(path.join(destination, 'entry.json'), JSON.stringify(entry, null, 2)); await fs.writeFile(path.join(destination, 'verification.json'), JSON.stringify(report, null, 2));
   await fs.writeFile(path.join(destination, 'manifest.json'), JSON.stringify({ dataFormatVersion: 1, channel, generatedAt, snapshots: [entry] }, null, 2));
