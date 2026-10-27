@@ -84,6 +84,11 @@ jobs:
           name: reviewed-candidate-${{ matrix.channel }}
           path: workbench/.test-temp/data-output/${{ matrix.channel }}/
   publish:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        channel: ${{ fromJSON((github.event_name == 'schedule' || inputs.channel == 'both') && '["stable","preview"]' || format('["{0}"]', inputs.channel)) }}
     needs: verify
     if: github.event_name == 'schedule' || inputs.publish == true
     runs-on: windows-latest
