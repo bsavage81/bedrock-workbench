@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "approvedFingerprints": [
-    "6b20a820f7215e63904437650f501b7cef0837d26430221d4b0848e7479d2deb",
-    "aa90606bccb0ec382c3bc55373211d04dd749586192e683ac30a0ecd8f800c96"
+    "3b09d0c0f881cbb9ff71aa6fd1b84e000ba3fe81fe8b4ff95012405a10d7854a",
+    "ba1359c9b0937bcdae9b30ffc266f263fbfb6f620dcf5ed1d8c1dc846eda1d68"
   ],
   "reviews": [
     {
@@ -13,6 +13,10 @@
         "preview"
       ],
       "reason": "Reviewed the documented facts and compatibility inventory, 485 vanilla fixtures and 61 candidate regressions per channel. Preview fallback entries are explicitly attributed and confirmed in actual Preview entities. Corrected the pinned Learn source date; no data facts changed."
+    },
+    {
+      "date": "2026-10-27",
+      "reason": "Verified repeated Learn downloads produce identical 378 extracted entries and channel audits despite volatile raw HTML hashes. Raw hashes retained in inputAudit; approval still binds all extracted data and source revisions."
     }
   ]
 }

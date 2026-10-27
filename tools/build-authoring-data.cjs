@@ -59,7 +59,12 @@ async function build(directory, output, channel, id) {
   const licenses = Object.fromEntries(Object.entries(unzipSync(archive, { filter: e => /^(LICENSE|LICENSE.md)$/i.test(e.name) })).map(([name, bytes]) => [name, Buffer.from(bytes).toString()]));
   const learnLicense = Object.entries(unzipSync(docsZip, { filter: e => /\/LICENSE$/.test(e.name) })).map(([, bytes]) => Buffer.from(bytes).toString()).join('\n');
   const authoredLicense = (await fs.readFile(path.join(__dirname, '../data-public/LICENSE'), 'utf8')).replace(/\r\n/g, '\n');
-  const snapshot = { dataFormatVersion: 1, id, channel, sources, files, reference, notices: { authored: authoredLicense, samples: licenses, learn: learnLicense, creator: await fs.readFile(path.join(directory, 'creator-license.txt'), 'utf8') } };
+  // Learn page chrome is volatile. Retain raw transport hashes as audit metadata;
+  // approval binds the extracted entries, channel audit and pinned source revisions.
+  const inputAudit = files['src/molang-catalog.json'].provenance.inputs;
+  delete files['src/molang-catalog.json'].provenance.inputs;
+  files['src/molang-catalog.json'].provenance.extractedSha256 = updates.sha256(Buffer.from(JSON.stringify(files['src/molang-catalog.json'].entries)));
+  const snapshot = { dataFormatVersion: 1, id, channel, sources, files, reference, inputAudit, notices: { authored: authoredLicense, samples: licenses, learn: learnLicense, creator: await fs.readFile(path.join(directory, 'creator-license.txt'), 'utf8') } };
   const bytes = Buffer.from(JSON.stringify(snapshot));
   const entry = { dataFormatVersion: 1, id, channel, generatedAt, extension: { min: require('../package.json').version, max: require('../package.json').version }, minecraft: { min: engine(source.tag), max: engine(source.tag) }, sources, url: '', sha256: updates.sha256(bytes), bytes: bytes.length }; entry.url = updates.artifactUrl(entry);
   updates.validateManifest({ dataFormatVersion: 1, channel, generatedAt, snapshots: [entry] }, channel); updates.validateSnapshot(snapshot, entry);
