@@ -86,7 +86,7 @@ async function harness(t, autoDeploy = false, releaseScenario = {}) {
     TreeItemCollapsibleState: { None: 0, Collapsed: 1, Expanded: 2 },
     TreeItemCheckboxState: { Unchecked: 0, Checked: 1 },
     Uri: { file: uri, joinPath: (base, relative) => uri(path.join(base.fsPath, relative)) },
-    workspace: { workspaceFolders: [{ uri: uri(root) }], isTrusted: true, textDocuments: [], onDidChangeWorkspaceFolders: () => disposable(), createFileSystemWatcher: () => ({ dispose() {}, onDidCreate: () => disposable(), onDidChange: () => disposable(), onDidDelete: () => disposable() }) },
+    workspace: { getConfiguration: () => ({get: () => false}), workspaceFolders: [{ uri: uri(root) }], isTrusted: true, textDocuments: [], onDidChangeWorkspaceFolders: () => disposable(), createFileSystemWatcher: () => ({ dispose() {}, onDidCreate: () => disposable(), onDidChange: () => disposable(), onDidDelete: () => disposable() }) },
     languages: { createDiagnosticCollection: () => ({ clear() {}, get() { return []; }, set() {}, delete() {}, dispose() {} }) },
     window: {
       createOutputChannel: () => ({ info() {}, warn() {}, error() {}, dispose() {} }),
@@ -105,7 +105,7 @@ async function harness(t, autoDeploy = false, releaseScenario = {}) {
   const factory = vm.runInNewContext(`(function(require, module, exports) { ${await fs.readFile(extensionFile, 'utf8')}\n})`, { console, process, setTimeout, clearTimeout }, { filename: extensionFile });
   factory(name => name === 'vscode' ? vscode : name === './releases.cjs' ? releaseApi : name === './scripts.cjs' ? scriptApi : name === './reference.cjs' ? {...actualRequire(name),loadReference:async()=>undefined} : name === './experiment-updates.cjs' ? updates : actualRequire(name), module, module.exports);
   const state=new Map();
-  module.exports.activate({ subscriptions: disposables, extensionUri: uri(path.dirname(path.dirname(extensionFile))),globalState:{get:(key,fallback)=>state.has(key)?state.get(key):fallback,update:async(key,value)=>state.set(key,value)} });
+  module.exports.activate({ subscriptions: disposables, globalStorageUri: uri(path.join(root,'.bedrock/test-global')), extensionUri: uri(path.dirname(path.dirname(extensionFile))),globalState:{get:(key,fallback)=>state.has(key)?state.get(key):fallback,update:async(key,value)=>state.set(key,value)} });
   t.after(() => disposables.forEach(d => d.dispose()));
   await commands.get('bedrock.refresh')();
   async function sidebar(node) {

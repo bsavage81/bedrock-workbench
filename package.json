@@ -2,10 +2,10 @@
   "name": "bedrock-workbench",
   "displayName": "Bedrock Workbench",
   "description": "Build, deploy and export Minecraft Bedrock add-ons with separate beta and stable profiles.",
-  "version": "0.24.0",
+  "version": "0.26.8",
   "icon": "media/bedrock-workbench.png",
   "publisher": "bsavage81",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.95.0"
   },
@@ -24,8 +24,8 @@
     "virtualWorkspaces": false
   },
   "scripts": {
-    "check": "node --check src/core.cjs && node --check src/extension.cjs && node --check src/releases.cjs && node --check src/reference.cjs && node --check src/editor.cjs && node --check src/scripts.cjs && node --check src/experiments.cjs && node --check src/experiment-updates.cjs && node --check src/official-schemas.cjs && node --check src/content.cjs && node --check src/content-editor.cjs && node --check src/validation.cjs && node --check src/commands.cjs && node --check tools/generate-owned-schemas.cjs && node --check src/auto-suggest.cjs && node --check src/script-components.cjs && node --check tools/block-schema.cjs && node --check src/component-parameters.cjs && node --check src/completion-key.cjs && node --check tools/block-components.cjs && node --check src/documentation.cjs && node --check tools/update-documentation-links.cjs && node --check src/vanilla.cjs && node --check src/validation-ignores.cjs && node --check src/diagnostic-policy.cjs && node --check tools/item-schema.cjs && node --check tools/audit-item-examples.cjs && node --check src/format-versions.cjs && node --check src/component-compatibility.cjs && node --check src/compatibility-actions.cjs && node --check tools/entity-schema.cjs && node --check tools/audit-entity-examples.cjs && node --check src/entity-authoring.cjs && node --check src/linked-entities.cjs && node --check src/entity-editor.cjs && node --check src/project-symbols.cjs && node --check src/localization.cjs && node --check tools/extract-format-requirements.cjs && node --check tools/update-format-requirements.cjs && node --check src/translation-decorations.cjs && node --check src/filters.cjs && node --check src/filter-editor.cjs && node --check tools/audit-component-hovers.cjs && node --check tools/update-filter-catalog.cjs && node --check tools/update-component-descriptions.cjs && node --check tools/audit-component-descriptions.cjs",
-    "test": "node --test test/compiler.test.cjs test/workflow.test.cjs test/releases.test.cjs test/reference.test.cjs test/scripts.test.cjs test/experiments.test.cjs test/intelligence.test.cjs test/commands.test.cjs test/authored-schemas.test.cjs test/auto-suggest.test.cjs test/blocks.test.cjs test/component-parameters.test.cjs test/completion-key.test.cjs test/documentation.test.cjs test/vanilla.test.cjs test/validation-ignores.test.cjs test/diagnostic-policy.test.cjs test/items.test.cjs test/creative-groups.test.cjs test/format-versions.test.cjs test/component-compatibility.test.cjs test/entity-authoring.test.cjs test/translation-preview.test.cjs test/filters.test.cjs test/hover-coverage.test.cjs",
+    "check": "node --check src/core.cjs && node --check src/extension.cjs && node --check src/releases.cjs && node --check src/reference.cjs && node --check src/editor.cjs && node --check src/scripts.cjs && node --check src/experiments.cjs && node --check src/experiment-updates.cjs && node --check src/official-schemas.cjs && node --check src/content.cjs && node --check src/content-editor.cjs && node --check src/validation.cjs && node --check src/commands.cjs && node --check tools/generate-owned-schemas.cjs && node --check src/auto-suggest.cjs && node --check src/script-components.cjs && node --check tools/block-schema.cjs && node --check src/component-parameters.cjs && node --check src/completion-key.cjs && node --check tools/block-components.cjs && node --check src/documentation.cjs && node --check tools/update-documentation-links.cjs && node --check src/vanilla.cjs && node --check src/validation-ignores.cjs && node --check src/diagnostic-policy.cjs && node --check tools/item-schema.cjs && node --check tools/audit-item-examples.cjs && node --check src/format-versions.cjs && node --check src/component-compatibility.cjs && node --check src/compatibility-actions.cjs && node --check tools/entity-schema.cjs && node --check tools/audit-entity-examples.cjs && node --check src/entity-authoring.cjs && node --check src/linked-entities.cjs && node --check src/entity-editor.cjs && node --check src/project-symbols.cjs && node --check src/localization.cjs && node --check tools/extract-format-requirements.cjs && node --check tools/update-format-requirements.cjs && node --check src/translation-decorations.cjs && node --check src/filters.cjs && node --check src/filter-editor.cjs && node --check tools/audit-component-hovers.cjs && node --check tools/update-filter-catalog.cjs && node --check tools/update-component-descriptions.cjs && node --check tools/audit-component-descriptions.cjs && node --check src/molang.cjs && node --check tools/update-molang-catalog.cjs && node --check tools/audit-molang.cjs && node --check test/molang-host.cjs && node --check src/preview-vanilla.cjs && node --check src/preview-actions.cjs && node --check src/model-preview.cjs && node --check src/preview-geometry.cjs && node --check media/model-preview.js && node --check src/molang-bindings.cjs && node --check tools/update-molang-guidance.cjs && node --check test/molang-followup-host.cjs && node --check src/preview-render-bindings.cjs && node --check src/preview-properties.cjs && node --check src/authoring-data.cjs && node --check src/authoring-updates.cjs && node --check src/authoring-service.cjs && node --check src/preview-images.cjs && node --check src/preview-plan.cjs && node --check tools/fetch-authoring-inputs.cjs && node --check tools/build-authoring-data.cjs && node --check tools/publish-authoring-data.cjs && node --check tools/use-authoring-candidate.cjs && node --check test/authoring-data-host.cjs && node --check tools/preview-reference-fallback.cjs",
+    "test": "node --test test/compiler.test.cjs test/workflow.test.cjs test/releases.test.cjs test/reference.test.cjs test/scripts.test.cjs test/experiments.test.cjs test/intelligence.test.cjs test/commands.test.cjs test/authored-schemas.test.cjs test/auto-suggest.test.cjs test/blocks.test.cjs test/component-parameters.test.cjs test/completion-key.test.cjs test/documentation.test.cjs test/vanilla.test.cjs test/validation-ignores.test.cjs test/diagnostic-policy.test.cjs test/items.test.cjs test/creative-groups.test.cjs test/format-versions.test.cjs test/component-compatibility.test.cjs test/entity-authoring.test.cjs test/translation-preview.test.cjs test/filters.test.cjs test/hover-coverage.test.cjs test/molang.test.cjs test/model-preview.test.cjs test/preview-texture-selection.test.cjs test/preview-vanilla.test.cjs test/molang-followup.test.cjs test/preview-render-bindings.test.cjs test/preview-properties.test.cjs test/authoring-updates.test.cjs test/preview-images.test.cjs test/preview-plan.test.cjs",
     "package": "vsce package --target win32-x64 --allow-missing-repository --skip-license",
     "build:sample": "node tools/build.cjs \"projects/SavageCraft v2\" beta",
     "export:sample": "node tools/build.cjs \"projects/SavageCraft v2\" stable",
@@ -150,12 +150,38 @@
         "title": "Bedrock: Validate Project"
       },
       {
+        "command": "bedrock.authoringSubpack",
+        "title": "Bedrock: Select Authoring Resource Subpack"
+      },
+      {
         "command": "bedrock.vanillaSource",
         "title": "Bedrock: Select Vanilla Reference Source"
       },
       {
         "command": "bedrock.validationIgnores",
         "title": "Bedrock: Review Intended References"
+      },
+      {
+        "command": "bedrock.openModelPreview",
+        "title": "Bedrock: Open Model Preview",
+        "icon": "$(preview)"
+      },
+      {
+        "command": "bedrock.openModelPreviewBeside",
+        "title": "Bedrock: Open Model Preview to the Side",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "bedrock.authoringData",
+        "title": "Bedrock: Authoring Data Status"
+      },
+      {
+        "command": "bedrock.refreshAuthoringData",
+        "title": "Bedrock: Refresh Authoring Data"
+      },
+      {
+        "command": "bedrock.rollbackAuthoringData",
+        "title": "Bedrock: Roll Back Authoring Data"
       }
     ],
     "viewsContainers": {
@@ -194,8 +220,13 @@
     "languages": [
       {
         "id": "bedrock-lang",
-        "aliases": ["Minecraft Language", "Bedrock Lang"],
-        "extensions": [".lang"]
+        "aliases": [
+          "Minecraft Language",
+          "Bedrock Lang"
+        ],
+        "extensions": [
+          ".lang"
+        ]
       },
       {
         "id": "mcfunction",
@@ -208,16 +239,94 @@
         ]
       }
     ],
-    "grammars": [{"language":"bedrock-lang","scopeName":"source.bedrock-lang","path":"./syntaxes/bedrock-lang.tmLanguage.json"}],
+    "grammars": [
+      {
+        "language": "bedrock-lang",
+        "scopeName": "source.bedrock-lang",
+        "path": "./syntaxes/bedrock-lang.tmLanguage.json"
+      }
+    ],
     "colors": [
-      {"id":"bedrock.lang.entity","description":"Entity name translation keys.","defaults":{"dark":"#4EC9B0","light":"#167C6B","highContrast":"#4EC9B0","highContrastLight":"#005A50"}},
-      {"id":"bedrock.lang.spawnEgg","description":"Spawn egg translation keys.","defaults":{"dark":"#C586C0","light":"#8A287F","highContrast":"#E5A0DF","highContrastLight":"#702068"}},
-      {"id":"bedrock.lang.item","description":"Item translation keys.","defaults":{"dark":"#DCDCAA","light":"#766000","highContrast":"#FFFFAA","highContrastLight":"#604B00"}},
-      {"id":"bedrock.lang.block","description":"Block translation keys.","defaults":{"dark":"#CE9178","light":"#A04A21","highContrast":"#FFAD88","highContrastLight":"#843800"}},
-      {"id":"bedrock.lang.ui","description":"Interface translation keys.","defaults":{"dark":"#9CDCFE","light":"#0066A2","highContrast":"#9CDCFE","highContrastLight":"#004E80"}},
-      {"id":"bedrock.lang.action","description":"Action and death-message translation keys.","defaults":{"dark":"#B5CEA8","light":"#416C28","highContrast":"#C8EDA9","highContrastLight":"#2B5018"}},
-      {"id":"bedrock.lang.pack","description":"Pack metadata translation keys.","defaults":{"dark":"#D7BA7D","light":"#846200","highContrast":"#F9D78B","highContrastLight":"#684D00"}},
-      {"id":"bedrock.lang.other","description":"Other translation keys.","defaults":{"dark":"#C5C5C5","light":"#444444","highContrast":"#FFFFFF","highContrastLight":"#000000"}},
+      {
+        "id": "bedrock.lang.entity",
+        "description": "Entity name translation keys.",
+        "defaults": {
+          "dark": "#4EC9B0",
+          "light": "#167C6B",
+          "highContrast": "#4EC9B0",
+          "highContrastLight": "#005A50"
+        }
+      },
+      {
+        "id": "bedrock.lang.spawnEgg",
+        "description": "Spawn egg translation keys.",
+        "defaults": {
+          "dark": "#C586C0",
+          "light": "#8A287F",
+          "highContrast": "#E5A0DF",
+          "highContrastLight": "#702068"
+        }
+      },
+      {
+        "id": "bedrock.lang.item",
+        "description": "Item translation keys.",
+        "defaults": {
+          "dark": "#DCDCAA",
+          "light": "#766000",
+          "highContrast": "#FFFFAA",
+          "highContrastLight": "#604B00"
+        }
+      },
+      {
+        "id": "bedrock.lang.block",
+        "description": "Block translation keys.",
+        "defaults": {
+          "dark": "#CE9178",
+          "light": "#A04A21",
+          "highContrast": "#FFAD88",
+          "highContrastLight": "#843800"
+        }
+      },
+      {
+        "id": "bedrock.lang.ui",
+        "description": "Interface translation keys.",
+        "defaults": {
+          "dark": "#9CDCFE",
+          "light": "#0066A2",
+          "highContrast": "#9CDCFE",
+          "highContrastLight": "#004E80"
+        }
+      },
+      {
+        "id": "bedrock.lang.action",
+        "description": "Action and death-message translation keys.",
+        "defaults": {
+          "dark": "#B5CEA8",
+          "light": "#416C28",
+          "highContrast": "#C8EDA9",
+          "highContrastLight": "#2B5018"
+        }
+      },
+      {
+        "id": "bedrock.lang.pack",
+        "description": "Pack metadata translation keys.",
+        "defaults": {
+          "dark": "#D7BA7D",
+          "light": "#846200",
+          "highContrast": "#F9D78B",
+          "highContrastLight": "#684D00"
+        }
+      },
+      {
+        "id": "bedrock.lang.other",
+        "description": "Other translation keys.",
+        "defaults": {
+          "dark": "#C5C5C5",
+          "light": "#444444",
+          "highContrast": "#FFFFFF",
+          "highContrastLight": "#000000"
+        }
+      },
       {
         "id": "bedrock.translationPreview",
         "description": "Inline pack translation previews.",
@@ -228,7 +337,43 @@
           "highContrastLight": "#235A30"
         }
       }
-    ]
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "bedrock.openModelPreview",
+          "when": "resourceScheme == file && resourceExtname =~ /\\.(json|jsonc|png|tga|jpg|jpeg)$/",
+          "group": "navigation"
+        },
+        {
+          "command": "bedrock.openModelPreviewBeside",
+          "when": "resourceScheme == file && resourceExtname =~ /\\.(json|jsonc|png|tga|jpg|jpeg)$/",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "bedrock.openModelPreview",
+          "when": "resourceScheme == file && resourceExtname =~ /\\.(json|jsonc|png|tga|jpg|jpeg)$/",
+          "group": "bedrock"
+        },
+        {
+          "command": "bedrock.openModelPreviewBeside",
+          "when": "resourceScheme == file && resourceExtname =~ /\\.(json|jsonc|png|tga|jpg|jpeg)$/",
+          "group": "bedrock"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Bedrock Workbench",
+      "properties": {
+        "bedrock.authoringData.autoUpdate": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check for compatible authoring data on project open and every six hours. Manual refresh remains available."
+        }
+      }
+    }
   },
   "repository": {
     "type": "git",

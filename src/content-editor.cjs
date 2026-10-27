@@ -6,6 +6,7 @@ const commands = require('./commands.cjs');
 const parameters = require('./component-parameters.cjs');
 const {keyEdit,valueEdit} = require('./completion-key.cjs');
 const documentation = require('./documentation.cjs');
+const molang = require('./molang.cjs');
 function attach(vscode, context, getProject, output) {
   if (!vscode.languages.registerCompletionItemProvider) return;
   const diagnostics = vscode.languages.createDiagnosticCollection('bedrock-content');
@@ -14,16 +15,16 @@ function attach(vscode, context, getProject, output) {
   let vanilla, vanillaKey, vanillaPending;
   async function referenceData() {
     const project = getProject(); if (!project) return;
-    const next = JSON.stringify([project.root, project.config.targetVersion]);
+    const next = JSON.stringify([project.root, project.config.target, project.config.targetVersion, require('./authoring-data.cjs').revision]);
     if (next !== vanillaKey) {
       vanillaKey = next; vanilla = undefined;
-      vanillaPending = reference.loadReference(project.root, project.config.targetVersion).then(value => { if (vanillaKey === next) vanilla = value; return value; }).catch(error => { output.warn(`Command reference: ${error.message}`); });
+      vanillaPending = reference.loadReference(project.root, project.config.targetVersion, { channel: project.config.target }).then(value => { if (vanillaKey === next) vanilla = value; return value; }).catch(error => { output.warn(`Command reference: ${error.message}`); });
     }
     return vanilla || vanillaPending;
   }
   async function ensure() {
     const project = getProject(); if (!project || disposed) return;
-    const next = JSON.stringify([project.root, project.packs,project.vanillaSource,project.config.target,project.config.targetVersion,project.config.validation]);
+    const next = JSON.stringify([project.root, project.packs,project.vanillaSource,project.config.target,project.config.targetVersion,project.config.validation,project.config.authoring,require('./authoring-data.cjs').revision]);
     if (next !== key) { key = next; dirty = true; cached = undefined; pendingFiles.clear(); }
     if (running) { await running; return ensure(); }
     if (!dirty && cached) return cached;
@@ -43,6 +44,13 @@ function attach(vscode, context, getProject, output) {
     const kind = content.fileKind(project, document.uri.fsPath); if (!kind || !document.uri.fsPath.endsWith('.json')) return;
     const text = document.getText(); return { ...kind, file: document.uri.fsPath, text, tree: json.parseTree(text.replace(/^\uFEFF/, ' ')) };
   }
+  async function molangIndex(){
+    const index=await ensure();if(!index)return;
+    const copy=Object.assign(Object.create(Object.getPrototypeOf(index)),index,{documents:new Map(index.documents)});
+    const key=file=>path.resolve(file).toLowerCase();
+    for(const document of vscode.workspace.textDocuments){if(!document.isDirty)continue;const data=documentData(document);if(!data?.tree)continue;for(const file of copy.documents.keys())if(key(file)===key(data.file))copy.documents.delete(file);copy.documents.set(data.file,{...data,data:json.getNodeValue(data.tree)});}
+    return copy;
+  }
   function at(document, position) {
     const data = documentData(document); if (!data?.tree) return;
     const offset = document.offsetAt(position), location = json.getLocation(data.text, offset), node = json.findNodeAtOffset(data.tree, offset, true);
@@ -59,8 +67,8 @@ function attach(vscode, context, getProject, output) {
     const data = documentData(document);
     if (!data) { diagnostics.delete(document.uri); return; }
     const compatibility=require('./component-compatibility.cjs').issues(data,getProject()).filter(issue=>!issue.native||!require('./diagnostic-policy.cjs').nativeOwnsSyntax(vscode,document.uri.fsPath));
-    const issues = [...(cached?require('./linked-entities.cjs').issues(cached,data):[]),...require('./entity-authoring.cjs').issues(data),...compatibility,...require('./format-versions.cjs').issues(data,getProject()), ...content.molangIssues(data), ...(cached ? [...content.referenceIssues(cached, data), ...content.customComponentIssues(cached, data)] : [])];
-    diagnostics.set(document.uri, issues.map(issue => diagnostic(document, issue)));
+    const issues = [...(cached?require('./linked-entities.cjs').issues(cached,data):[]),...require('./entity-authoring.cjs').issues(data),...compatibility,...require('./format-versions.cjs').issues(data,getProject()), ...content.molangIssues(data,cached), ...(cached ? [...content.referenceIssues(cached, data), ...content.customComponentIssues(cached, data)] : [])];
+    diagnostics.set(document.uri, require('./validation-ignores.cjs').partition(getProject(),issues).active.map(issue => diagnostic(document, issue)));
   }
   const selector = [{ language: 'json', scheme: 'file' }, { language: 'jsonc', scheme: 'file' }];
   if(vscode.languages.registerCodeActionsProvider)context.subscriptions.push(vscode.languages.registerCodeActionsProvider(selector,{
@@ -68,7 +76,9 @@ function attach(vscode, context, getProject, output) {
       const data=documentData(document);if(!data)return;
       const compatibility=await require('./compatibility-actions.cjs').codeActions(vscode,document,range,data,getProject());
       const index=await ensure();if(!index)return compatibility;
-      return compatibility.concat(content.referenceIssues(index,data).filter(issue=>range.intersection(new vscode.Range(document.positionAt(issue.offset),document.positionAt(issue.offset+issue.length)))).flatMap(issue=>['file','project'].map(scope=>{
+      const references=[...content.referenceIssues(index,data),...require('./entity-authoring.cjs').issues(data).filter(issue=>issue.reference&&!require('./validation-ignores.cjs').match(getProject(),issue))];
+      const selected=references.filter(issue=>range.intersection(new vscode.Range(document.positionAt(issue.offset),document.positionAt(issue.offset+issue.length))));
+      return compatibility.concat(selected.flatMap(issue=>['file','project'].map(scope=>{
         const action=new vscode.CodeAction(`Mark '${issue.reference.value}' as intended ${scope==='file'?'in this file':'throughout project'}`,vscode.CodeActionKind.QuickFix);
         action.command={command:'bedrock.ignoreReference',title:action.title,arguments:[{...issue.reference,file:document.uri.fsPath,scope}]};return action;
       })));
@@ -193,13 +203,19 @@ function attach(vscode, context, getProject, output) {
       async provideCompletionItems(document, position) {
         const state = at(document, position); if (!state) return;
         const { data, node, offset, location } = state;
-        const before = data.text.slice(node.offset + 1, offset), molang = content.molangNodes(data).includes(node);
-        const prefix = /(?:query|q|math)\.[a-z_]*$/i.exec(before)?.[0];
         const range = new vscode.Range(document.positionAt(node.offset + 1), document.positionAt(node.offset + node.length - 1));
-        if (molang && prefix) return [...content.MOLANG_QUERIES, ...content.MOLANG_MATH].filter(value => (prefix.startsWith('q.') ? value.name.replace(/^query\./, 'q.') : value.name).startsWith(prefix)).map(value => {
-          const name = prefix.startsWith('q.') ? value.name.replace(/^query\./, 'q.') : value.name;
-          const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Function); item.detail = 'Mojang Molang reference'; item.documentation = value.description;
-          item.range = new vscode.Range(document.positionAt(offset - prefix.length), position); item.insertText = name; return item;
+        // The entity provider owns whole-string resource aliases. Molang owns
+        // aliases embedded in larger expressions, preventing duplicate choices.
+        if(require('./linked-entities.cjs').context(data,node)?.prefix)return;
+        if (molang.field(data,node)) return molang.completions(data,node,offset,await molangIndex()).map(value => {
+          const item = new vscode.CompletionItem(value.name, value.parameters ? vscode.CompletionItemKind.Function : vscode.CompletionItemKind.Variable);
+          item.detail = 'Molang'; item.documentation = new vscode.MarkdownString(molang.markdown(value));
+          const map=molang.offsets(data,node);
+          item.range=new vscode.Range(document.positionAt(map[value.start]),document.positionAt(map[value.end]));
+          // JSON encode inserted text but retain VS Code snippet placeholders.
+          item.insertText=new vscode.SnippetString(JSON.stringify(value.insert).slice(1,-1));
+          if(value.parameters?.length)item.command={command:'editor.action.triggerParameterHints',title:'Molang parameters'};
+          return item;
         });
         if(location.path.length===1&&location.path[0]==='format_version'&&data.relative!=='manifest.json'){
           const index=await ensure();if(!index)return;
@@ -223,12 +239,9 @@ function attach(vscode, context, getProject, output) {
       async provideHover(document, position) {
         const state = at(document, position); if (!state) return;
         const { data, node, location, offset } = state;
-        if (content.molangNodes(data).includes(node)) {
-          const offsets = content.rawOffsets(data.text, node), decoded = Math.max(0, offsets.findIndex(value => value >= offset));
-          const token = content.molangParser.getCursorContext(node.value, decoded).tokenAtCursor;
-          const id = token?.fullIdentifier?.replace(/^q\./, 'query.');
-          const reference = [...content.MOLANG_QUERIES, ...content.MOLANG_MATH].find(entry => entry.name === id);
-          if (reference) return new vscode.Hover(`${reference.name}: ${reference.description}${reference.syntax ? '\n\n' + reference.syntax : ''}`);
+        if (molang.field(data,node)) {
+          const value=molang.hover(data,node,offset,await molangIndex()),map=molang.offsets(data,node);
+          if(value)return new vscode.Hover(new vscode.MarkdownString(value.markdown),new vscode.Range(document.positionAt(map[value.start]),document.positionAt(map[value.end])));
         }
         const kind = content.referenceKind(location.path, node.value, data); if (!kind) return;
         const index = await ensure(), files = index?.values(kind).get(kind==='texture'?node.value.replace(/\.(png|tga|jpe?g)$/i,''):node.value);
@@ -239,6 +252,10 @@ function attach(vscode, context, getProject, output) {
     vscode.languages.registerDefinitionProvider(selector, {
       async provideDefinition(document, position) {
         const state = at(document, position); if (!state) return;
+        if(molang.field(state.data,state.node)&&!require('./linked-entities.cjs').context(state.data,state.node)){
+          const definitions=require('./molang-bindings.cjs').definitions(await molangIndex(),state.data,state.node,state.offset);
+          if(definitions.length)return Promise.all(definitions.map(async value=>{const source=await vscode.workspace.openTextDocument(vscode.Uri.file(value.document.file));return new vscode.Location(source.uri,new vscode.Range(source.positionAt(value.offset),source.positionAt(value.offset+value.length)));}));
+        }
         const kind = content.referenceKind(state.location.path, state.node.value, state.data); if (!kind) return;
         const index = await ensure(); return index && content.referenceDefinitions(index, kind, state.node.value,state.data).map(value => new vscode.Location(vscode.Uri.file(value.file), new vscode.Position(value.line, value.column)));
       }
@@ -247,6 +264,14 @@ function attach(vscode, context, getProject, output) {
     vscode.workspace.onDidChangeTextDocument(event => validate(event.document)),
     vscode.workspace.onDidCloseTextDocument(document => diagnostics.delete(document.uri))
   );
+  if(vscode.languages.registerSignatureHelpProvider)context.subscriptions.push(vscode.languages.registerSignatureHelpProvider(selector,{
+    async provideSignatureHelp(document,position){
+      const state=at(document,position);if(!state||!molang.field(state.data,state.node))return;
+      const call=molang.signature(state.data,state.node,state.offset,await molangIndex());if(!call)return;
+      const result=new vscode.SignatureHelp(),entry=call.entry;
+      result.signatures=(call.signatures||[entry]).map(entry=>{const signature=new vscode.SignatureInformation(entry.name+'('+entry.parameters.join(', ')+')',new vscode.MarkdownString(molang.markdown(entry)));signature.parameters=entry.parameters.map(p=>new vscode.ParameterInformation(p,molang.parameterDescription(entry,p)));return signature;});result.activeSignature=call.activeSignature||0;result.activeParameter=call.parameter;return result;
+    }
+  },'(',',',')'));
   const functionSelector = [{ language: 'mcfunction', scheme: 'file' }];
   async function commandState(document, position) {
     const project = getProject();
@@ -294,5 +319,6 @@ function attach(vscode, context, getProject, output) {
     timer = setTimeout(() => { void ensure().then(() => { for (const document of vscode.workspace.textDocuments) validate(document); }); }, 500);
   }
   context.subscriptions.push(watcher, watcher.onDidCreate(change), watcher.onDidChange(change), watcher.onDidDelete(change), { dispose() { disposed = true; clearTimeout(timer); } });
+  return { async refresh() { key = undefined; vanillaKey = undefined; dirty = true; await ensure(); for (const document of vscode.workspace.textDocuments) validate(document); } };
 }
 module.exports = { attach };

@@ -1,5 +1,5 @@
-const catalog = require('./documentation-links.json');
-const descriptions = require('./component-descriptions.json');
+const catalog = require('./authoring-data.cjs').get('src/documentation-links.json');
+const descriptions = require('./authoring-data.cjs').get('src/component-descriptions.json');
 const BASE = 'https://learn.microsoft.com/en-us/minecraft/creator/';
 const lists = {
   block:'reference/content/blockreference/examples/blockcomponents/blockcomponentslist',

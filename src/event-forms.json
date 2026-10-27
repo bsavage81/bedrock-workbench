@@ -1,0 +1,135 @@
+{
+  "source": "https://github.com/MicrosoftDocs/minecraft-creator",
+  "revision": "4432fb62a8e0ce5c785bd2bf02a6f981dcffbbe8",
+  "license": "CC-BY-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "pagesReviewed": 513,
+  "components": {
+    "minecraft:ageable": {
+      "grow_up": {
+        "description": "Event to fire when an entity grows up. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_ageable.md",
+        "blob": "79bcef621710f1ea8033481a17cfb534ed005ecd"
+      },
+      "pause_growth": {
+        "description": "Event triggered when a baby entity's growth is paused (via a pause_growth_items feed).",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_ageable.md",
+        "blob": "79bcef621710f1ea8033481a17cfb534ed005ecd"
+      },
+      "reset_growth": {
+        "description": "Event triggered when a baby entity's growth is reset (via a reset_growth_items feed).",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_ageable.md",
+        "blob": "79bcef621710f1ea8033481a17cfb534ed005ecd"
+      }
+    },
+    "minecraft:angry": {
+      "calm_event": {
+        "description": "Event to fire when this entity is calmed down. Can be a simple event name string or an object with event and target properties.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_angry.md",
+        "blob": "3bf2898314fb5d7987c096f0f79ab2b8567c6259"
+      }
+    },
+    "minecraft:attack_cooldown": {
+      "attack_cooldown_complete_event": {
+        "description": "Event to be run when the cooldown is complete. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_attack_cooldown.md",
+        "blob": "835f6d8cb30f574014330bb5af44c35fb6a1a8ce"
+      }
+    },
+    "minecraft:breedable": {
+      "breed_event": {
+        "description": "Event to run when this entity breeds. Can be a simple event name string or a trigger object with event and optional filters.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_breedable.md",
+        "blob": "3132c4cf61758c096521fbd5905715cd92ec9a6e"
+      }
+    },
+    "minecraft:drying_out_timer": {
+      "dried_out_event": {
+        "description": "Event to fire when the drying out time runs out. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_drying_out_timer.md",
+        "blob": "325842b762a55905d522399d0b744f8cf7787a14"
+      },
+      "recover_after_dried_out_event": {
+        "description": "Event to fire when entity was already dried out but received increase in water supply. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_drying_out_timer.md",
+        "blob": "325842b762a55905d522399d0b744f8cf7787a14"
+      },
+      "stopped_drying_out_event": {
+        "description": "Event to fire when entity stopped drying out. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_drying_out_timer.md",
+        "blob": "325842b762a55905d522399d0b744f8cf7787a14"
+      }
+    },
+    "minecraft:giveable": {
+      "on_give": {
+        "description": "Event to fire when the correct item is given. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_giveable.md",
+        "blob": "d56e6bc6d4e6f40c7a8de939a18621e6e0fa0fc9"
+      }
+    },
+    "minecraft:leashable": {
+      "on_leash": {
+        "description": "Event to call when this entity is leashed. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_leashable.md",
+        "blob": "118b7697e514bb441842dd9ff77f8a2f7940e877"
+      },
+      "on_unleash": {
+        "description": "Event to call when this entity is unleashed. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_leashable.md",
+        "blob": "118b7697e514bb441842dd9ff77f8a2f7940e877"
+      }
+    },
+    "minecraft:sittable": {
+      "sit_event": {
+        "description": "Event to run when the entity enters the 'sit' state. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_sittable.md",
+        "blob": "3d8d9be5bcd2f9f360ecdb384c88e3d81c6e3363"
+      },
+      "stand_event": {
+        "description": "Event to run when the entity exits the 'sit' state. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_sittable.md",
+        "blob": "3d8d9be5bcd2f9f360ecdb384c88e3d81c6e3363"
+      }
+    },
+    "minecraft:tameable": {
+      "tame_event": {
+        "description": "Event to fire when the entity is tamed. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_tameable.md",
+        "blob": "3cd7af78002199c5623d3ea04a43c834fe767736"
+      }
+    },
+    "minecraft:target_nearby_sensor": {
+      "on_inside_range": {
+        "description": "Event to call when an entity gets in the inside range. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_target_nearby_sensor.md",
+        "blob": "93a19a9ac88c05b3628b57fc433862a262fd434f"
+      },
+      "on_outside_range": {
+        "description": "Event to call when an entity gets outside the outside range. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_target_nearby_sensor.md",
+        "blob": "93a19a9ac88c05b3628b57fc433862a262fd434f"
+      }
+    },
+    "minecraft:timer": {
+      "time_down_event": {
+        "description": "Event to fire when the time on the timer runs out. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_timer.md",
+        "blob": "1bf4512701d79d59accc9fd524eea86b612633c2"
+      }
+    },
+    "minecraft:trusting": {
+      "trust_event": {
+        "description": "Event to run when this entity becomes trusting. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityComponents/minecraftComponent_trusting.md",
+        "blob": "a85855d1134dc7ecdc36477883321db7ede863a9"
+      }
+    },
+    "minecraft:behavior.knockback_roar": {
+      "on_roar_end": {
+        "description": "Event that is triggered when the roar ends. Can be an object with event and target properties, or a simple event string.",
+        "source": "creator/Reference/Content/EntityReference/Examples/EntityGoals/minecraftBehavior_knockback_roar.md",
+        "blob": "5a219340d46f7daa638aebe61b330d2c04bb622e"
+      }
+    }
+  }
+}

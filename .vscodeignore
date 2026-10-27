@@ -2,6 +2,7 @@ projects/**
 dist/**
 test/**
 tools/**
+data-public/**
 .git/**
 .vscode/**
 *.vsix

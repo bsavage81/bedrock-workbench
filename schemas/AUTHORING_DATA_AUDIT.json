@@ -1,0 +1,275 @@
+{
+  "verifiedAt": "2026-10-27T16:13:36.812Z",
+  "extensionVersion": "0.26.8",
+  "baselineVersion": "0.26.6",
+  "publicRepository": "bsavage81/bedrock-workbench-data",
+  "dataFormatVersion": 1,
+  "syntaxChecksPassed": true,
+  "workflowYamlParsed": true,
+  "scheduleEnabled": false,
+  "publicationEnabled": false,
+  "immutableReleasesEnabled": true,
+  "unitSuite": {
+    "tests": 308,
+    "passed": 307,
+    "skipped": 1,
+    "failed": 0
+  },
+  "nativeVSCode": {
+    "version": "0.26.8",
+    "timestamp": "2026-10-27T16:11:46.731Z",
+    "authoringOnly": true,
+    "anonymousDownload": true,
+    "liveSchemaCompletion": true,
+    "liveSchemaHover": true,
+    "liveValidation": true,
+    "liveMolangCatalog": true,
+    "atomicReplacement": true,
+    "rollback": true,
+    "failedChecksumRecovery": true,
+    "bundledFallback": true,
+    "downloadCalls": 6,
+    "deploymentPerformed": false
+  },
+  "channels": {
+    "stable": {
+      "entry": {
+        "dataFormatVersion": 1,
+        "id": "v0.26.8-stable-20261027",
+        "channel": "stable",
+        "generatedAt": "2026-10-27T16:10:32.330Z",
+        "extension": {
+          "min": "0.26.8",
+          "max": "0.26.8"
+        },
+        "minecraft": {
+          "min": "1.26.50",
+          "max": "1.26.50"
+        },
+        "sources": [
+          {
+            "url": "https://github.com/Mojang/bedrock-samples",
+            "revision": "46ba6ea985fb5a92d79a9419198f10dda14c199d",
+            "tag": "v1.26.50.4",
+            "channel": "stable",
+            "available": true,
+            "license": "Minecraft EULA (upstream LICENSE.md)",
+            "attribution": "(c) Mojang AB. All rights reserved."
+          },
+          {
+            "url": "https://github.com/MicrosoftDocs/minecraft-creator",
+            "revision": "efda551c01f4c36ceb9c5f20546ed6e1380a7ab4",
+            "license": "CC-BY-4.0",
+            "attribution": "Microsoft Learn contributors; descriptions extracted and adapted by Bedrock Workbench."
+          },
+          {
+            "url": "https://github.com/Mojang/minecraft-creator-tools",
+            "revision": "a8f2cd2fc7aa7e7e075dbf54a4597319aa8b71e1",
+            "license": "MIT (supporting reference only; no code included)",
+            "attribution": "Mojang; supporting reference, parser not distributed in data."
+          }
+        ],
+        "url": "https://github.com/bsavage81/bedrock-workbench-data/releases/download/data-v0.26.8-stable-20261027/snapshot.json",
+        "sha256": "c26546b4a3199df3ea4f3cb12487f675fe131c89b80db4559778c665fcb2dc43",
+        "bytes": 3082749
+      },
+      "coverage": {
+        "block": {
+          "components": 46,
+          "namedParameters": 140,
+          "schemaHovers": 140,
+          "filterHovers": 0,
+          "missing": []
+        },
+        "item": {
+          "components": 52,
+          "namedParameters": 196,
+          "schemaHovers": 196,
+          "filterHovers": 0,
+          "missing": []
+        },
+        "entity": {
+          "components": 107,
+          "namedParameters": 1385,
+          "schemaHovers": 945,
+          "filterHovers": 440,
+          "missing": []
+        }
+      },
+      "missingLearnPages": 0,
+      "vanillaDocuments": 485,
+      "vanillaFailures": 0,
+      "projectRegressions": {
+        "tests": 61,
+        "passed": true
+      },
+      "fallbackFailures": 0,
+      "reviewFingerprint": "21bd821ba565375684a8a1233435ccd754f4dd5ad7877da053ba5bcd384d6913",
+      "reviewApproved": true,
+      "published": false
+    },
+    "preview": {
+      "entry": {
+        "dataFormatVersion": 1,
+        "id": "v0.26.8-preview-20261027",
+        "channel": "preview",
+        "generatedAt": "2026-10-27T16:10:41.954Z",
+        "extension": {
+          "min": "0.26.8",
+          "max": "0.26.8"
+        },
+        "minecraft": {
+          "min": "1.26.60",
+          "max": "1.26.60"
+        },
+        "sources": [
+          {
+            "url": "https://github.com/Mojang/bedrock-samples",
+            "revision": "4d30ae63750467771b6eccda105f732c6cb77ff7",
+            "tag": "v1.26.60.30-preview",
+            "channel": "preview",
+            "available": true,
+            "license": "Minecraft EULA (upstream LICENSE.md)",
+            "attribution": "(c) Mojang AB. All rights reserved."
+          },
+          {
+            "url": "https://github.com/MicrosoftDocs/minecraft-creator",
+            "revision": "efda551c01f4c36ceb9c5f20546ed6e1380a7ab4",
+            "license": "CC-BY-4.0",
+            "attribution": "Microsoft Learn contributors; descriptions extracted and adapted by Bedrock Workbench."
+          },
+          {
+            "url": "https://github.com/Mojang/minecraft-creator-tools",
+            "revision": "a8f2cd2fc7aa7e7e075dbf54a4597319aa8b71e1",
+            "license": "MIT (supporting reference only; no code included)",
+            "attribution": "Mojang; supporting reference, parser not distributed in data."
+          },
+          {
+            "url": "https://github.com/Mojang/bedrock-samples",
+            "revision": "46ba6ea985fb5a92d79a9419198f10dda14c199d",
+            "tag": "v1.26.50.4",
+            "channel": "stable",
+            "available": true,
+            "license": "Minecraft EULA (upstream LICENSE.md)",
+            "attribution": "(c) Mojang AB. All rights reserved."
+          }
+        ],
+        "url": "https://github.com/bsavage81/bedrock-workbench-data/releases/download/data-v0.26.8-preview-20261027/snapshot.json",
+        "sha256": "b3521fc7592f7b03143084e5033a2096c4f06e6fd3361246b0aed1668ec28b6c",
+        "bytes": 3088105
+      },
+      "coverage": {
+        "block": {
+          "components": 46,
+          "namedParameters": 140,
+          "schemaHovers": 140,
+          "filterHovers": 0,
+          "missing": []
+        },
+        "item": {
+          "components": 52,
+          "namedParameters": 196,
+          "schemaHovers": 196,
+          "filterHovers": 0,
+          "missing": []
+        },
+        "entity": {
+          "components": 107,
+          "namedParameters": 1385,
+          "schemaHovers": 945,
+          "filterHovers": 440,
+          "missing": []
+        }
+      },
+      "missingLearnPages": 0,
+      "vanillaDocuments": 485,
+      "vanillaFailures": 0,
+      "projectRegressions": {
+        "tests": 61,
+        "passed": true
+      },
+      "previewReview": {
+        "inherited": [
+          {
+            "name": "minecraft:attack",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 61
+          },
+          {
+            "name": "minecraft:spell_effects",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 6
+          },
+          {
+            "name": "minecraft:movement.amphibious",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 3
+          },
+          {
+            "name": "minecraft:movement.basic",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 65
+          },
+          {
+            "name": "minecraft:movement.fly",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 1
+          },
+          {
+            "name": "minecraft:movement.generic",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 1
+          },
+          {
+            "name": "minecraft:movement.hover",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 3
+          },
+          {
+            "name": "minecraft:movement.jump",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 8
+          },
+          {
+            "name": "minecraft:movement.skip",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 1
+          },
+          {
+            "name": "minecraft:movement.sway",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 9
+          },
+          {
+            "name": "minecraft:trail",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 1
+          },
+          {
+            "name": "minecraft:transformation",
+            "sourceTag": "v1.26.50.4",
+            "previewExamples": 20
+          }
+        ],
+        "unresolved": []
+      },
+      "fallbackFailures": 0,
+      "reviewFingerprint": "790d87ac38641583be47b1d680bbd8aa9849c0182362224f6b214adb4fcea264",
+      "reviewApproved": true,
+      "published": false
+    }
+  },
+  "limitations": [
+    "Public repository initialized with README and license; no feeds or releases uploaded.",
+    "GitHub rejected required reviewers for the private environment on the current billing plan.",
+    "A narrowly scoped cross-repository Contents write token is needed as the DATA_PUBLICATION_TOKEN environment secret.",
+    "Actual public anonymous downloads remain a deployment gate.",
+    "Offline selection retains active and previous snapshot pointers; older target snapshots require online retained feeds.",
+    "Parsers, official package adaptation and structural compatibility behavior remain extension updates."
+  ],
+  "extensionInstalled": true,
+  "extensionPublished": false,
+  "testerBundleRefreshed": false,
+  "sourceLicense": "MIT",
+  "sourcePublicRequested": true
+}

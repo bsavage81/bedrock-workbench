@@ -2,6 +2,21 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { zipSync, strToU8 } = require('fflate');
 const { buildIndex, chooseRelease, closest, componentSchema } = require('../src/reference.cjs');
+test('real Preview tag syntax is selectable only for Preview projects', () => {
+  const stable = { tag_name: 'v1.26.50.4', prerelease: false }, preview = { tag_name: 'v1.26.60.30-preview', prerelease: true };
+  assert.equal(chooseRelease([preview, stable], '1.26.60').tag_name, stable.tag_name);
+  assert.equal(chooseRelease([preview, stable], '1.26.60', 'preview').tag_name, preview.tag_name);
+  assert.equal(chooseRelease([preview, stable], '1.26.50', 'preview').tag_name, stable.tag_name);
+});
+test('Preview reference preserves only sample-confirmed Stable documentation with honest attribution', () => {
+  const stable = { tag: 'v1.26.50.4', components: { entity: { 'minecraft:trail': { description: 'Trail.', fields: { block: { type: 'String', description: 'Block.' } } }, 'minecraft:missing': { description: 'Missing.', fields: {} } } } };
+  const preview = { tag: 'v1.26.60.30-preview', target: '1.26.60', components: { entity: {} } };
+  const result = require('../tools/preview-reference-fallback.cjs').mergePreviewReference(preview, stable, { 'behavior_pack/entities/test.json': Buffer.from(JSON.stringify({ 'minecraft:entity': { component_groups: { sample: { 'minecraft:trail': { block: 'minecraft:snow' } } } } })) });
+  assert.equal(result.inherited[0].previewExamples, 1); assert.deepEqual(result.unresolved, ['minecraft:missing']);
+  const schema = componentSchema(preview, 'entity'), descriptions = JSON.stringify(schema);
+  assert.match(descriptions, /v1\.26\.50\.4 \(Stable documentation; confirmed in Preview samples\)/);
+  assert.ok(!preview.components.entity['minecraft:missing']);
+});
 function archive() {
   const json = value => strToU8(JSON.stringify(value));
   return zipSync({
@@ -11,6 +26,7 @@ function archive() {
     'behavior_pack/blocks/stone.json':json({'minecraft:block':{description:{identifier:'minecraft:stone'}}}),
     'behavior_pack/loot_tables/blocks/stone.json':json({pools:[]}),
     'resource_pack/models/entity/test.geo.json':json({'minecraft:geometry':[{description:{identifier:'geometry.vanilla_test'}}]}),
+    'resource_pack/render_controllers/test.json':json({render_controllers:{'controller.render.test':{geometry:'Geometry.default',textures:['Texture.default']}}}),
     'resource_pack/texts/en_US.lang':strToU8('item.apple.name=Apple\n'),
     'resource_pack/animations/test.json':json({animations:{'animation.vanilla_test':{}}}),
     'behavior_pack/animations/server.json':json({animations:{'animation.server_only':{}}}),
@@ -33,6 +49,10 @@ test('Mojang documentation and schema references supply component and field desc
   assert.ok(index.vanilla.item.includes('minecraft:apple'));
   assert.ok(index.vanilla.block.includes('minecraft:stone'));
   assert.deepEqual(index.vanilla.geometry,['geometry.vanilla_test']);
+  assert.equal(index.previewGeometry[0].relative,'models/entity/test.geo.json');
+  assert.equal(index.previewControllers[0].relative,'render_controllers/test.json');
+  assert.deepEqual(index.previewControllers[0].data.render_controllers['controller.render.test'].textures,['Texture.default']);
+  assert.equal(index.previewGeometry[0].data['minecraft:geometry'][0].description.identifier,'geometry.vanilla_test');
   assert.ok(index.vanilla.texture.includes('textures/blocks/stone'));
   assert.deepEqual(index.vanilla.loot_table,['loot_tables/blocks/stone.json']);
   assert.equal(index.components.block['minecraft:friction'].description, 'Controls friction.');
@@ -55,6 +75,15 @@ test('reference selection respects project target and excludes preview releases'
   assert.equal(chooseRelease(releases, '1.26.52').tag_name, 'v1.26.50.4');
   assert.equal(chooseRelease(releases, '1.26.40').tag_name, 'v1.26.40.5');
   assert.equal(chooseRelease(releases, '1.21.0'), undefined);
+});
+test('preview requests upgrade an ID-only cache at the same sample tag once, then work offline',async t=>{
+ const fs=require('node:fs/promises'),path=require('node:path'),core=require('../src/core.cjs'),{loadReference}=require('../src/reference.cjs');
+ const base=path.resolve('.test-temp');await fs.mkdir(base,{recursive:true});const root=await fs.mkdtemp(path.join(base,'preview-reference-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+ const cached={...buildIndex(archive(),'v1.26.50.4'),updated:Date.now(),target:'1.26.50'};delete cached.previewGeometry;delete cached.previewOwners;await core.writeJson(path.join(root,'.bedrock/reference/components.json'),cached);
+ const url='https://github.com/Mojang/bedrock-samples/releases/download/v1.26.50.4/bedrock-samples-v1.26.50.4-min.zip';let calls=0;
+ const fetchImpl=async requested=>{calls++;return {ok:true,headers:{get:()=>null},body:[requested===url?Buffer.from(archive()):Buffer.from(JSON.stringify([{tag_name:'v1.26.50.4',assets:[{name:'bedrock-samples-v1.26.50.4-min.zip',browser_download_url:url}]}]))]};};
+ const enriched=await loadReference(root,'1.26.50',{includePreviewGeometry:true,fetchImpl});assert.equal(calls,2);assert.equal(enriched.previewGeometry.length,1);assert.ok(Array.isArray(enriched.previewOwners));
+ assert.equal((await loadReference(root,'1.26.50',{includePreviewGeometry:true,fetchImpl:()=>{throw Error('offline');}})).previewGeometry.length,1);
 });
 test('spelling suggestions remain close and malformed reference archives fail', () => {
   assert.deepEqual(closest('minecraft:helth', ['minecraft:health', 'minecraft:friction']), ['minecraft:health']);

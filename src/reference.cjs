@@ -5,10 +5,10 @@ const { compareVersions } = require('./releases.cjs');
 const core = require('./core.cjs');
 const documentation = require('./documentation.cjs');
 const API = 'https://api.github.com/repos/Mojang/bedrock-samples/releases?per_page=100';
-function engine(tag) { return /^v(\d+\.\d+\.\d+)\.\d+$/.exec(tag)?.[1]; }
-function chooseRelease(list, target) {
-  return list.filter(r => !r.draft && !r.prerelease && engine(r.tag_name) && compareVersions(engine(r.tag_name), target) <= 0)
-    .sort((a, b) => compareVersions(engine(b.tag_name), engine(a.tag_name)))[0];
+function engine(tag) { return /^v(\d+\.\d+\.\d+)\.\d+(?:-preview)?$/.exec(tag)?.[1]; }
+function chooseRelease(list, target, channel = 'release') {
+  return list.filter(r => !r.draft && (channel === 'preview' || !r.prerelease) && engine(r.tag_name) && compareVersions(engine(r.tag_name), target) <= 0)
+    .sort((a, b) => compareVersions(engine(b.tag_name), engine(a.tag_name)) || parseInt(b.tag_name.split('.').at(-1), 10) - parseInt(a.tag_name.split('.').at(-1), 10))[0];
 }
 function descriptionText(value) {
   const parts=Array.isArray(value)?value:[value];
@@ -36,7 +36,7 @@ function buildIndex(bytes, tag) {
   const result = { tag, engine: engine(tag), source: `https://github.com/Mojang/bedrock-samples/tree/${tag}`, components: { block: {}, entity: {}, item: {} } };
   const text = descriptionText;
   result.intelligenceVersion = 12;
-  result.vanilla = {};result.formatVersions={};result.languages=[];result.vanillaNames={item:{},block:{}};
+  result.vanilla = {};result.formatVersions={};result.languages=[];result.vanillaNames={item:{},block:{}};result.previewGeometry=[];result.previewOwners=[];result.previewControllers=[];
   for (const [file, kind] of Object.entries({ items: 'item', blocks: 'block', entities: 'entity', effects: 'effect', enchantments: 'enchantment', biomes: 'biome', dimensions: 'dimension' })) {
     result.vanilla[kind] = [...new Set((read(`metadata/vanilladata_modules/mojang-${file}.json`)?.data_items || []).map(value => value.command_name || value.name).filter(value => typeof value === 'string'))];
   }
@@ -50,7 +50,7 @@ function buildIndex(bytes, tag) {
     if(/^resource_pack\/texts\/[^/]+\.lang$/.test(file)){result.languages.push(require('./localization.cjs').vanillaDocument(Buffer.from(bytes).toString('utf8'),file));continue;}
     const match=/^(behavior_pack|resource_pack)\/(.*)$/.exec(file);if(!match)continue;
     const errors=[],data=require('jsonc-parser').parse(Buffer.from(bytes).toString('utf8').replace(/^\uFEFF/,''),errors,{allowTrailingComma:true});
-    if(!errors.length){const side=match[1]==='behavior_pack'?'behavior':'resource';vanilla.file(side,match[2],data);if(require('./format-versions.cjs').version(data?.format_version)){const family=side+':'+match[2].split('/')[0];const values=result.formatVersions[family]||=[];if(!values.includes(data.format_version))values.push(data.format_version);}}
+    if(!errors.length){const side=match[1]==='behavior_pack'?'behavior':'resource';vanilla.file(side,match[2],data);if(side==='resource'&&match[2].startsWith('models/')&&(Array.isArray(data?.['minecraft:geometry'])||Object.keys(data||{}).some(k=>k.startsWith('geometry.'))))result.previewGeometry.push({relative:match[2],data});if(side==='resource'&&(data?.['minecraft:client_entity']||data?.['minecraft:attachable']))result.previewOwners.push({relative:match[2],data});if(side==='resource'&&data?.render_controllers)result.previewControllers.push({relative:match[2],data});if(require('./format-versions.cjs').version(data?.format_version)){const family=side+':'+match[2].split('/')[0];const values=result.formatVersions[family]||=[];if(!values.includes(data.format_version))values.push(data.format_version);}}
   }
   for(const [kind,ids]of Object.entries(vanilla.finish()))result.vanilla[kind]=[...new Set([...(result.vanilla[kind]||[]),...ids])];
   result.vanillaBySide=vanilla.bySide();result.vanillaReferences=vanilla.references();for(const kind of ['item','block'])for(const [id,keys]of Object.entries(vanilla.names()[kind]))result.vanillaNames[kind][id]=[...new Set([...keys,...(result.vanillaNames[kind][id]||[])])];
@@ -95,10 +95,13 @@ function buildIndex(bytes, tag) {
   if (!Object.values(result.components).every(c => Object.keys(c).length)) throw new Error('Mojang reference archive is missing component documentation');
   return result;
 }
-async function loadReference(root, target, { force = false, fetchImpl = globalThis.fetch } = {}) {
+async function loadReference(root, target, { force = false, fetchImpl = globalThis.fetch, includePreviewGeometry = false, channel = 'release' } = {}) {
+  const published = require('./authoring-data.cjs').reference;
+  if (published && published.engine && compareVersions(published.engine, target) <= 0 && (!includePreviewGeometry || Array.isArray(published.previewGeometry))) return { ...published, target };
   const file = await core.local(root, '.bedrock/reference/components.json');
   const cached = await fs.readFile(file, 'utf8').then(JSON.parse).then(cleanDescriptions).catch(() => null);
-  if (!force && cached?.intelligenceVersion === 12 && cached?.target === target && cached.tag && Date.now() - cached.updated < 86400000) return cached;
+  const channelMatch = (cached?.requestedChannel || 'release') === channel;
+  if (!force && channelMatch && cached?.intelligenceVersion === 12 && cached?.target === target && cached.tag && Date.now() - cached.updated < 86400000 && (!includePreviewGeometry||Array.isArray(cached.previewGeometry)&&Array.isArray(cached.previewOwners)&&Array.isArray(cached.previewControllers))) return cached;
   const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
   async function get(url, limit) {
     const response = await fetchImpl(url, { signal: controller.signal, headers: { 'User-Agent': 'Bedrock-Workbench', Accept: 'application/vnd.github+json' } });
@@ -110,18 +113,18 @@ async function loadReference(root, target, { force = false, fetchImpl = globalTh
   }
   try {
     const list = JSON.parse((await get(API, 4 * 1024 * 1024)).toString());
-    const release = chooseRelease(list, target);
+    const release = chooseRelease(list, target, channel);
     if (!release) throw new Error(`No released Mojang samples found at or below engine ${target}`);
-    if (!force && cached?.intelligenceVersion === 12 && cached?.tag === release.tag_name) { cached.target = target; cached.updated = Date.now(); await core.writeJson(file, cached); return cached; }
+    if (!force && channelMatch && cached?.intelligenceVersion === 12 && cached?.tag === release.tag_name && (!includePreviewGeometry||Array.isArray(cached.previewGeometry)&&Array.isArray(cached.previewOwners)&&Array.isArray(cached.previewControllers))) { cached.target = target; cached.updated = Date.now(); await core.writeJson(file, cached); return cached; }
     const asset = release.assets?.find(a => a.name === `bedrock-samples-${release.tag_name}-min.zip`);
     const expected = `https://github.com/Mojang/bedrock-samples/releases/download/${release.tag_name}/${asset?.name}`;
     if (!asset || asset.browser_download_url !== expected) throw new Error('Mojang release is missing its text reference archive');
     const index = buildIndex(await get(expected, 40 * 1024 * 1024), release.tag_name);
-    index.target = target; index.updated = Date.now();
+    index.target = target; index.updated = Date.now(); index.requestedChannel = channel; index.sourceChannel = release.prerelease ? 'preview' : 'stable';
     await core.writeJson(file, index);
     return index;
   } catch (error) {
-    if (!force && cached?.engine && compareVersions(cached.engine, target) <= 0) return cached;
+    if (!force && channelMatch && cached?.engine && compareVersions(cached.engine, target) <= 0) return cached;
     throw error;
   } finally { clearTimeout(timer); }
 }
@@ -130,26 +133,26 @@ function closest(name, names) {
   return names.map(value => ({ value, distance: distance(name, value) })).filter(v => v.distance <= 2).sort((a, b) => a.distance - b.distance).slice(0, 3).map(v => v.value);
 }
 function componentSchema(index, kind, { omit = [], supplement } = {}) {
-  function valueSchema(value, component, root=false) {
+  function valueSchema(value, component, root=false, sourceTag=value.sourceTag || index.tag) {
     const description=root?documentation.componentDescription(kind,component,descriptionText(value.description)):descriptionText(value.description);
     const result = { description };
-    result.markdownDescription = [description, value.type ? `Type: ${value.type}` : '', `Reference data: Mojang ${index.tag}.`, documentation.componentLink(kind, component)].filter(Boolean).join('\n\n');
+    result.markdownDescription = [description, value.type ? `Type: ${value.type}` : '', `Reference data: Mojang ${sourceTag}${sourceTag !== index.tag ? ' (Stable documentation; confirmed in Preview samples)' : ''}.`, documentation.componentLink(kind, component)].filter(Boolean).join('\n\n');
     // HTML type labels with alternatives or legacy names are intentionally
     // advisory. Only unambiguous primitive types become validation rules.
     const type = { String: 'string', string: 'string', Boolean: 'boolean', boolean: 'boolean', Integer: 'integer', integer: 'integer', number: 'number', object: 'object', array: 'array' }[value.type];
     if (type) result.type = type;
-    if (value.fields && Object.keys(value.fields).length) result.properties = Object.fromEntries(Object.entries(value.fields).map(([name, field]) => [name, valueSchema(field, component)]));
+    if (value.fields && Object.keys(value.fields).length) result.properties = Object.fromEntries(Object.entries(value.fields).map(([name, field]) => [name, valueSchema(field, component, false, sourceTag)]));
     return result;
   }
   const components = { type: 'object', additionalProperties: true, properties: Object.fromEntries(Object.entries(index.components[kind]).filter(([name]) => !omit.includes(name)).map(([name, value]) => [name, valueSchema(value,name,true)])) };
   if(supplement){
     const names=(node,seen=new Set())=>{if(!node||typeof node!=='object')return [];if(node.$ref?.startsWith('#/definitions/')){const name=node.$ref.slice(14);if(seen.has(name))return [];seen.add(name);return names(supplement.definitions?.[name],seen);}return [...Object.keys(node.properties||{}),...['anyOf','oneOf','allOf'].flatMap(key=>(node[key]||[]).flatMap(child=>names(child,new Set(seen))))];};
     for(const id of omit){const owned=supplement.definitions?.components?.properties?.[id],known=new Set(names(owned)),fields=Object.entries(index.components[kind][id]?.fields||{}).filter(([field])=>!known.has(field));if(!fields.length)continue;
-      components.properties[id]={doNotSuggest:true,properties:Object.fromEntries(fields.map(([field,value])=>{const next=valueSchema(value,id);delete next.type;return [field,next];}))};
+      components.properties[id]={doNotSuggest:true,properties:Object.fromEntries(fields.map(([field,value])=>{const next=valueSchema(value,id,false,index.components[kind][id]?.sourceTag || index.tag);delete next.type;return [field,next];}))};
     }
   }
   return require('./format-versions.cjs').apply({ $schema: 'http://json-schema.org/draft-07/schema#', title: `Mojang ${index.tag} ${kind} reference`, type: 'object', properties: {
     [`minecraft:${kind}`]: { type: 'object', properties: { components, ...(kind==='entity'?{component_groups: { type: 'object', additionalProperties: components }}:{}), ...(kind==='block'?{permutations: { type: 'array', items: { type: 'object', properties: { components } } }}:{}) } }
   } },kind,index.target);
 }
-module.exports = { descriptionText, buildIndex, chooseRelease, loadReference, closest, componentSchema };
+module.exports = { engine, descriptionText, buildIndex, chooseRelease, loadReference, closest, componentSchema };

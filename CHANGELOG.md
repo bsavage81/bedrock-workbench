@@ -2,6 +2,57 @@
 
 ## Unreleased
 
+- Accept Learn-documented event strings and trigger objects for 20 fields across 13 entity components. Preserve local event suggestions and links for either form. Allow entity-reference warnings to be marked as intended.
+
+- Extend Molang potential bindings and source navigation, dirty-buffer references, runtime actor privacy boundaries, reviewed query overload/version guidance, particle/worldgen expression fields and contextual resource-subpack authoring previews. Keep undocumented runtime names and unverified compatibility boundaries permissive.
+
+## 0.26.8 — October 27, 2026
+
+- Add independently updatable authoring schemas, documentation, Molang catalogs and compatibility facts, with separate Stable and Preview feeds, anonymous verified downloads, background checks, rollback and offline fallback.
+- Refresh editor completion, hover and validation services when compatible snapshots are applied; select actual Mojang Preview sample releases.
+
+## 0.26.7 — October 27, 2026
+
+- Fix fractional box UVs on bull horns and slingshot pellets. Add bounded TGA decoding and combined controller passes for koi. Make render controllers authoritative, show branch-relevant appearance inputs, offer constrained unresolved controller variants, and move raw model/texture selections into explicit manual inspection.
+
+## 0.26.6 — October 27, 2026
+
+- Add client-synced property preview controls with schema validation/defaults and reset. Apply supported property-based bone visibility to prevent overlapping bull horn variants; follow matching geometry/texture branches and simple saved property bindings without running scripts.
+
+## 0.26.5 — October 27, 2026
+
+- Infer preview textures from owner render controllers, including paired geometry/texture arrays and conditional life-stage branches. Label compatible skins, preserve manual overrides and explain unresolved runtime variants or layered textures. Include compatible vanilla controller fallbacks.
+
+## 0.26.3 — October 26, 2026
+
+- Add Open Geometry Viewer to Side source links above geometry declarations and references in JSON/JSONC, including vanilla models.
+- Target the exact geometry, retain owner/texture choices, and reuse its existing preview beside the source editor. Verify column placement and panel reuse in native VS Code.
+- Initially select the entity's default texture, or its first declared texture when no default exists; preserve explicit texture-file opens and manual selections on refresh.
+
+## 0.26.2 — October 26, 2026
+
+- Preview vanilla geometry such as cod and salmon through compatible installed sources or pinned Mojang samples, while preserving project overrides and explicit source choices.
+- Add vanilla texture-to-owner discovery and on-demand cached vanilla PNGs; explain missing/offline assets and retain neutral geometry. Keep reads confined to approved resources.
+- Verify native WebGL rendering for cod and both SavageCraft salmon skins, plus version/precedence/cache/security regressions. No new visual or in-game accuracy claim.
+
+## 0.26.1 — October 26, 2026
+
+- Fix Bedrock cube/bone coordinate handedness and pivot rotations; correct east/west box UV strips and top/bottom UV orientation, including mirrored layouts.
+- Add asymmetric texture-corner, signed UV, nested-pivot and cow-neck regressions; verify the copied SavageCraft cow in a native VS Code host. No in-game parity claim.
+
+## 0.26.0 — October 26, 2026
+
+- Add local textured static model previews from geometry, texture and owner files, with explicit resource choices, camera controls, saved-file refresh and workspace trust/resource restrictions.
+- Support cube geometry and PNG/JPEG textures; document material, dynamic binding and in-game parity limitations.
+- Preserve the shared workspace’s latest Molang authoring follow-ups, including authoring subpack selection and guidance.
+- Release verification: 252 Node tests, 251 passed, one skipped, zero failed.
+
+## 0.25.0 — October 26, 2026
+
+- Expand Molang authoring with an owned parser, 378-entry Learn catalog, contextual completion/snippets, parameter guidance and Learn-linked hovers across BP/RP expression fields.
+- Add scoped project variables/references, precise JSON escape locations, documented format/pack-version restrictions and one editor owner for live/report findings. Preserve runtime-defined names and legacy content.
+- Audit vanilla/SavageCraft expressions and add unit/native VS Code regression coverage. Local VSIX release; tester bundle remains 0.23.1.
+
 ## 0.24.0 — October 26, 2026
 
 - Add an independently authored client-entity schema with Learn-linked field hovers, legacy/modern layouts and a documentation/sample coverage audit.

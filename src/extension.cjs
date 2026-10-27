@@ -30,8 +30,10 @@ function activate(context) {
   }
   const vanillaSource = () => context.globalState?.get('bedrock.vanillaSources',{})?.[project?.config.target];
   const referenceProject = () => project && ({...project,root,vanillaSource:vanillaSource()});
+  require('./model-preview.cjs').attach(vscode, context, referenceProject, output);
   const editor = require('./editor.cjs').attach(vscode, context, referenceProject, output);
-  require('./content-editor.cjs').attach(vscode, context, referenceProject, output);
+  const contentEditor = require('./content-editor.cjs').attach(vscode, context, referenceProject, output);
+  const authoringData = require('./authoring-service.cjs').attach(vscode, context, referenceProject, output, async () => { await editor.refresh(); await contentEditor?.refresh(); changed.fire(); }, () => changed.fire());
   require('./auto-suggest.cjs').attach(vscode, context, () => project && ({ ...project, root }), output);
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 30);
   statusBar.command = 'bedrock.build';
@@ -67,7 +69,7 @@ function activate(context) {
           case 'settings': {
             const folder = item('Minecraft folder', 'bedrock.destination', 'folder-opened', config.build.destinations?.[config.target] ? 'Custom' : 'Automatic');
             folder.tooltip = config.build.destinations?.[config.target] || 'Automatically detect the selected Minecraft installation.';
-            return [item('Minecraft installation', 'bedrock.target', 'versions', config.target === 'release' ? 'Release' : 'Preview'), folder, item('Target engine version', 'bedrock.checkTargetVersion', 'check', config.targetVersion), item('Beta Script APIs', 'bedrock.betaScripts', 'beaker', config.experimentalGameplay?.betaApis ? 'On' : 'Off'), item('Vanilla reference source','bedrock.vanillaSource','library',vanillaSource()?'Samples + installed packs':'Mojang samples'), item('Refresh Mojang reference', 'bedrock.refreshReference', 'book')];
+            return [item('Minecraft installation', 'bedrock.target', 'versions', config.target === 'release' ? 'Release' : 'Preview'), folder, item('Target engine version', 'bedrock.checkTargetVersion', 'check', config.targetVersion), item('Beta Script APIs', 'bedrock.betaScripts', 'beaker', config.experimentalGameplay?.betaApis ? 'On' : 'Off'), item('Authoring resource subpack','bedrock.authoringSubpack','layers',config.authoring?.resourceSubpack||'Base pack'), item('Vanilla reference source','bedrock.vanillaSource','library',vanillaSource()?'Samples + installed packs':'Mojang samples'), item('Authoring data', 'bedrock.authoringData', 'database', authoringData.description()), item('Refresh authoring data', 'bedrock.refreshAuthoringData', 'sync'), item('Refresh Mojang reference', 'bedrock.refreshReference', 'book')];
           }
           case 'scripts': {
             const dependencies = await scripts.readDependencies({ ...project, root });
@@ -119,12 +121,13 @@ function activate(context) {
     catch(error){root=nextRoot;project=undefined;throw error;}
     root=nextRoot;project=nextProject;
     status = project ? 'Ready' : 'Open a Bedrock project'; refresh();
-    if (project) void editor.refresh();
+    if (project) { await authoringData.open(); void editor.refresh(); }
+    if (disposed) return;
     const engineKey = project && `${root}:${project.config.target}`;
     if (engineKey !== openedRoot) { openedRoot = engineKey; if (project) void checkTargetVersion(false); }
     if (project) {
       const key = JSON.stringify([root, project.config.target, project.config.targetVersion, !!project.config.experimentalGameplay?.betaApis]);
-      if (key !== scriptOpenedKey) { scriptOpenedKey = key; void checkScriptVersions(false); }
+      if (key !== scriptOpenedKey) { scriptOpenedKey = key; void checkScriptVersions(false).catch(error => output.warn(`Script version check: ${error.message}`)); }
       const keyExperiments = JSON.stringify([root, project.config.target, project.config.targetVersion]);
       if (keyExperiments !== experimentKey) { experimentKey = keyExperiments; experimentCatalog = undefined; void checkExperiments(false); }
     }
@@ -370,6 +373,14 @@ function activate(context) {
   // approved update is queued, so an unanswered prompt never blocks builds.
   context.subscriptions.push(vscode.commands.registerCommand('bedrock.checkTargetVersion', () => checkTargetVersion(true)));
   context.subscriptions.push(vscode.commands.registerCommand('bedrock.refreshReference', () => editor.refresh(true)));
+  register('authoringSubpack',async()=>{
+    await requireProject();
+    const manifest=await core.readJson(path.join(project.packs.resource,'manifest.json'));
+    const choices=[{label:'Base pack',description:'Default authoring references',folder:''},...(manifest.subpacks||[]).filter(s=>typeof s.folder_name==='string'&&!/[\\/]/.test(s.folder_name)).map(s=>({label:s.name||s.folder_name,description:s.folder_name,folder:s.folder_name}))];
+    const selected=await vscode.window.showQuickPick(choices,{title:'Authoring resource subpack',placeHolder:'Preview references only; Minecraft selection and builds are unchanged'});if(!selected)return;
+    const {config}=await core.loadProject(root);config.authoring||={};if(selected.folder)config.authoring.resourceSubpack=selected.folder;else delete config.authoring.resourceSubpack;
+    await saveConfig(config);
+  });
   register('vanillaSource',async()=>{
     await requireProject();
     const choice=await vscode.window.showQuickPick(['Mojang samples only','Select installed vanilla packs…'],{title:`Vanilla references for Minecraft ${project.config.target}`});
@@ -424,7 +435,7 @@ function activate(context) {
   register('build', () => run('build'));
   async function runValidation() {
     await requireProject(); validationDiagnostics.clear(); status = 'Validating saved files…'; refresh();
-    try { await require('./reference.cjs').loadReference(root,project.config.targetVersion); } catch(error) { output.warn(`Vanilla samples reference unavailable: ${error.message}`); }
+    try { await require('./reference.cjs').loadReference(root,project.config.targetVersion,{channel:project.config.target}); } catch(error) { output.warn(`Vanilla samples reference unavailable: ${error.message}`); }
     const result = await require('./validation.cjs').validateProject(root,{vanillaSource:vanillaSource()});
     if(result.referenceWarning)output.warn(result.referenceWarning);
     const grouped = new Map(), texts = new Map();
@@ -458,10 +469,9 @@ function activate(context) {
   })));
   register('validationIgnores',async()=>{await requireProject();await vscode.window.showTextDocument(vscode.Uri.file(path.join(root,'bedrock-project.json')));});
   function clearDuplicateSyntax(document) {
-    if(!diagnosticPolicy.nativeOwnsSyntax(vscode,document.uri.fsPath))return;
     for(const collection of [diagnostics,validationDiagnostics]) {
       const existing=collection.get(document.uri);
-      if(existing?.some(issue=>issue.code==='bedrock.jsonSyntax'))collection.set(document.uri,existing.filter(issue=>issue.code!=='bedrock.jsonSyntax'));
+      if(existing?.some(issue=>!diagnosticPolicy.visible(vscode,document.uri.fsPath,issue)))collection.set(document.uri,existing.filter(issue=>diagnosticPolicy.visible(vscode,document.uri.fsPath,issue)));
     }
   }
   if(vscode.workspace.onDidOpenTextDocument)context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(clearDuplicateSyntax));

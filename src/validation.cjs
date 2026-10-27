@@ -50,7 +50,7 @@ async function validateProject(root, {vanillaSource}={}) {
     issues.push(...require('./component-compatibility.cjs').issues(document,project).filter(issue=>!issue.native||!schemaChecked).map(({fixes,native,...issue})=>issue));
     issues.push(...require('./entity-authoring.cjs').issues(document),...require('./linked-entities.cjs').issues(index,document));
     issues.push(...require('./format-versions.cjs').issues(document,project));
-    issues.push(...content.referenceIssues(index, document,{includeIgnored:true}), ...content.customComponentIssues(index, document), ...content.molangIssues(document));
+    issues.push(...content.referenceIssues(index, document,{includeIgnored:true}), ...content.customComponentIssues(index, document), ...content.molangIssues(document,index));
   }
   for (const type of ['entity', 'item', 'block', 'client_entity', 'geometry', 'animation', 'animation_controller', 'render_controller']) for (const [id, files] of index.values(type)) {
     const groups = new Map();

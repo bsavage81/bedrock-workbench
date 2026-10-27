@@ -368,6 +368,17 @@
           }
         }
       }
+    },
+    "authoring": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resourceSubpack": {
+          "type": "string",
+          "pattern": "^[^/\\\\]*$",
+          "description": "Resource subpack used for editor references outside subpack files. Empty or omitted selects the base pack. Does not select a subpack in Minecraft or alter builds."
+        }
+      }
     }
   }
 }

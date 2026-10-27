@@ -8,6 +8,30 @@ const sounds = ajv.compile(require('../schemas/sound-definitions.schema.json'));
 const loot = ajv.compile(require('../schemas/loot-table.schema.json'));
 const lootDoc = functions => ({ pools: [{ entries: [{ type: 'item', name: 'minecraft:iron_sword', functions }] }] });
 
+test('Learn event alternatives accept strings and trigger objects but reject invalid primitives',()=>{
+ const schema=require('../schemas/entity.schema.json'),validate=ajv.compile(schema),catalog=require('../src/event-forms.json');
+ assert.equal(Object.values(catalog.components).reduce((n,fields)=>n+Object.keys(fields).length,0),20);
+ for(const [id,fields]of Object.entries(catalog.components))for(const name of Object.keys(fields)){
+  for(const container of ['components','component_groups']){
+   const doc=value=>({format_version:'1.26.50','minecraft:entity':{[container]:container==='components'?{[id]:{[name]:value}}:{test:{[id]:{[name]:value}}}}});
+   for(const value of ['test:done',{event:'test:done',target:'self'},{event:'test:done',filters:{test:'is_baby',value:true}}])assert.ok(validate(doc(value)),id+'.'+name+': '+JSON.stringify(validate.errors));
+   for(const value of [false,42,[],{event:42},{target:42}])assert.equal(validate(doc(value)),false,id+'.'+name);
+  }
+  const field=schema.definitions.components.properties[id].properties[name];
+  assert.match(field.markdownDescription,/Microsoft Learn documentation/);
+  assert.ok(field.anyOf.some(branch=>branch.type==='object'&&branch.properties.event));
+ }
+});
+
+test('event form extractor verifies sources and excludes ordinary string fields',()=>{
+ const crypto=require('node:crypto'),{extract}=require('../tools/update-event-forms.cjs');
+ const text='| on_done | not set | Object | Event to run. |\n| on_done (as String) | not set | String | |\n| label | not set | String | Display name. |';
+ const sha=crypto.createHash('sha1').update('blob '+Buffer.byteLength(text)+'\0').update(text).digest('hex');
+ const input={pages:{'entity|minecraft:test':{text,sha,path:'test.md'}}};
+ assert.deepEqual(Object.keys(extract(input).components['minecraft:test']),['on_done']);
+ input.pages['entity|minecraft:test'].text+='changed';assert.throws(()=>extract(input),/Unverified/);
+});
+
 test('client entity schema documents Learn fields and preserves legacy and modern layouts',()=>{
  const schema=require('../schemas/client-entity.schema.json'),validate=ajv.compile(schema),audit=require('../tools/audit-client-entities.cjs');
  assert.deepEqual(audit.coverage(schema).missing,[]);assert.deepEqual(audit.coverage(schema).missingHovers,[]);

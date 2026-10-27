@@ -2508,7 +2508,7 @@
               "markdownDescription": "Base movement speed; higher values move faster. May be a number or a range with range_min and range_max.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_timer?view=minecraft-bedrock-stable)"
             },
             "time_down_event": {
-              "description": "Event name or a conditional trigger with a target entity.",
+              "description": "Event to fire when the time on the timer runs out. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
               "anyOf": [
                 {
                   "type": "string",
@@ -2538,7 +2538,7 @@
                   "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_timer?view=minecraft-bedrock-stable)"
                 }
               ],
-              "markdownDescription": "Event name or a conditional trigger with a target entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_timer?view=minecraft-bedrock-stable)"
+              "markdownDescription": "Event to fire when the time on the timer runs out. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_timer?view=minecraft-bedrock-stable)"
             }
           },
           "markdownDescription": "Adds a timer after which an event will fire.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_timer?view=minecraft-bedrock-stable)"
@@ -2930,7 +2930,7 @@
               "markdownDescription": "Items used to feed the entity and accelerate its growth.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable)"
             },
             "grow_up": {
-              "description": "Event name or a conditional trigger with a target entity.",
+              "description": "Event to fire when an entity grows up. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
               "anyOf": [
                 {
                   "type": "string",
@@ -2960,7 +2960,7 @@
                   "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable)"
                 }
               ],
-              "markdownDescription": "Event name or a conditional trigger with a target entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable)"
+              "markdownDescription": "Event to fire when an entity grows up. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable)"
             },
             "interact_filters": {
               "$ref": "#/definitions/filter",
@@ -2978,7 +2978,7 @@
               "markdownDescription": "Items dropped on growth.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable)"
             },
             "pause_growth": {
-              "description": "Event name or a conditional trigger with a target entity.",
+              "description": "Event triggered when a baby entity's growth is paused (via a pause_growth_items feed). Accepts an event string or an object with event, target and optional filters.",
               "anyOf": [
                 {
                   "type": "string",
@@ -3008,10 +3008,10 @@
                   "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable)"
                 }
               ],
-              "markdownDescription": "Event name or a conditional trigger with a target entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable)"
+              "markdownDescription": "Event triggered when a baby entity's growth is paused (via a pause_growth_items feed). Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable)"
             },
             "reset_growth": {
-              "description": "Event name or a conditional trigger with a target entity.",
+              "description": "Event triggered when a baby entity's growth is reset (via a reset_growth_items feed). Accepts an event string or an object with event, target and optional filters.",
               "anyOf": [
                 {
                   "type": "string",
@@ -3041,7 +3041,7 @@
                   "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable)"
                 }
               ],
-              "markdownDescription": "Event name or a conditional trigger with a target entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable)"
+              "markdownDescription": "Event triggered when a baby entity's growth is reset (via a reset_growth_items feed). Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_ageable?view=minecraft-bedrock-stable)"
             },
             "pause_growth_items": {
               "type": "array",
@@ -3293,6 +3293,39 @@
               "$ref": "#/definitions/filter",
               "description": "Conditions evaluated by Minecraft filter tests.",
               "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_breedable?view=minecraft-bedrock-stable)"
+            },
+            "breed_event": {
+              "description": "Event to run when this entity breeds. Can be a simple event name string or a trigger object with event and optional filters. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_breedable?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_breedable?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_breedable?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_breedable?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_breedable?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to run when this entity breeds. Can be a simple event name string or a trigger object with event and optional filters. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_breedable?view=minecraft-bedrock-stable)"
             }
           },
           "markdownDescription": "Allows an entity to establish a way to get into the love state used for breeding.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_breedable?view=minecraft-bedrock-stable)"
@@ -3402,7 +3435,7 @@
               "markdownDescription": "Item identifier or an ingredient descriptor with an optional replacement item.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_tameable?view=minecraft-bedrock-stable)"
             },
             "tame_event": {
-              "description": "Event name or a conditional trigger with a target entity.",
+              "description": "Event to fire when the entity is tamed. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
               "anyOf": [
                 {
                   "type": "string",
@@ -3432,7 +3465,7 @@
                   "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_tameable?view=minecraft-bedrock-stable)"
                 }
               ],
-              "markdownDescription": "Event name or a conditional trigger with a target entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_tameable?view=minecraft-bedrock-stable)"
+              "markdownDescription": "Event to fire when the entity is tamed. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_tameable?view=minecraft-bedrock-stable)"
             }
           },
           "markdownDescription": "This entity can be tamed.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_tameable?view=minecraft-bedrock-stable)"
@@ -7391,6 +7424,550 @@
             }
           },
           "markdownDescription": "Allows the mob to target another mob that hurts them.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_hurt_by_target?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:angry": {
+          "type": "object",
+          "description": "Defines an entity's 'angry' state using a timer.",
+          "properties": {
+            "calm_event": {
+              "description": "Event to fire when this entity is calmed down. Can be a simple event name string or an object with event and target properties. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_angry?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_angry?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_angry?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_angry?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_angry?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to fire when this entity is calmed down. Can be a simple event name string or an object with event and target properties. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_angry?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Defines an entity's 'angry' state using a timer.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_angry?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:attack_cooldown": {
+          "type": "object",
+          "description": "Adds a cooldown to an entity. The intention of this cooldown is to be used to prevent the entity from attempting to acquire new attack targets.",
+          "properties": {
+            "attack_cooldown_complete_event": {
+              "description": "Event to be run when the cooldown is complete. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_attack_cooldown?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_attack_cooldown?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_attack_cooldown?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_attack_cooldown?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_attack_cooldown?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to be run when the cooldown is complete. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_attack_cooldown?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Adds a cooldown to an entity. The intention of this cooldown is to be used to prevent the entity from attempting to acquire new attack targets.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_attack_cooldown?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:drying_out_timer": {
+          "type": "object",
+          "description": "Adds a timer for drying out that will count down and fire 'dried_out_event' or will stop as soon as the entity will get under rain or water and fire 'stopped_drying_out_event'.",
+          "properties": {
+            "dried_out_event": {
+              "description": "Event to fire when the drying out time runs out. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to fire when the drying out time runs out. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+            },
+            "recover_after_dried_out_event": {
+              "description": "Event to fire when entity was already dried out but received increase in water supply. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to fire when entity was already dried out but received increase in water supply. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+            },
+            "stopped_drying_out_event": {
+              "description": "Event to fire when entity stopped drying out. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to fire when entity stopped drying out. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Adds a timer for drying out that will count down and fire 'dried_out_event' or will stop as soon as the entity will get under rain or water and fire 'stopped_drying_out_event'.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_drying_out_timer?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:giveable": {
+          "type": "object",
+          "description": "Defines sets of items that can be used to trigger events when used on this entity. The item will also be taken and placed in the entity's inventory.",
+          "properties": {
+            "on_give": {
+              "description": "Event to fire when the correct item is given. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_giveable?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_giveable?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_giveable?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_giveable?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_giveable?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to fire when the correct item is given. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_giveable?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Defines sets of items that can be used to trigger events when used on this entity. The item will also be taken and placed in the entity's inventory.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_giveable?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:leashable": {
+          "type": "object",
+          "description": "Describes how this mob can be leashed to other items.",
+          "properties": {
+            "on_leash": {
+              "description": "Event to call when this entity is leashed. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to call when this entity is leashed. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+            },
+            "on_unleash": {
+              "description": "Event to call when this entity is unleashed. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to call when this entity is unleashed. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Describes how this mob can be leashed to other items.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_leashable?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:sittable": {
+          "type": "object",
+          "description": "Defines the entity's 'sit' state.",
+          "properties": {
+            "sit_event": {
+              "description": "Event to run when the entity enters the 'sit' state. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to run when the entity enters the 'sit' state. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+            },
+            "stand_event": {
+              "description": "Event to run when the entity exits the 'sit' state. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to run when the entity exits the 'sit' state. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Defines the entity's 'sit' state.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_sittable?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:target_nearby_sensor": {
+          "type": "object",
+          "description": "Defines the entity's range within which it can see or sense other entities to target them.",
+          "properties": {
+            "on_inside_range": {
+              "description": "Event to call when an entity gets in the inside range. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to call when an entity gets in the inside range. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+            },
+            "on_outside_range": {
+              "description": "Event to call when an entity gets outside the outside range. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to call when an entity gets outside the outside range. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Defines the entity's range within which it can see or sense other entities to target them.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_target_nearby_sensor?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:trusting": {
+          "type": "object",
+          "description": "Defines the rules for a mob to trust players.",
+          "properties": {
+            "trust_event": {
+              "description": "Event to run when this entity becomes trusting. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_trusting?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_trusting?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_trusting?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_trusting?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_trusting?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event to run when this entity becomes trusting. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_trusting?view=minecraft-bedrock-stable)"
+            },
+            "trust_items": {
+              "description": "Item identifier used to gain trust.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Item identifier used to gain trust.",
+                  "markdownDescription": "Item identifier used to gain trust.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_trusting?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Item identifier used to gain trust.",
+                    "markdownDescription": "Item identifier used to gain trust.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_trusting?view=minecraft-bedrock-stable)"
+                  }
+                }
+              ],
+              "markdownDescription": "Item identifier used to gain trust.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_trusting?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Defines the rules for a mob to trust players.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitycomponents/minecraftcomponent_trusting?view=minecraft-bedrock-stable)"
+        },
+        "minecraft:behavior.knockback_roar": {
+          "type": "object",
+          "description": "Allows the mob to perform a damaging knockback that affects all nearby entities.",
+          "properties": {
+            "on_roar_end": {
+              "description": "Event that is triggered when the roar ends. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "description": "Event name.",
+                  "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_knockback_roar?view=minecraft-bedrock-stable)"
+                },
+                {
+                  "type": "object",
+                  "description": "Event to send to a target.",
+                  "properties": {
+                    "event": {
+                      "type": "string",
+                      "description": "Event name.",
+                      "markdownDescription": "Event name.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_knockback_roar?view=minecraft-bedrock-stable)"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target entity; self is the owning entity.",
+                      "markdownDescription": "Target entity; self is the owning entity.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_knockback_roar?view=minecraft-bedrock-stable)"
+                    },
+                    "filters": {
+                      "$ref": "#/definitions/filter",
+                      "description": "Conditions evaluated by Minecraft filter tests.",
+                      "markdownDescription": "Conditions evaluated by Minecraft filter tests.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_knockback_roar?view=minecraft-bedrock-stable)"
+                    }
+                  },
+                  "markdownDescription": "Event to send to a target.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_knockback_roar?view=minecraft-bedrock-stable)"
+                }
+              ],
+              "markdownDescription": "Event that is triggered when the roar ends. Can be an object with event and target properties, or a simple event string. Accepts an event string or an object with event, target and optional filters.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_knockback_roar?view=minecraft-bedrock-stable)"
+            }
+          },
+          "markdownDescription": "Allows the mob to perform a damaging knockback that affects all nearby entities.\n\n[Microsoft Learn documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/entityreference/examples/entitygoals/minecraftbehavior_knockback_roar?view=minecraft-bedrock-stable)"
         }
       }
     },

@@ -3,7 +3,11 @@ const path = require('node:path');
 const json = require('jsonc-parser');
 const core = require('./core.cjs');
 const scripts = require('./script-components.cjs');
-const { molangParser, MOLANG_QUERIES, MOLANG_MATH } = require('./vendor/molang.cjs');
+const molang = require('./molang.cjs');
+const MOLANG_QUERIES=molang.entries.filter(e=>e.name.startsWith('query.')),MOLANG_MATH=molang.entries.filter(e=>e.name.startsWith('math.'));
+require('./authoring-data.cjs').subscribe(() => { MOLANG_QUERIES.splice(0,MOLANG_QUERIES.length,...molang.entries.filter(e=>e.name.startsWith('query.'))); MOLANG_MATH.splice(0,MOLANG_MATH.length,...molang.entries.filter(e=>e.name.startsWith('math.'))); });
+// Preserve the original content API while using Workbench's parser and inventory.
+const molangParser={parse(text){const tokens=molang.lex(text),errors=molang.errors(text);return {text,tokens,errors,isValid:!errors.length,queries:tokens.filter(t=>/^q(?:uery)?\./i.test(t.value)).map(t=>t.value),variables:tokens.filter(t=>/^(?:v|variable)\./i.test(t.value)).map(t=>t.value)};}};
 class ContentIndex {
   constructor(project) { this.project = project; this.types = new Map(); this.documents = new Map(); this.issues = []; this.scriptSources = new Map(); this.commandSources = new Map(); this.languages=new Map(); this.customComponents = []; this.scriptsDirty = false; }
   add(type, id, file) {
@@ -38,8 +42,9 @@ async function scan(project) {
   await Promise.all(batch.map(run => run())); refreshScripts(index);
   if (project.config?.targetVersion) try {
     const cached = await core.readJson(await core.local(project.root, '.bedrock/reference/components.json'));
-    if (cached.engine && require('./releases.cjs').compareVersions(cached.engine, project.config.targetVersion) <= 0) index.reference = cached;
+    if ((cached.requestedChannel || 'release') === (project.config.target || 'release') && cached.engine && require('./releases.cjs').compareVersions(cached.engine, project.config.targetVersion) <= 0) index.reference = cached;
   } catch { /* Reference data is optional when offline or not yet cached. */ }
+  if (require('./authoring-data.cjs').reference) index.reference = require('./authoring-data.cjs').reference;
   try { index.localReference=await require('./vanilla.cjs').local(project);index.reference=require('./vanilla.cjs').merge(index.reference,index.localReference); }
   catch(error) { index.referenceWarning=error.message; }
   return index;
@@ -292,23 +297,12 @@ function referenceIssues(index, document, {includeIgnored=false}={}) {
   return includeIgnored?issues:issues.filter(issue=>!require('./validation-ignores.cjs').match(index.project,issue));
 }
 function molangNodes(document) {
-  if (!/^(?:animations|animation_controllers|render_controllers|particles|entity|attachables)\//.test(document.relative)) return [];
-  const result = [];
-  function walk(node) {
-    if (node.type === 'string' && node.value.length <= 16384 && !(node.parent?.type === 'property' && node.parent.children[0] === node) && /\b(?:query|q|variable|v|temp|t|context|c|math)\.|^\s*(?:return|loop|for_each)\b/i.test(node.value)) result.push(node);
-    for (const child of node.children || []) walk(child);
-  }
-  if (document.tree) walk(document.tree); return result;
+  return require('./molang.cjs').nodes(document);
 }
 function rawOffsets(text, node) {
-  const offsets = []; const raw = text.slice(node.offset + 1, node.offset + node.length - 1); let i = 0;
-  while (i < raw.length) { offsets.push(node.offset + 1 + i); i += raw[i] === '\\' ? raw[i + 1] === 'u' ? 6 : 2 : 1; }
-  offsets.push(node.offset + node.length - 1); return offsets;
+  return require('./molang.cjs').offsets({text},node);
 }
-function molangIssues(document) {
-  return molangNodes(document).flatMap(node => {
-    const offsets = rawOffsets(document.text, node);
-    return molangParser.parse(node.value).errors.map(error => ({ file: document.file, offset: offsets[error.start] || node.offset + 1, length: Math.max(1, (offsets[error.end] || offsets[error.start] || node.offset + 1) - (offsets[error.start] || node.offset + 1)), severity: 'warning', message: `Molang: ${error.message}` }));
-  });
+function molangIssues(document,index) {
+  return require('./molang.cjs').issues(document,index);
 }
 module.exports = { ContentIndex, scan, update, fileKind, referenceKind, referenceValues, referenceDefinitions, builtinGeometries, references, referenceIssues, componentContext, customComponentIssues, molangNodes, molangIssues, rawOffsets, MOLANG_QUERIES, MOLANG_MATH, molangParser };

@@ -1,0 +1,80 @@
+name: Verify authoring data candidate
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        type: choice
+        options: [stable, preview]
+        default: stable
+      publish:
+        description: Publish a reviewed candidate (also requires repository enablement and environment approval)
+        type: boolean
+        default: false
+      source_tag:
+        description: Optional exact official tag to build historical coverage; blank selects latest in the actual channel
+        type: string
+        default: ''
+      stable_comparison_tag:
+        description: Optional Stable tag for a historical Preview comparison
+        type: string
+        default: ''
+  # Prepared schedule; enable only after explicit owner authorization:
+  # schedule:
+  #   - cron: '23 5 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: authoring-data-publication
+  cancel-in-progress: false
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        channel: ${{ fromJSON(github.event_name == 'schedule' && '["stable","preview"]' || format('["{0}"]', inputs.channel)) }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - name: Fetch official sources and detect actual Preview availability
+        run: node tools/fetch-authoring-inputs.cjs .test-temp/data-inputs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BEDROCK_DATA_CHANNEL: ${{ matrix.channel }}
+          BEDROCK_DATA_SOURCE_TAG: ${{ inputs.source_tag }}
+          BEDROCK_DATA_STABLE_TAG: ${{ inputs.stable_comparison_tag }}
+      - name: Generate and verify candidate; hold unreviewed source changes
+        run: node tools/build-authoring-data.cjs .test-temp/data-inputs .test-temp/data-output ${{ matrix.channel }} run-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.channel }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-authoring-candidate-${{ matrix.channel }}
+          path: .test-temp/data-output/${{ matrix.channel }}/
+  publish:
+    needs: verify
+    if: (inputs.publish == true || github.event_name == 'schedule') && vars.AUTHORING_PUBLICATION_ENABLED == 'true'
+    strategy:
+      matrix:
+        channel: ${{ fromJSON(github.event_name == 'schedule' && '["stable","preview"]' || format('["{0}"]', inputs.channel)) }}
+    environment: authoring-data-publication
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: reviewed-authoring-candidate-${{ matrix.channel }}
+          path: .test-temp/data-output/${{ matrix.channel }}
+      - run: node tools/publish-authoring-data.cjs .test-temp/data-output/${{ matrix.channel }}
+        env:
+          AUTHORING_PUBLICATION_ENABLED: ${{ vars.AUTHORING_PUBLICATION_ENABLED }}
+          GH_TOKEN: ${{ secrets.DATA_PUBLICATION_TOKEN }}

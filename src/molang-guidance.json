@@ -1,0 +1,433 @@
+{
+  "reviewed": "2026-10-26",
+  "channelAudit": {
+    "contractsCompared": 21,
+    "textDifferences": []
+  },
+  "entries": {
+    "query.is_item_equipped": {
+      "parameters": [],
+      "overloads": [
+        [],
+        [
+          "hand"
+        ]
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_is_item_equipped?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.get_equipped_item_name": {
+      "parameters": [],
+      "overloads": [
+        [],
+        [
+          "hand"
+        ],
+        [
+          "hand",
+          "rendered_item"
+        ]
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_get_equipped_item_name?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.is_item_name_any": {
+      "parameters": [
+        "slot",
+        "item_name",
+        "...item_names"
+      ],
+      "overloads": [
+        [
+          "slot",
+          "item_name",
+          "...item_names"
+        ],
+        [
+          "slot",
+          "slot_index",
+          "item_name",
+          "...item_names"
+        ]
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_is_item_name_any?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.cooldown_time": {
+      "parameters": [
+        "slot"
+      ],
+      "overloads": [
+        [
+          "slot"
+        ],
+        [
+          "slot",
+          "slot_index"
+        ]
+      ],
+      "formatMinimum": "1.20.60",
+      "withoutExperimentSince": "1.20.60",
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_cooldown_time?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.cooldown_time_remaining": {
+      "parameters": [],
+      "overloads": [
+        [],
+        [
+          "cooldown_type"
+        ],
+        [
+          "slot",
+          "slot_index"
+        ]
+      ],
+      "formatMinimum": "1.20.60",
+      "withoutExperimentSince": "1.20.60",
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_cooldown_time_remaining?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.camera_rotation": {
+      "parameters": [
+        "axis"
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_camera_rotation?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.position": {
+      "parameters": [
+        "axis"
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_position?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.bone_orientation_matrix": {
+      "parameters": [
+        "bone_name"
+      ],
+      "formatMinimum": "1.20.60",
+      "withoutExperimentSince": "1.20.60",
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_bone_orientation_matrix?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.bone_orientation_trs": {
+      "parameters": [
+        "bone_name"
+      ],
+      "formatMinimum": "1.20.60",
+      "withoutExperimentSince": "1.20.60",
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_bone_orientation_trs?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.bone_aabb": {
+      "parameters": [
+        "bone_name"
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_bone_aabb?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.noise": {
+      "parameters": [
+        "x",
+        "z"
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_noise?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.in_range": {
+      "parameters": [
+        "value",
+        "minimum",
+        "maximum"
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_in_range?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.all": {
+      "parameters": [
+        "value",
+        "candidate",
+        "candidate",
+        "...candidates"
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_all?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.any": {
+      "parameters": [
+        "value",
+        "candidate",
+        "candidate",
+        "...candidates"
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_any?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.graphics_mode_is_any": {
+      "parameters": [
+        "graphics_mode",
+        "...graphics_modes"
+      ],
+      "formatMinimum": "1.21.80",
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_graphics_mode_is_any?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.is_pack_setting_enabled": {
+      "parameters": [
+        "setting_name"
+      ],
+      "formatMinimum": "1.21.130",
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_is_pack_setting_enabled?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.is_pack_setting_selected": {
+      "parameters": [
+        "setting_name",
+        "selection"
+      ],
+      "formatMinimum": "1.21.130",
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_is_pack_setting_selected?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.combine_entities": {
+      "parameters": [
+        "entity_reference",
+        "...entity_references"
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_combine_entities?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.item_slot_to_bone_name": {
+      "parameters": [
+        "equipment_slot"
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_item_slot_to_bone_name?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.had_component_group": {
+      "parameters": [
+        "component_group"
+      ],
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_had_component_group?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    },
+    "query.state_time": {
+      "formatMinimum": "1.21.20",
+      "source": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_state_time?view=minecraft-bedrock-stable",
+      "versionPolicy": "Documented format/experiment guidance; not an inferred first engine introduction or a hard diagnostic."
+    }
+  },
+  "pages": [
+    {
+      "name": "query.is_item_equipped",
+      "channel": "stable",
+      "sha256": "ab6a15ffbf38e67c3acc682513ead299dd11a14e8f18c748a96053b3ffd7ef4e"
+    },
+    {
+      "name": "query.is_item_equipped",
+      "channel": "experimental",
+      "sha256": "ab6a15ffbf38e67c3acc682513ead299dd11a14e8f18c748a96053b3ffd7ef4e"
+    },
+    {
+      "name": "query.get_equipped_item_name",
+      "channel": "stable",
+      "sha256": "2d63ff17a942ab0749c3fdec7a3f879f724b34b2993aaa5556ce21561fe95b94"
+    },
+    {
+      "name": "query.get_equipped_item_name",
+      "channel": "experimental",
+      "sha256": "2d63ff17a942ab0749c3fdec7a3f879f724b34b2993aaa5556ce21561fe95b94"
+    },
+    {
+      "name": "query.is_item_name_any",
+      "channel": "stable",
+      "sha256": "14ceb6242f0b1e05e2cde8cc2a596df1c8cd73ac80ce374ea6541c2806a27c9c"
+    },
+    {
+      "name": "query.is_item_name_any",
+      "channel": "experimental",
+      "sha256": "14ceb6242f0b1e05e2cde8cc2a596df1c8cd73ac80ce374ea6541c2806a27c9c"
+    },
+    {
+      "name": "query.cooldown_time",
+      "channel": "stable",
+      "sha256": "c0a6cf65097ad79aefef274a50d28b300b347081fe46c91eb1a84274a211dd55"
+    },
+    {
+      "name": "query.cooldown_time",
+      "channel": "experimental",
+      "sha256": "c0a6cf65097ad79aefef274a50d28b300b347081fe46c91eb1a84274a211dd55"
+    },
+    {
+      "name": "query.cooldown_time_remaining",
+      "channel": "stable",
+      "sha256": "44e43f6569688ffc961a6cf9fa591e9f531fe4fe310ac7876cb7016537191e1c"
+    },
+    {
+      "name": "query.cooldown_time_remaining",
+      "channel": "experimental",
+      "sha256": "44e43f6569688ffc961a6cf9fa591e9f531fe4fe310ac7876cb7016537191e1c"
+    },
+    {
+      "name": "query.camera_rotation",
+      "channel": "stable",
+      "sha256": "fe436dfc0ae6ba78a4060a4db6c88d44b832c9d41e153aca1513d7429e8ee80c"
+    },
+    {
+      "name": "query.camera_rotation",
+      "channel": "experimental",
+      "sha256": "fe436dfc0ae6ba78a4060a4db6c88d44b832c9d41e153aca1513d7429e8ee80c"
+    },
+    {
+      "name": "query.position",
+      "channel": "stable",
+      "sha256": "1cbf1abf651a5866789652be790b468584f0f07fa8286e773220116727c23ecc"
+    },
+    {
+      "name": "query.position",
+      "channel": "experimental",
+      "sha256": "1cbf1abf651a5866789652be790b468584f0f07fa8286e773220116727c23ecc"
+    },
+    {
+      "name": "query.bone_orientation_matrix",
+      "channel": "stable",
+      "sha256": "f06bc4983c010be2e95fcad560b7734c20ae710663bc9b613e5e0932ec41f16b"
+    },
+    {
+      "name": "query.bone_orientation_matrix",
+      "channel": "experimental",
+      "sha256": "f06bc4983c010be2e95fcad560b7734c20ae710663bc9b613e5e0932ec41f16b"
+    },
+    {
+      "name": "query.bone_orientation_trs",
+      "channel": "stable",
+      "sha256": "7f627e6a1dc104bc994374fba74742b908364b5050172049c1a6fc1e8e6aad70"
+    },
+    {
+      "name": "query.bone_orientation_trs",
+      "channel": "experimental",
+      "sha256": "7f627e6a1dc104bc994374fba74742b908364b5050172049c1a6fc1e8e6aad70"
+    },
+    {
+      "name": "query.bone_aabb",
+      "channel": "stable",
+      "sha256": "757341583339282a3147f72d29511b1c1ec75fb19d0ace96e9ae10a6bd1715e0"
+    },
+    {
+      "name": "query.bone_aabb",
+      "channel": "experimental",
+      "sha256": "757341583339282a3147f72d29511b1c1ec75fb19d0ace96e9ae10a6bd1715e0"
+    },
+    {
+      "name": "query.noise",
+      "channel": "stable",
+      "sha256": "80da4cc8699baee6b6a8628146e47a595076fbc2de5edfd10b9963fe6369f97f"
+    },
+    {
+      "name": "query.noise",
+      "channel": "experimental",
+      "sha256": "80da4cc8699baee6b6a8628146e47a595076fbc2de5edfd10b9963fe6369f97f"
+    },
+    {
+      "name": "query.in_range",
+      "channel": "stable",
+      "sha256": "b04049a47c20a99cad561454598ff37f6e73834acab5b67760c868aaa47dbc0e"
+    },
+    {
+      "name": "query.in_range",
+      "channel": "experimental",
+      "sha256": "b04049a47c20a99cad561454598ff37f6e73834acab5b67760c868aaa47dbc0e"
+    },
+    {
+      "name": "query.all",
+      "channel": "stable",
+      "sha256": "8ff1de009f3bbce88dd566e617b2a14c663a09986639a9a5cb820a5fcf5588ad"
+    },
+    {
+      "name": "query.all",
+      "channel": "experimental",
+      "sha256": "8ff1de009f3bbce88dd566e617b2a14c663a09986639a9a5cb820a5fcf5588ad"
+    },
+    {
+      "name": "query.any",
+      "channel": "stable",
+      "sha256": "5dccdfa167e11cf5e8d7461940d5f06aa1135338a458f6621e135e86865e7711"
+    },
+    {
+      "name": "query.any",
+      "channel": "experimental",
+      "sha256": "5dccdfa167e11cf5e8d7461940d5f06aa1135338a458f6621e135e86865e7711"
+    },
+    {
+      "name": "query.graphics_mode_is_any",
+      "channel": "stable",
+      "sha256": "97c3245afec2400ddd630fb39b546f73e5cd55250bdcd0f87fe972b3d0de651a"
+    },
+    {
+      "name": "query.graphics_mode_is_any",
+      "channel": "experimental",
+      "sha256": "97c3245afec2400ddd630fb39b546f73e5cd55250bdcd0f87fe972b3d0de651a"
+    },
+    {
+      "name": "query.is_pack_setting_enabled",
+      "channel": "stable",
+      "sha256": "59a2c37fbd93c48a1889d3102e38039803ccf43d99c2cc7f15530cd4cb1a6eb6"
+    },
+    {
+      "name": "query.is_pack_setting_enabled",
+      "channel": "experimental",
+      "sha256": "59a2c37fbd93c48a1889d3102e38039803ccf43d99c2cc7f15530cd4cb1a6eb6"
+    },
+    {
+      "name": "query.is_pack_setting_selected",
+      "channel": "stable",
+      "sha256": "fb80c5a35f00fdd322d37708c4c11eacdd7ca327f7356decba1eb78dff244e89"
+    },
+    {
+      "name": "query.is_pack_setting_selected",
+      "channel": "experimental",
+      "sha256": "fb80c5a35f00fdd322d37708c4c11eacdd7ca327f7356decba1eb78dff244e89"
+    },
+    {
+      "name": "query.combine_entities",
+      "channel": "stable",
+      "sha256": "15b82dc69006584b3666b0249b1443f068b160c1ee1689d6373b54416e7055a1"
+    },
+    {
+      "name": "query.combine_entities",
+      "channel": "experimental",
+      "sha256": "15b82dc69006584b3666b0249b1443f068b160c1ee1689d6373b54416e7055a1"
+    },
+    {
+      "name": "query.item_slot_to_bone_name",
+      "channel": "stable",
+      "sha256": "cb40eea95600b84ebacc86dbd8db8e07a6e6b6ecd9326e037a2388a17a8c81f4"
+    },
+    {
+      "name": "query.item_slot_to_bone_name",
+      "channel": "experimental",
+      "sha256": "cb40eea95600b84ebacc86dbd8db8e07a6e6b6ecd9326e037a2388a17a8c81f4"
+    },
+    {
+      "name": "query.had_component_group",
+      "channel": "stable",
+      "sha256": "880c3a656085049f00f4cfd330d81918b80457b79bf56ee239654884c222e1b6"
+    },
+    {
+      "name": "query.had_component_group",
+      "channel": "experimental",
+      "sha256": "880c3a656085049f00f4cfd330d81918b80457b79bf56ee239654884c222e1b6"
+    },
+    {
+      "name": "query.state_time",
+      "channel": "stable",
+      "sha256": "8b4e351747e51031d36218e159338a9aa4ad4356c50fd31786f509135206b1c3"
+    },
+    {
+      "name": "query.state_time",
+      "channel": "experimental",
+      "sha256": "8b4e351747e51031d36218e159338a9aa4ad4356c50fd31786f509135206b1c3"
+    }
+  ]
+}

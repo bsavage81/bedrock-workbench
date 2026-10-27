@@ -1,0 +1,18 @@
+{
+  "formatVersion": 1,
+  "approvedFingerprints": [
+    "21bd821ba565375684a8a1233435ccd754f4dd5ad7877da053ba5bcd384d6913",
+    "790d87ac38641583be47b1d680bbd8aa9849c0182362224f6b214adb4fcea264"
+  ],
+  "reviews": [
+    {
+      "date": "2026-10-27",
+      "extension": "0.26.8",
+      "channels": [
+        "stable",
+        "preview"
+      ],
+      "reason": "Reviewed identical bundled documentation and compatibility inventories; verified Preview metadata omissions against real Preview vanilla usage and retained explicitly attributed Stable descriptions for the 12 confirmed components. Both source snapshots passed vanilla/schema/hover and candidate-loaded regressions."
+    }
+  ]
+}

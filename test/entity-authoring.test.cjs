@@ -1,7 +1,16 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs/promises'),path=require('node:path'),json=require('jsonc-parser');const content=require('../src/content.cjs'),entity=require('../src/entity-authoring.cjs'),symbols=require('../src/project-symbols.cjs'),lang=require('../src/localization.cjs');
 const doc=data=>({file:'entity.json',side:'behavior',relative:'entities/test.json',data,text:JSON.stringify(data),tree:json.parseTree(JSON.stringify(data))});
+test('documented event shorthand and objects share local event completion and navigation',()=>{
+ for(const [id,fields]of Object.entries(require('../src/event-forms.json').components))for(const field of Object.keys(fields))for(const value of ['test:done',{event:'test:done',target:'self'}]){
+  const document=doc({'minecraft:entity':{components:{[id]:{[field]:value}},events:{'test:done':{}}}});
+  const use=entity.uses(document).find(use=>use.id==='test:done');
+  assert.equal(use?.kind,'entity_event',id+'.'+field);
+  assert.equal(entity.completionContext(document,use.node.offset+2)?.kind,'entity_event');
+  assert.deepEqual(entity.issues(document),[]);
+ }
+});
 test('owned entity schema validates meaningful nested forms and rejects broken payloads',()=>{
- const schema=require('../schemas/entity.schema.json'),validate=new(require('ajv'))({strict:false}).compile(schema);assert.equal(Object.keys(schema.definitions.components.properties).length,98);
+ const schema=require('../schemas/entity.schema.json'),validate=new(require('ajv'))({strict:false}).compile(schema);assert.equal(Object.keys(schema.definitions.components.properties).length,107);
  const good={format_version:'1.26.50','minecraft:entity':{description:{identifier:'test:fish',properties:{'test:mode':{type:'enum',values:['idle','swim'],default:'idle'}}},components:{'minecraft:health':{value:{range_min:3,range_max:5},max:5},'minecraft:behavior.tempt':{priority:1,items:[{tags:"q.any_tag('test:food')"},'minecraft:fish']},'test:unknown':{arbitrary:[true]}},component_groups:{wet:{'minecraft:timer':{time:[1,3],time_down_event:{event:'test:done',target:'self'}}}},events:{'test:done':{sequence:[{add:{component_groups:['wet']}}]}}}};assert.ok(validate(good),JSON.stringify(validate.errors));
  const bad=structuredClone(good);bad['minecraft:entity'].components['minecraft:health'].max='bad';assert.equal(validate(bad),false);bad['minecraft:entity'].components['minecraft:health'].max=5;bad['minecraft:entity'].events['test:done'].sequence='bad';assert.equal(validate(bad),false);
  for(const value of Object.values(schema.definitions.components.properties))if(value.description)assert.match(value.markdownDescription,/learn.microsoft.com/);

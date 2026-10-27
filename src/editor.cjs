@@ -3,8 +3,8 @@ const json = require('jsonc-parser');
 const reference = require('./reference.cjs');
 const core = require('./core.cjs');
 const officialSchemas = require('./official-schemas.cjs');
-const ownedBlocks = require('../schemas/block.schema.json').definitions.components.properties;
-const ownedByKind = {entity:require('../schemas/entity.schema.json').definitions.components.properties,block:ownedBlocks,item:require('../schemas/item.schema.json').definitions.components.properties};
+const ownedBlocks = require('./authoring-data.cjs').get('schemas/block.schema.json').definitions.components.properties;
+const ownedByKind = {entity:require('./authoring-data.cjs').get('schemas/entity.schema.json').definitions.components.properties,block:ownedBlocks,item:require('./authoring-data.cjs').get('schemas/item.schema.json').definitions.components.properties};
 const documentation = require('./documentation.cjs');
 function attach(vscode, context, getProject, output) {
   if (!vscode.languages.registerCompletionItemProvider) return { refresh() {} };
@@ -31,7 +31,8 @@ function attach(vscode, context, getProject, output) {
     const requirement=require('./format-versions.cjs').rule(kind,component),minimum=(field?requirement?.fields?.[field]:requirement)?.min;if(minimum)md.appendText('\n\nMinimum format version: '+minimum+'.');
     if (value.type) md.appendText(`\n\nType: ${value.type}`);
     if (value.default !== undefined) md.appendText(`\nDefault: ${JSON.stringify(value.default)}`);
-    md.appendText(`\n\nReference data: Mojang ${index.tag}.`);
+    const sourceTag = index.components[kind]?.[component]?.sourceTag || index.tag;
+    md.appendText(`\n\nReference data: Mojang ${sourceTag}${sourceTag !== index.tag ? ' (Stable documentation; confirmed in Preview samples)' : ''}.`);
     md.appendMarkdown('\n\n'+documentation.componentLink(kind, component));
     md.isTrusted = false; return md;
   }
@@ -56,7 +57,7 @@ function attach(vscode, context, getProject, output) {
         const format=json.findNodeAtLocation(json.parseTree(data.text),['format_version'])?.value;
         return Object.entries(values).filter(([name])=>require('./format-versions.cjs').supported(data.kind,level===1?name:data.keys[data.c+1],format,getProject()?.config.targetVersion,level===2?name:undefined)).filter(([name]) => !existing.has(name) || name === data.keys.at(-1)).map(([name, value]) => {
           const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Property);
-          item.documentation = markdown(value, data.kind, level === 1 ? name : data.keys[data.c + 1],level===2?name:undefined); item.detail = `Mojang ${index.tag}`;
+          item.documentation = markdown(value, data.kind, level === 1 ? name : data.keys[data.c + 1],level===2?name:undefined); item.detail = `Mojang ${data.components[level === 1 ? name : data.keys[data.c + 1]]?.sourceTag || index.tag}`;
           // Replace only the content inside existing quotes; JSON service handles values.
           if (previous?.type === 'property' && previous.offset <= document.offsetAt(position)) {
             item.range = new vscode.Range(document.positionAt(previous.offset + 1), document.positionAt(previous.offset + previous.length - 1)); item.insertText = name;
@@ -101,7 +102,7 @@ function attach(vscode, context, getProject, output) {
   context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(validate), vscode.workspace.onDidChangeTextDocument(e => validate(e.document)), vscode.workspace.onDidCloseTextDocument(d => problems.delete(d.uri)), { dispose() { generation++; } });
   async function refresh(force = false) {
     const project = getProject(); if (!project || !vscode.workspace.isTrusted) return;
-    const key = JSON.stringify([project.root, project.config.targetVersion, project.packs]);
+    const key = JSON.stringify([project.root, project.config.target, project.config.targetVersion, project.packs, require('./authoring-data.cjs').revision]);
     if (!force && activeKey === key) return;
     activeKey = key; index = undefined; problems.clear(); const ticket = ++generation;
     let official;
@@ -123,7 +124,7 @@ function attach(vscode, context, getProject, output) {
     try { official = await officialSchemas.prepare(project); await associate(official.associations); if (official.directory) output.info(`Official Bedrock schemas ${official.version} ready.`); }
     catch (error) { output.warn(`Official schemas unavailable: ${error.message}`); }
     if (ticket !== generation) return;
-    const task = reference.loadReference(project.root, project.config.targetVersion, { force }); pending.set(key, task);
+    const task = reference.loadReference(project.root, project.config.targetVersion, { force, channel: project.config.target }); pending.set(key, task);
     try {
       const loaded = await task; if (ticket !== generation) return;
       index = loaded; output.info(`Mojang reference loaded: ${index.tag}`);
@@ -132,7 +133,7 @@ function attach(vscode, context, getProject, output) {
       const associations = [];
       for (const [folder, kind] of Object.entries({ blocks: 'block', items: 'item', entities: 'entity' })) {
         const file = await core.local(project.root, `.bedrock/reference/${kind}.schema.json`);
-        await core.writeJson(file, reference.componentSchema(index, kind, { omit: Object.keys(ownedByKind[kind]||{}),supplement:kind==='entity'?require('../schemas/entity.schema.json'):undefined }));
+        await core.writeJson(file, reference.componentSchema(index, kind, { omit: Object.keys(ownedByKind[kind]||{}),supplement:kind==='entity'?require('./authoring-data.cjs').get('schemas/entity.schema.json'):undefined }));
         associations.push({ fileMatch: [path.join(project.packs.behavior, folder, '**/*.json').replaceAll(path.sep, '/')], url: vscode.Uri.file(file).toString() });
       }
       associations.push(...(official?.associations || []));

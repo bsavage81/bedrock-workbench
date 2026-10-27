@@ -7,20 +7,20 @@ const PACKAGE = path.dirname(require.resolve('@minecraft/bedrock-schemas/catalog
 const VERSION = require(path.join(PACKAGE, 'package.json')).version;
 const catalog = require('@minecraft/bedrock-schemas/catalog.json');
 const documentation = require('./documentation.cjs');
-const documentationCatalog = require('./documentation-links.json');
-const BUILD = 37;
+const documentationCatalog = require('./authoring-data.cjs').get('src/documentation-links.json');
+const BUILD = 38;
 // Independent Workbench replacements. Broader Mojang routes remain fallbacks.
 const OWNED = {
-  'rp/entity/index.schema.json': require('../schemas/client-entity.schema.json'),
-  'bp/item_catalog/index.schema.json': require('../schemas/creative-catalog.schema.json'),
-  'bp/blocks/index.schema.json': require('../schemas/block.schema.json'),
-  'bp/entities/index.schema.json': require('../schemas/entity.schema.json'),
-  'bp/items/index.schema.json': require('../schemas/item.schema.json'),
-  'bp/loot_tables/index.schema.json': require('../schemas/loot-table.schema.json'),
-  'bp/recipes/index.schema.json': require('../schemas/recipe.schema.json'),
-  'rp/textures/item_texture.schema.json': require('../schemas/texture-atlas.schema.json'),
-  'rp/textures/terrain_texture.schema.json': require('../schemas/texture-atlas.schema.json'),
-  'rp/sounds/index.schema.json': require('../schemas/sound-definitions.schema.json')
+  'rp/entity/index.schema.json': require('./authoring-data.cjs').get('schemas/client-entity.schema.json'),
+  'bp/item_catalog/index.schema.json': require('./authoring-data.cjs').get('schemas/creative-catalog.schema.json'),
+  'bp/blocks/index.schema.json': require('./authoring-data.cjs').get('schemas/block.schema.json'),
+  'bp/entities/index.schema.json': require('./authoring-data.cjs').get('schemas/entity.schema.json'),
+  'bp/items/index.schema.json': require('./authoring-data.cjs').get('schemas/item.schema.json'),
+  'bp/loot_tables/index.schema.json': require('./authoring-data.cjs').get('schemas/loot-table.schema.json'),
+  'bp/recipes/index.schema.json': require('./authoring-data.cjs').get('schemas/recipe.schema.json'),
+  'rp/textures/item_texture.schema.json': require('./authoring-data.cjs').get('schemas/texture-atlas.schema.json'),
+  'rp/textures/terrain_texture.schema.json': require('./authoring-data.cjs').get('schemas/texture-atlas.schema.json'),
+  'rp/sounds/index.schema.json': require('./authoring-data.cjs').get('schemas/sound-definitions.schema.json')
 };
 const preparing = new Map();
 function adapt(schema, relative) {
@@ -53,7 +53,7 @@ function adapt(schema, relative) {
     // The version-aware reference entry supplies these keys. Keeping the broad
     // fallback copies would leak newer components/fields into older documents.
     if(kind==='entity'){
-      const rules=require('./format-requirements.json').components.entity;
+      const rules=require('./authoring-data.cjs').get('src/format-requirements.json').components.entity;
       function suppress(node){if(!node||typeof node!=='object')return;if(node.properties)for(const name of Object.keys(node.properties))if(rules[name]||rules[component]?.fields?.[name]||['transform_to_item','result_item'].includes(name)&&component==='minecraft:ageable')delete node.properties[name];for(const child of Object.values(node))if(Array.isArray(child))child.forEach(suppress);else if(child&&typeof child==='object')suppress(child);}
       suppress(schema);
     }
@@ -131,7 +131,7 @@ function glob(pattern) {
 function match(route, file) { return route.patterns.some(p => !p.startsWith('!') && glob(p).test(file)) && !route.patterns.some(p => p.startsWith('!') && glob(p.slice(1)).test(file)); }
 async function prepare(project) {
   const legacyTarget=compareVersions(project.config.targetVersion, VERSION)<0;
-  const directory = await core.local(project.root, `.bedrock/reference/official-${VERSION}`);
+  const directory = await core.local(project.root, `.bedrock/reference/official-${VERSION}-${require('./authoring-data.cjs').revision}`);
   const cacheKey = JSON.stringify([directory, project.packs,project.config.targetVersion]);
   if (!preparing.has(cacheKey)) preparing.set(cacheKey, (async () => {
     const marker = path.join(directory, 'ready.json');

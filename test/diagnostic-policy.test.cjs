@@ -15,3 +15,9 @@ test('native JSON owns open-file syntax only; reports, closed files and other di
   extension=true;document.languageId='plaintext';assert.equal(visible(vscode,file,syntax),true);
   vscode.workspace.textDocuments=[];assert.equal(visible(vscode,file,syntax),true);
 });
+test('live Molang owns open JSON findings independently of the native JSON service',()=>{
+ const file=path.resolve('animations/test.json'),document={uri:{scheme:'file',fsPath:file},languageId:'json'};
+ const vscode={workspace:{textDocuments:[document],getConfiguration:()=>({get:()=>false})}};
+ assert.equal(visible(vscode,file,{code:'bedrock.molangSyntax'}),false);assert.equal(visible(vscode,file,{code:'bedrock.molangRestriction'}),false);
+ vscode.workspace.textDocuments=[];assert.equal(visible(vscode,file,{code:'bedrock.molangSyntax'}),true);
+});

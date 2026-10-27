@@ -1,7 +1,7 @@
 const json=require('jsonc-parser');
 const engineCompare=require('./releases.cjs').compareVersions;
 const compareVersions=(a,b)=>engineCompare(typeof a==='string'&&a.split('.').length===2?a+'.0':a,typeof b==='string'&&b.split('.').length===2?b+'.0':b);
-const catalog=require('./format-requirements.json');
+const catalog=require('./authoring-data.cjs').get('src/format-requirements.json');
 const version=value=>typeof value==='string'&&/^\d+\.\d+(?:\.\d+)?$/.test(value)?value:undefined;
 function directCustom(format){return !version(format)||compareVersions(format,'1.21.90')>=0;}
 function rule(kind,id){return catalog.components[kind]?.[id];}

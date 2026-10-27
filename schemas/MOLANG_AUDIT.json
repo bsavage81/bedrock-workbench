@@ -1,0 +1,175 @@
+{
+  "date": "2026-10-26",
+  "status": "unreleased development checkout",
+  "packageVersion": "0.24.0",
+  "catalog": {
+    "primary": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/",
+    "queryEntries": 317,
+    "mathEntries": 61,
+    "releasePreviewInventoryEqual": true,
+    "inputHashes": "../src/molang-catalog.json#provenance"
+  },
+  "corpus": {
+    "vanillaSource": "https://github.com/Mojang/bedrock-samples/tree/v1.26.50.4",
+    "vanillaDocuments": 7863,
+    "vanillaExpressionStrings": 9983,
+    "project": "SavageCraft v2",
+    "projectDocuments": 721,
+    "projectExpressionStrings": 1910,
+    "totalExpressionStrings": 11893,
+    "molangFindings": 0,
+    "unrecognizedExpressionLikeStrings": 0,
+    "queriesWithoutReviewedLearnEntry": [
+      "query.texture_frame_index"
+    ],
+    "separatePackManifestRulesChecked": true,
+    "packSourceFilesModified": false
+  },
+  "verification": {
+    "syntaxCheck": "passed",
+    "nodeTests": {
+      "total": 233,
+      "passed": 232,
+      "failed": 0,
+      "skipped": 1
+    },
+    "nativeVSCodeHost": {
+      "timestamp": "2026-10-26T17:58:02.867Z",
+      "processExitCode": 0,
+      "wrapperExitCode": 0,
+      "completion": true,
+      "middleTokenInsertion": true,
+      "cursorPlacement": true,
+      "signatureHelp": true,
+      "learnHover": true,
+      "contextFiltering": true,
+      "emptyBehaviorField": true,
+      "stateArgumentReference": true,
+      "escapedDiagnostic": true,
+      "diagnosticOwnership": true
+    }
+  },
+  "limits": [
+    "Corpus coverage is not a guarantee of runtime behavior or undocumented field coverage.",
+    "Unknown query introductions, overloads and experiment boundaries remain permissive.",
+    "Dynamic/transitive actor ownership and active-subpack precedence are not inferred.",
+    "Individual strings over 64 KiB are omitted; nesting over 128 levels receives delimiter checks only."
+  ],
+  "published": false,
+  "installed": false,
+  "testerBundleRefreshed": false,
+  "testerBundleVersion": "0.23.1",
+  "followup": {
+    "date": "2026-10-26",
+    "status": "Molang follow-up source verification; no release actions performed by this task",
+    "sourceVersionAtStart": "0.25.0",
+    "sourceVersionAtVerification": "0.26.0",
+    "concurrentWork": "Unrelated model-preview changes and version metadata preserved.",
+    "baselinePreserved": true,
+    "documentation": {
+      "primary": "Microsoft Learn live stable/experimental pages",
+      "compatibleSamples": "Mojang/bedrock-samples v1.26.50.4",
+      "tableNames": 378,
+      "tableDescriptionOrSignatureDifferences": 0,
+      "individualQueryContracts": 21,
+      "individualChannelPages": 42,
+      "individualPageTextDifferences": 0,
+      "contracts": "../src/molang-guidance.json",
+      "channelAudit": "../src/molang-catalog.json#provenance/channelAudit",
+      "versionPolicy": "Documented format/experiment guidance is not an inferred initial engine introduction and creates no speculative version errors."
+    },
+    "implemented": [
+      "Cycle-safe static potential controller/entity bindings and scoped helper variables/resources",
+      "Variable/state/curve/array/resource declaration navigation with JSON source ranges",
+      "Dirty bound JSON overlays",
+      "Runtime actor alias navigation and caller-private boundary after direct/grouped arrows",
+      "Optional hand/rendered-item/equipment-index/cooldown overloads and explicit parameter guidance",
+      "Channel-aware inventory/description/signature/documentation selection",
+      "Additional empty/constant particle/worldgen fields and exclusion of literal enums/tags/aliases",
+      "Declared authoring subpack picker with whole-file override/base fallback/file-context/sibling isolation"
+    ],
+    "corpus": {
+      "vanillaDocuments": 7863,
+      "projectDocuments": 721,
+      "vanillaExpressionStrings": 8015,
+      "projectExpressionStrings": 1645,
+      "totalExpressionStrings": 9660,
+      "molangFindings": 0,
+      "unrecognizedExpressionLikeStrings": 0,
+      "addedConstantExpressions": 1,
+      "excludedEnumStrings": 2234,
+      "queriesWithoutReviewedLearnEntry": [
+        "query.texture_frame_index"
+      ],
+      "packSourceFilesHashChecked": 1595,
+      "packSourceFilesChanged": 0
+    },
+    "verification": {
+      "syntaxCheck": "passed",
+      "diffCheck": "passed",
+      "nodeTests": {
+        "total": 252,
+        "passed": 251,
+        "failed": 0,
+        "skipped": 1
+      },
+      "finalRelevantTests": {
+        "total": 54,
+        "passed": 54,
+        "failed": 0
+      },
+      "nativeVSCodeHost": {
+        "version": "0.26.0",
+        "timestamp": "2026-10-26T20:41:49.523Z",
+        "authoringOnly": true,
+        "baseline": {
+          "completion": true,
+          "middleTokenInsertion": true,
+          "cursorPlacement": true,
+          "signatureHelp": true,
+          "learnHover": true,
+          "contextFiltering": true,
+          "emptyBehaviorField": true,
+          "stateArgumentReference": true,
+          "escapedDiagnostic": true,
+          "diagnosticOwnership": true
+        },
+        "followup": {
+          "picker": true,
+          "subpackOverride": true,
+          "fileContext": true,
+          "transitiveVariables": true,
+          "unsavedOverlay": true,
+          "variableNavigation": true,
+          "resourceNavigation": true,
+          "singleHover": true,
+          "overloadSignatures": true,
+          "actorBoundary": true
+        },
+        "deploymentPerformed": false,
+        "processExitCode": 0,
+        "wrapperExitCode": 0
+      }
+    },
+    "remaining": [
+      "Runtime actor identities and computed or external bindings without a documented target relation",
+      "Individual overload/name/introduction/experiment review beyond the 21 curated query contracts",
+      "Undocumented query.texture_frame_index and unavailable public nearby-entity contracts",
+      "Ownership through other asset consumer families",
+      "Non-Molang asset/localization/index precedence under B2"
+    ],
+    "actions": {
+      "versionBumpedByThisTask": false,
+      "packagedByThisTask": false,
+      "installedByThisTask": false,
+      "publishedByThisTask": false,
+      "deployedByThisTask": false,
+      "testerBundleRefreshedByThisTask": false,
+      "gameplayVerified": false
+    },
+    "testerBundle": {
+      "version": "0.23.1",
+      "sha256": "60a3c841f57306c3042385234ef04ae4d9c36402f78bf03ce3c2334f3abbdc47"
+    }
+  }
+}

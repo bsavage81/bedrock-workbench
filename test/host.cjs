@@ -122,7 +122,8 @@ async function run() {
   await until(async () => vscode.languages.getDiagnostics(animationUri).some(d => d.message.startsWith('Molang:')), 'Molang diagnostics missing');
   const molangPosition = animationDoc.positionAt(animationDoc.getText().indexOf('query.anim_time') + 'query.anim_'.length);
   const molangCompletions = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', animationUri, molangPosition);
-  assert.ok(molangCompletions.items.some(item => item.label === 'query.anim_time' && item.detail === 'Mojang Molang reference'), 'Molang completion missing');
+  assert.ok(molangCompletions.items.some(item => item.label === 'query.anim_time' && item.detail === 'Molang'), 'Molang completion missing');
+  const molangAuthoring=await require('./molang-host.cjs')(root);
   assert.ok(commands.includes('bedrock.vanillaSource'),'Vanilla reference source command missing');
   assert.ok(commands.includes('bedrock.createProject'),'New-project wizard command missing');
   const referenceFixtureFile=path.join(root,'.bedrock/reference/components.json'),referenceFixture=await core.readJson(referenceFixtureFile);
@@ -751,6 +752,7 @@ async function run() {
   assert.ok(validationReport.files >= 6); assert.equal(validationReport.schemaVersion, '1.26.50');
   state = await core.readJson(stateFile);
   const result = { activated: true, commands: true, manualBuild: true, automaticCreateChangeSaveDelete: true, automaticIconCompilation: true, versionUnchanged: true, betaBuilds: state.betaBuild, jsonCompletion: true, jsonValidation: true, mojangCompletion: true, mojangHover: true, componentQuickFix: true, officialLootValidation: true, projectReferenceCompletion: true, projectDefinition: true, molangDiagnostics: true, molangCompletion: true, projectValidation: true };
+  result.molangAuthoring=molangAuthoring;result.version=require('../package.json').version;result.timestamp=new Date().toISOString();
   await fs.writeFile(path.resolve(__dirname, '../HOST_VERIFICATION.json'), JSON.stringify(result, null, 2) + '\n');
   console.log('HOST VERIFICATION PASSED', result);
 }
