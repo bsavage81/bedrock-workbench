@@ -13,7 +13,8 @@
 - [x] Document supported data families, maintenance, security, historical coverage, offline cache limits and licensing in `AUTHORING_DATA.md` and `schemas/AUTHORING.md`.
 - [x] Correct Windows short-path preview containment by resolving both file and pack roots; retain escape protection and add a symlink-escape regression. Normalize preview fixture line endings for Windows CI.
 - [x] Review both 0.26.8 candidate fingerprints. Preview metadata omitted twelve components still used in Preview vanilla; retain their Stable documentation with explicit source attribution and verify its constraints against Preview fixtures.
-- [ ] Public data release and scheduled publication: The owner selected one-person fingerprint review. The data repository workflow uses its own scoped Actions token; deploy and verify the manual publication workflow and anonymous downloads. Scheduled publication remains disabled pending a specific request. No data release, schedule enablement, or tester-bundle refresh performed.
+- [x] Publish immutable Stable `run-40587848516-1-stable` and Preview `run-40587710657-1-preview` releases through the data repository Actions token and owner-reviewed fingerprints. Both Actions runs passed; anonymous downloads and native VS Code activation passed for each channel.
+- [ ] Scheduled publication remains disabled pending a specific request. Tester bundle unchanged.
 
 
 ## 0.26.7 controller-driven appearance, TGA and fractional UV correction — October 27, 2026 (local update)

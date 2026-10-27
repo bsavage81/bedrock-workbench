@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-27T21:07:27.078Z",
+  "verifiedAt": "2026-10-27T21:38:50.338Z",
   "extensionVersion": "0.26.8",
   "baselineVersion": "0.26.6",
   "publicRepository": "bsavage81/bedrock-workbench-data",
@@ -7,7 +7,7 @@
   "syntaxChecksPassed": true,
   "workflowYamlParsed": true,
   "scheduleEnabled": false,
-  "publicationEnabled": false,
+  "publicationEnabled": true,
   "immutableReleasesEnabled": true,
   "unitSuite": {
     "tests": 311,
@@ -35,9 +35,9 @@
     "stable": {
       "entry": {
         "dataFormatVersion": 1,
-        "id": "v0.26.8-stable-20261027",
+        "id": "run-40587848516-1-stable",
         "channel": "stable",
-        "generatedAt": "2026-10-27T16:26:20.277Z",
+        "generatedAt": "2026-10-27T21:36:39.464Z",
         "extension": {
           "min": "0.26.8",
           "max": "0.26.8"
@@ -69,10 +69,10 @@
             "attribution": "Mojang; supporting reference, parser not distributed in data."
           }
         ],
-        "url": "https://github.com/bsavage81/bedrock-workbench-data/releases/download/data-v0.26.8-stable-20261027/snapshot.json",
-        "sha256": "693b935ecb48a21660754dfe89ba7964787344bc97e3d7de5da0010cfab30581",
-        "bytes": 3082749,
-        "reviewFingerprint": "6b20a820f7215e63904437650f501b7cef0837d26430221d4b0848e7479d2deb"
+        "url": "https://github.com/bsavage81/bedrock-workbench-data/releases/download/data-run-40587848516-1-stable/snapshot.json",
+        "sha256": "e3649fe4ba6fb470ce3f1c8e2dda5a91866c0d4cb31041504ea03bb8374a5c12",
+        "bytes": 3082839,
+        "reviewFingerprint": "3b09d0c0f881cbb9ff71aa6fd1b84e000ba3fe81fe8b4ff95012405a10d7854a"
       },
       "coverage": {
         "block": {
@@ -105,16 +105,27 @@
         "passed": true
       },
       "fallbackFailures": 0,
-      "reviewFingerprint": "6b20a820f7215e63904437650f501b7cef0837d26430221d4b0848e7479d2deb",
+      "reviewFingerprint": "3b09d0c0f881cbb9ff71aa6fd1b84e000ba3fe81fe8b4ff95012405a10d7854a",
       "reviewApproved": true,
-      "published": false
+      "published": true,
+      "nativePublicFeed": {
+        "version": "0.26.8",
+        "timestamp": "2026-10-27T21:37:54.178Z",
+        "channel": "stable",
+        "activeVersion": "run-40587848516-1-stable",
+        "source": "GitHub release",
+        "mojangTag": "v1.26.50.4",
+        "anonymousManifest": true,
+        "nativeActivation": true,
+        "deploymentPerformed": false
+      }
     },
     "preview": {
       "entry": {
         "dataFormatVersion": 1,
-        "id": "v0.26.8-preview-20261027",
+        "id": "run-40587710657-1-preview",
         "channel": "preview",
-        "generatedAt": "2026-10-27T16:26:29.809Z",
+        "generatedAt": "2026-10-27T21:34:33.342Z",
         "extension": {
           "min": "0.26.8",
           "max": "0.26.8"
@@ -155,10 +166,10 @@
             "attribution": "(c) Mojang AB. All rights reserved."
           }
         ],
-        "url": "https://github.com/bsavage81/bedrock-workbench-data/releases/download/data-v0.26.8-preview-20261027/snapshot.json",
-        "sha256": "280556d9bfbc6898a396d3d77b31cdaf3fc8b6b4928fca6fc650a4eacf4618b7",
-        "bytes": 3088105,
-        "reviewFingerprint": "aa90606bccb0ec382c3bc55373211d04dd749586192e683ac30a0ecd8f800c96"
+        "url": "https://github.com/bsavage81/bedrock-workbench-data/releases/download/data-run-40587710657-1-preview/snapshot.json",
+        "sha256": "426cdee4c7741caa8b0eeb06bc3aaea00bc0aba10ddc468b5c83654356267b39",
+        "bytes": 3088195,
+        "reviewFingerprint": "ba1359c9b0937bcdae9b30ffc266f263fbfb6f620dcf5ed1d8c1dc846eda1d68"
       },
       "coverage": {
         "block": {
@@ -256,17 +267,26 @@
         "unresolved": []
       },
       "fallbackFailures": 0,
-      "reviewFingerprint": "aa90606bccb0ec382c3bc55373211d04dd749586192e683ac30a0ecd8f800c96",
+      "reviewFingerprint": "ba1359c9b0937bcdae9b30ffc266f263fbfb6f620dcf5ed1d8c1dc846eda1d68",
       "reviewApproved": true,
-      "published": false
+      "published": true,
+      "nativePublicFeed": {
+        "version": "0.26.8",
+        "timestamp": "2026-10-27T21:36:04.699Z",
+        "channel": "preview",
+        "activeVersion": "run-40587710657-1-preview",
+        "source": "GitHub release",
+        "mojangTag": "v1.26.60.30-preview",
+        "anonymousManifest": true,
+        "nativeActivation": true,
+        "deploymentPerformed": false
+      }
     }
   },
   "limitations": [
-    "Public repository initialized; manual reviewed publication workflow and feeds are pending deployment.",
-    "Scheduled publication remains disabled pending a specific request.",
-    "Real GitHub Actions runs and anonymous release downloads remain to be verified.",
+    "Scheduled publication is disabled pending a specific request.",
     "Offline selection retains active and previous snapshot pointers; older targets require available historical feed entries.",
-    "Parsers, official package adaptation, and structural compatibility behavior remain extension updates."
+    "Parsers and executable behavior still require extension updates."
   ],
   "extensionInstalled": true,
   "extensionPublished": false,
@@ -274,5 +294,6 @@
   "sourceLicense": "MIT",
   "sourcePublicRequested": true,
   "sourcePublic": true,
-  "approvalMethod": "Owner-reviewed content and compatibility fingerprint"
+  "approvalMethod": "Owner-reviewed content and compatibility fingerprint",
+  "publicationMethod": "Manual Actions dispatch with automatic owner-fingerprint verification"
 }

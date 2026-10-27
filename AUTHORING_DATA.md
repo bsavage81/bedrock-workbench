@@ -3,7 +3,7 @@
 Implementation and local verification: October 27, 2026. Initial audit baseline: 0.26.6. Concurrent preview work subsequently advanced
 the shared checkout to 0.26.7. The owner then authorized the 0.26.8 extension
 update, public MIT source and public data setup. The verified VSIX was installed
-locally; the tester bundle and public data releases remain unchanged.
+locally; the tester bundle remains unchanged. Stable and Preview public data releases are live.
 
 ## Audit and release baseline
 
@@ -179,10 +179,17 @@ Local evidence lives under `.test-temp/`: `authoring-data-host.json`,
 `data-unit-tests.log`, and `authoring-full-tests.log`. Real-source candidates
 for each channel validated 485 vanilla documents with zero fixture failures,
 zero missing linked Learn pages and zero missing owned component hovers.
-The initial 0.26.8 candidates were reviewed, including source-tagged Preview fallback descriptions for twelve components still used by Preview vanilla. The owner selected fingerprint-based review for this one-person project. Data publication uses the data repository's scoped Actions token; a real Actions run and anonymous release verification remain deployment gates. No public feed or data release has yet been uploaded.
+The initial 0.26.8 candidates were reviewed, including source-tagged Preview fallback descriptions for twelve components still used by Preview vanilla. The owner selected fingerprint-based review for this one-person project. Data publication uses the data repository's scoped Actions token; a real Actions run and anonymous release verification remain deployment gates. Both public feeds are now published as immutable releases, verified anonymously and activated successfully in native VS Code.
 
 Final local verification: syntax checks passed; full suite 311 tests (309 passed,
 two skipped, zero failures); eleven updater/service regressions passed; native
 VS Code authoring host passed on 0.26.8. Both channel candidates passed their
 61 candidate-loaded regressions and 485 vanilla fixtures. The maintained evidence
-summary is `schemas/AUTHORING_DATA_AUDIT.json`. The public repository has its README/license and immutable releases enabled; both reviewed candidates await the manual publication workflow.
+summary is `schemas/AUTHORING_DATA_AUDIT.json`. The public repository has its README/license and immutable releases enabled; both channels are published and verified.
+
+Published October 27, 2026: Stable `run-40587848516-1-stable` and Preview
+`run-40587710657-1-preview`. Both release workflows passed, including immutable
+release checks and anonymous asset checksums. Native VS Code loaded both feeds
+without GitHub sign-in. Scheduled publication remains disabled. Raw Learn HTML
+hashes are retained in `inputAudit`; review binds extracted content and pinned
+source revisions, so unrelated page chrome does not invalidate reviewed data.
