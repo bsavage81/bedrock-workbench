@@ -81,6 +81,11 @@ test('unbound geometry remains viewable and block atlas variations are explicit 
  const [b]=preview.candidates(i,'/BP/b.json');assert.equal(b.textures.length,2);assert.match(b.warning,/one selected material/);
 });
 test('asset reads reject escapes',async()=>{const root=await fs.mkdtemp(path.join(os.tmpdir(),'preview-'));try{await fs.mkdir(path.join(root,'RP'));await fs.writeFile(path.join(root,'secret'),'private');await assert.rejects(preview.safeRead({packs:{resource:path.join(root,'RP')}},path.join(root,'secret')),/outside/);}finally{await fs.rm(root,{recursive:true,force:true});}});
+test('asset reads reject symbolic links that resolve outside the pack',async t=>{
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'preview-link-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));const pack=path.join(root,'RP'),outside=path.join(root,'outside.json'),link=path.join(pack,'escape.json');await fs.mkdir(pack);await fs.writeFile(outside,'{}');
+ try{await fs.symlink(outside,link,'file');}catch(error){if(['EPERM','EACCES','ENOTSUP'].includes(error.code)){t.skip('Symbolic links are unavailable on this host');return;}throw error;}
+ await assert.rejects(preview.safeRead({packs:{resource:pack}},link),/outside/);
+});
 test('shipped browser geometry conversion matches tested source',async()=>{const canonical=text=>text.replace(/\r\n/g,'\n');assert.equal(canonical(await fs.readFile(path.join(__dirname,'../media/model-preview.js'),'utf8')),canonical(await fs.readFile(path.join(__dirname,'../src/preview-geometry.cjs'),'utf8'))+'\n'+canonical(await fs.readFile(path.join(__dirname,'../media/preview-renderer.js'),'utf8')));});
 test('native panel adapter enforces trust, confines webview resources, and refreshes saved bindings',async()=>{
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'preview-host-')),commands=new Map(),messages=[];let receive,changed,disposed;

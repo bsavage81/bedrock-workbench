@@ -47,7 +47,8 @@ function candidates(index,file,{propertyValues}={}) {
 }
 async function safeRead(project,file) {
   const resolved=await fs.realpath(file);
-  if(!Object.values(project.packs).some(root=>core.inside(root,resolved)))throw Error('Preview asset is outside the configured source packs.');
+  const roots=await Promise.all(Object.values(project.packs).map(root=>fs.realpath(root).catch(()=>undefined)));
+  if(!roots.some(root=>root&&core.inside(root,resolved)))throw Error('Preview asset is outside the configured source packs.');
   if((await fs.stat(resolved)).size>16*1024*1024)throw Error('Preview asset exceeds the 16 MiB limit.');
   return fs.readFile(resolved);
 }

@@ -181,8 +181,8 @@ for each channel validated 485 vanilla documents with zero fixture failures,
 zero missing linked Learn pages and zero missing owned component hovers.
 The initial 0.26.8 candidates were reviewed, including source-tagged Preview fallback descriptions for twelve components still used by Preview vanilla. The owner selected fingerprint-based review for this one-person project. Data publication uses the data repository's scoped Actions token; a real Actions run and anonymous release verification remain deployment gates. No public feed or data release has yet been uploaded.
 
-Final local verification: syntax checks passed; full suite 310 tests (309 passed,
-one skipped, zero failures); eleven updater/service regressions passed; native
+Final local verification: syntax checks passed; full suite 311 tests (309 passed,
+two skipped, zero failures); eleven updater/service regressions passed; native
 VS Code authoring host passed on 0.26.8. Both channel candidates passed their
 61 candidate-loaded regressions and 485 vanilla fixtures. The maintained evidence
 summary is `schemas/AUTHORING_DATA_AUDIT.json`. The public repository has its README/license and immutable releases enabled; both reviewed candidates await the manual publication workflow.
