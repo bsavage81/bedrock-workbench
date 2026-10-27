@@ -9,11 +9,6 @@ on:
         options: [stable, preview, both]
         default: stable
       publish:
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        channel: ${{ fromJSON((github.event_name == 'schedule' || inputs.channel == 'both') && '["stable","preview"]' || format('["{0}"]', inputs.channel)) }}
         description: Publish the candidate if its fingerprint has been reviewed
         type: boolean
         default: false
