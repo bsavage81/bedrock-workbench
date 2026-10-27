@@ -6,10 +6,6 @@ on:
         type: choice
         options: [stable, preview]
         default: stable
-      publish:
-        description: Publish a reviewed candidate (also requires repository enablement and environment approval)
-        type: boolean
-        default: false
       source_tag:
         description: Optional exact official tag to build historical coverage; blank selects latest in the actual channel
         type: string
@@ -55,26 +51,3 @@ jobs:
         with:
           name: reviewed-authoring-candidate-${{ matrix.channel }}
           path: .test-temp/data-output/${{ matrix.channel }}/
-  publish:
-    needs: verify
-    if: (inputs.publish == true || github.event_name == 'schedule') && vars.AUTHORING_PUBLICATION_ENABLED == 'true'
-    strategy:
-      matrix:
-        channel: ${{ fromJSON(github.event_name == 'schedule' && '["stable","preview"]' || format('["{0}"]', inputs.channel)) }}
-    environment: authoring-data-publication
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: npm
-      - run: npm ci
-      - uses: actions/download-artifact@v4
-        with:
-          name: reviewed-authoring-candidate-${{ matrix.channel }}
-          path: .test-temp/data-output/${{ matrix.channel }}
-      - run: node tools/publish-authoring-data.cjs .test-temp/data-output/${{ matrix.channel }}
-        env:
-          AUTHORING_PUBLICATION_ENABLED: ${{ vars.AUTHORING_PUBLICATION_ENABLED }}
-          GH_TOKEN: ${{ secrets.DATA_PUBLICATION_TOKEN }}

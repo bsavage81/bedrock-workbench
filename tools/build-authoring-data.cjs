@@ -90,6 +90,9 @@ async function build(directory, output, channel, id) {
   const review = JSON.parse(await fs.readFile(path.join(__dirname, '../data-public/reviewed.json')));
   const key = updates.reviewFingerprint(snapshot, entry);
   report.reviewFingerprint = key; await fs.writeFile(path.join(destination, 'verification.json'), JSON.stringify(report, null, 2));
+  entry.reviewFingerprint = key;
+  await fs.writeFile(path.join(destination, 'entry.json'), JSON.stringify(entry, null, 2));
+  await fs.writeFile(path.join(destination, 'manifest.json'), JSON.stringify({ dataFormatVersion: 1, channel, generatedAt, snapshots: [entry] }, null, 2));
   if (fixtures.length || fallbackFailures.length || previewReview?.unresolved.length || missingPages.length || !report.projectRegressionsPassed || Object.values(coverage).some(v => v.missing.length) || !review.approvedFingerprints.includes(key)) throw Error(`Candidate held for review: ${key}. Inspect ${destination}/verification.json`);
   await fs.writeFile(path.join(destination, 'verified.json'), JSON.stringify({ sha256: entry.sha256, reviewFingerprint: key }));
   return entry;

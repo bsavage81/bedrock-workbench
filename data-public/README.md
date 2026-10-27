@@ -4,8 +4,10 @@ Public data repository: https://github.com/bsavage81/bedrock-workbench-data
 
 The extension and its generators are open source at https://github.com/bsavage81/bedrock-workbench. Only generated declarative
 JSON snapshots, versioned manifests and attribution belong in the public repo.
-Snapshots are published only after source and compatibility review. Scheduled
-publication is controlled separately in the private build repository.
+Snapshots are published only after the owner reviews and commits their exact
+content and compatibility fingerprints in the source repository. The data
+repository workflow uses its own GitHub token; no cross-repository secret is
+needed. Scheduled publication is disabled until specifically requested.
 
 When enabled, `feeds/stable.json` and `feeds/preview.json` retain an index of
 compatible historical releases. Each entry points to the immutable release
@@ -22,6 +24,6 @@ published.
 
 Maintenance and review instructions are in the source repository's
 `AUTHORING_DATA.md`. Publication requires a reviewed candidate fingerprint,
-passing tests and source/fixture coverage audits, an approved Actions environment,
-and immutable releases enabled on this repository. Preview absence is reported;
+passing tests and source/fixture coverage audits, and immutable releases enabled
+on this repository. Preview absence is reported;
 Stable content is never relabeled as Preview.

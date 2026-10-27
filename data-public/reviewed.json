@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "approvedFingerprints": [
-    "21bd821ba565375684a8a1233435ccd754f4dd5ad7877da053ba5bcd384d6913",
-    "790d87ac38641583be47b1d680bbd8aa9849c0182362224f6b214adb4fcea264"
+    "6b20a820f7215e63904437650f501b7cef0837d26430221d4b0848e7479d2deb",
+    "aa90606bccb0ec382c3bc55373211d04dd749586192e683ac30a0ecd8f800c96"
   ],
   "reviews": [
     {
@@ -12,7 +12,7 @@
         "stable",
         "preview"
       ],
-      "reason": "Reviewed identical bundled documentation and compatibility inventories; verified Preview metadata omissions against real Preview vanilla usage and retained explicitly attributed Stable descriptions for the 12 confirmed components. Both source snapshots passed vanilla/schema/hover and candidate-loaded regressions."
+      "reason": "Reviewed the documented facts and compatibility inventory, 485 vanilla fixtures and 61 candidate regressions per channel. Preview fallback entries are explicitly attributed and confirmed in actual Preview entities. Corrected the pinned Learn source date; no data facts changed."
     }
   ]
 }

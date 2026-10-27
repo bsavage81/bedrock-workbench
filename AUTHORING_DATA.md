@@ -125,56 +125,48 @@ of that repository's publisher account.
 
 ## Generation and maintenance
 
-The Actions workflow stays in the source repository:
-`.github/workflows/authoring-data.yml`. Manual builds are available after that
-workflow is pushed. The cron stanza is commented out and the publish job is
-disabled unless `AUTHORING_PUBLICATION_ENABLED=true` and the manual `publish`
-input is true. Do not enable either until the owner requests it.
+The owner chose a one-person review arrangement: review each candidate and commit
+its exact content/compatibility fingerprint in `data-public/reviewed.json` in the
+source repository. The public data repository's manual Actions workflow checks
+out that exact source revision, fetches official inputs, verifies schemas and
+fixtures, and builds only approved candidates. The separate publisher job uses
+only the data repository's own `GITHUB_TOKEN`, rechecks the approved fingerprint
+at the pinned source commit, enforces immutable releases, verifies anonymous
+downloads, and only then advances the channel feed. No cross-repository credential
+or self-approved GitHub environment is used. A reviewed unchanged fingerprint is
+not published twice. This is an owner review, not independent two-person review.
+
+The data workflow is `data-public/.github/workflows/refresh.yml` in this source
+tree and `.github/workflows/refresh.yml` in the data repository. It currently has
+manual dispatch only. Scheduled publication remains disabled pending an explicit
+request; the source repository's own candidate workflow is also manual only.
 
 1. Run `npm ci`, `npm run check`, and `npm test`.
 2. Run `node tools/fetch-authoring-inputs.cjs .test-temp/data-inputs`. It detects
-   Stable/Preview releases, resolves exact commits, fetches text archives and
-   only the needed Learn Markdown pages, verifies Git blob hashes, saves Learn
-   Stable/experimental Molang tables and preserves upstream licenses. It inspects
-   Creator Tools revision/license as supporting provenance, never ships its parser.
+   actual Stable and Preview samples, records commits and hashes, verifies Learn
+   Markdown blobs, and saves the source notices and Molang tables.
 3. Run `node tools/build-authoring-data.cjs .test-temp/data-inputs .test-temp/data-output stable <unique-id>`
-   and repeat for `preview`. Regeneration uses the existing owned extractors,
-   compiles every schema, audits component hover coverage and validates all
-   applicable vanilla block/item/entity/client-entity fixtures. The candidate is
-   also loaded through a test preload for 61 existing
-   project/format/Molang/hover regressions. Unit tests provide source-channel,
-   failure and recovery regressions.
-   For historical coverage, set `BEDROCK_DATA_CHANNEL=stable` (or `preview`)
-   and `BEDROCK_DATA_SOURCE_TAG` to an exact official release tag before fetching,
-   or use the manual workflow's `source_tag` input. Its actual prerelease flag
-   must match the requested channel. For a historical Preview, also set
-   `BEDROCK_DATA_STABLE_TAG` or `stable_comparison_tag` to a Stable release no
-   newer than that Preview; otherwise the comparison is held. Keep older entries.
-4. Review each local `verification.json`, source changes, generated catalogs
-   and compatibility implications. Unapproved candidates deliberately exit
-   nonzero after writing evidence; no `verified.json` is issued. `data-public/reviewed.json` records reviewed fingerprints. Add an exact
-   reviewed fingerprint through source review only after resolving ambiguities.
-   A fingerprint binds official source revisions, generated data-family hashes,
-   reference facts, notices, format version and compatibility coverage. No automatic
-   widening of target ranges or behavioral contract changes.
-5. For changes to authored schemas, edit our private generators first and
-   regenerate normally. Run the relevant audits with representative project
-   fixtures. Use `powershell -File tools/test-host.ps1 -Tests test/authoring-data-host.cjs`
-   for real VS Code association/completion/hover/validation/rollback checks.
-6. On explicit publication authorization: bootstrap only the public README and
-   license, enable immutable releases in public repository settings, configure
-   protected environment `authoring-data-publication` with a required reviewer,
-   and set `DATA_PUBLICATION_TOKEN` to a narrowly scoped public-repo content-write
-   credential in the source repository workflow environment. The source repository's default token cannot publish into another repository. Set the publication variable only
-   after these controls are verified.
-7. Dispatch the manual workflow with `publish=false` first, review artifacts,
-   then dispatch an approved candidate with `publish=true`. Publisher refuses
-   stale verification, never clobbers assets, publishes a draft, requires the
-   returned release to be immutable, verifies an anonymous asset download, then
-   advances the feed using the existing file SHA. If immutable-release settings
-   are missing, it stops before advancing the feed; investigate the unindexed
-   release before retrying. Retain old entries. Once both feeds are proven with
-   anonymous testers, the owner may authorize the prepared daily cron.
+   and repeat for `preview`. Candidates must compile schemas, cover component
+   hovers, validate vanilla fixtures and pass candidate-loaded project regressions.
+   For historical coverage set `BEDROCK_DATA_CHANNEL` and the exact official
+   `BEDROCK_DATA_SOURCE_TAG`. For historical Preview also set a compatible
+   `BEDROCK_DATA_STABLE_TAG` no newer than the Preview source.
+4. Review each local `verification.json`, source changes, generated catalogs,
+   attribution and compatibility implications. Unapproved candidates stop and
+   produce no `verified.json`; do not upload candidate artifacts publicly.
+   Add the exact reviewed fingerprint to `data-public/reviewed.json`, commit it
+   and push the reviewed source. The fingerprint binds source revisions, data
+   families, reference facts, notices and compatibility ranges.
+5. Repeat generation to confirm the reviewed fingerprint passes, then dispatch
+   the data repository workflow with `publish=false` to verify Actions. Dispatch
+   with `publish=true` for the requested channel only after checks pass. Data
+   releases contain only `snapshot.json` and `manifest.json`. The publisher
+   refuses altered data, duplicate fingerprints and mutable releases. It retains
+   existing feed entries for older targets.
+6. Use `powershell -File tools/test-host.ps1 -Tests test/authoring-data-host.cjs`
+   for real VS Code completion, hover, validation, rollback and fallback checks.
+   Source code, schemas and parser behavior evolve under the MIT extension license;
+   official references and third-party components keep their own notices.
 
 Public source attribution: authored data MIT; Microsoft Learn CC-BY-4.0; sample
 facts retain Mojang's LICENSE.md/Minecraft EULA notice; Creator Tools MIT notice
@@ -187,10 +179,10 @@ Local evidence lives under `.test-temp/`: `authoring-data-host.json`,
 `data-unit-tests.log`, and `authoring-full-tests.log`. Real-source candidates
 for each channel validated 485 vanilla documents with zero fixture failures,
 zero missing linked Learn pages and zero missing owned component hovers.
-The initial 0.26.8 candidates were reviewed, including source-tagged Preview fallback descriptions for twelve components still used by Preview vanilla. GitHub Actions execution, protected environment reviewer setup, a narrowly scoped publication token and anonymous real-release download verification remain deployment gates. GitHub rejected the required-reviewer protection rule while the source repository was private; the owner requested making it public so the protected environment can be configured. No public feed or data release has been uploaded.
+The initial 0.26.8 candidates were reviewed, including source-tagged Preview fallback descriptions for twelve components still used by Preview vanilla. The owner selected fingerprint-based review for this one-person project. Data publication uses the data repository's scoped Actions token; a real Actions run and anonymous release verification remain deployment gates. No public feed or data release has yet been uploaded.
 
-Final local verification: syntax checks passed; full suite 308 tests (307 passed,
+Final local verification: syntax checks passed; full suite 310 tests (309 passed,
 one skipped, zero failures); eleven updater/service regressions passed; native
 VS Code authoring host passed on 0.26.8. Both channel candidates passed their
 61 candidate-loaded regressions and 485 vanilla fixtures. The maintained evidence
-summary is `schemas/AUTHORING_DATA_AUDIT.json`. The public repository has its README/license and immutable releases enabled; both reviewed candidates await the protected publication workflow.
+summary is `schemas/AUTHORING_DATA_AUDIT.json`. The public repository has its README/license and immutable releases enabled; both reviewed candidates await the manual publication workflow.

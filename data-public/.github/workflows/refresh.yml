@@ -1,0 +1,91 @@
+name: Build reviewed authoring data
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        type: choice
+        options: [stable, preview]
+        default: stable
+      publish:
+        description: Publish the candidate if its fingerprint has been reviewed
+        type: boolean
+        default: false
+      source_tag:
+        description: Optional official source tag for historical coverage
+        type: string
+        default: ''
+      stable_comparison_tag:
+        description: Optional Stable comparison tag for historical Preview
+        type: string
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: authoring-data-publication
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: windows-latest
+    outputs:
+      source_revision: ${{ steps.source.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: bsavage81/bedrock-workbench
+          path: workbench
+          persist-credentials: false
+      - id: source
+        working-directory: workbench
+        shell: pwsh
+        run: |
+          $revision = git rev-parse HEAD
+          "revision=$revision" >> $env:GITHUB_OUTPUT
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: workbench/package-lock.json
+      - working-directory: workbench
+        run: npm ci
+      - working-directory: workbench
+        run: npm run check
+      - working-directory: workbench
+        run: npm test
+      - name: Fetch verified official sources
+        working-directory: workbench
+        run: node tools/fetch-authoring-inputs.cjs .test-temp/data-inputs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BEDROCK_DATA_CHANNEL: ${{ inputs.channel }}
+          BEDROCK_DATA_SOURCE_TAG: ${{ inputs.source_tag }}
+          BEDROCK_DATA_STABLE_TAG: ${{ inputs.stable_comparison_tag }}
+      - name: Generate and verify reviewed candidate
+        working-directory: workbench
+        run: node tools/build-authoring-data.cjs .test-temp/data-inputs .test-temp/data-output ${{ inputs.channel }} run-${{ github.run_id }}-${{ github.run_attempt }}-${{ inputs.channel }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-candidate-${{ inputs.channel }}
+          path: workbench/.test-temp/data-output/${{ inputs.channel }}/
+  publish:
+    needs: verify
+    if: inputs.publish == true
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          name: reviewed-candidate-${{ inputs.channel }}
+          path: candidate
+      - name: Publish immutable data after owner-fingerprint verification
+        run: node .github/scripts/publish.cjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_DIR: candidate
+          SOURCE_REVISION: ${{ needs.verify.outputs.source_revision }}
