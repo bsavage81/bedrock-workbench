@@ -1,0 +1,236 @@
+{
+  "source": "Mojang bedrock-samples immutable Stable release",
+  "archiveSha256": "2bb667786f4d5bedf97a61cec4ce9613c1e2986224c9deda5fbb108c2d96b07c",
+  "files": {
+    "villager_v2.entity.json": {
+      "sourcePath": "resource_pack/entity/villager_v2.entity.json",
+      "sha256": "d7f2f4e25f2ff8b16676eea9852b19eb489c905fd8097a795deaa7bcc57b9faf"
+    },
+    "villager.v1.0.entity.json": {
+      "sourcePath": "resource_pack/entity/villager.v1.0.entity.json",
+      "sha256": "52c9d389f40f118964851ba60a7784efa4ca3935d752a7f9766f2f10f2e08396"
+    },
+    "villager.entity.json": {
+      "sourcePath": "resource_pack/entity/villager.entity.json",
+      "sha256": "d87c341be5fdbe2a03ce36484b6a1881c92c5f4f40c4e747aa1216a8144b7ce2"
+    },
+    "villager.render_controllers.json": {
+      "sourcePath": "resource_pack/render_controllers/villager.render_controllers.json",
+      "sha256": "35e26384a5eab02202a876a07dd82f35a27803fadce02096c404da722f0f9c87"
+    },
+    "villager_v2.render_controllers.json": {
+      "sourcePath": "resource_pack/render_controllers/villager_v2.render_controllers.json",
+      "sha256": "7c472dd4bf7a36e7e363ae80f9c147eee2bd76dfec1e7bac6020f1ee0bd2132d"
+    },
+    "villager_v3.render_controllers.json": {
+      "sourcePath": "resource_pack/render_controllers/villager_v3.render_controllers.json",
+      "sha256": "8c07947fa873a53642a405aef4b8f76654e8ea61ded4a200bd8a11464ed115a6"
+    },
+    "villager_v2.geo.json": {
+      "sourcePath": "resource_pack/models/entity/villager_v2.geo.json",
+      "sha256": "33271db5b87d3be5656fad93d08f4175bca9afc1692e91885445b0c856b46dcb",
+      "gitBlob": "ce70a3ce46ba863cd7dc4a6fe8734adee8fe99b3"
+    },
+    "baby_villager.geo.json": {
+      "sourcePath": "resource_pack/models/entity/baby_villager.geo.json",
+      "sha256": "6957d29c198fed456872eefcfdcea1f50de2d439679bd6096127b1770c9b7827",
+      "gitBlob": "a96d2bdf2563360e8168105fce6313556b124e9b"
+    },
+    "textures/entity/villager2/villager.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/villager.png",
+      "sha256": "8e085403ad169cc63558201c8379f5bb5282aa79127375d5f9d8cf0059d7399b",
+      "gitBlob": "c73b02cbeff64cf2ba6f01ad7612903428917a21"
+    },
+    "textures/entity/villager2/biomes/biome_desert.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_desert.png",
+      "sha256": "725348bb2b19db3659cfeed88667f162b8c1de5d133f2888038372143c3681fe",
+      "gitBlob": "8c45ce5c3fc6f491a5ae7bbe47233bbee7362cc5"
+    },
+    "textures/entity/villager2/biomes/biome_jungle.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_jungle.png",
+      "sha256": "3f3c4de47e94c7f44b345cc206566a4f998d6632174cd49a87253afe1718e00b",
+      "gitBlob": "2d7150885a5fa859c2f01aaad215213134d18a43"
+    },
+    "textures/entity/villager2/biomes/biome_plains.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_plains.png",
+      "sha256": "19c0f1d9b48cf19237d764b0d04b371118b8711568f18f0667ce53a6cc7e8692",
+      "gitBlob": "b9780979614c8f69bcb2cfdad6691a037ee3931f"
+    },
+    "textures/entity/villager2/biomes/biome_savanna.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_savanna.png",
+      "sha256": "6f6e3d54064806050f8481d32c55c6a8158f04127fa348d509248790eed935aa",
+      "gitBlob": "42fb38739698d6606186a448b07e3104d67e2d49"
+    },
+    "textures/entity/villager2/biomes/biome_snow.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_snow.png",
+      "sha256": "0580ae0e0d9b27689d1389fa904382acf63c2ba6499abe6f9d92b99ddec333bf",
+      "gitBlob": "dbe6f765c222a49f1324d70515885e0c9275d6f5"
+    },
+    "textures/entity/villager2/biomes/biome_swamp.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_swamp.png",
+      "sha256": "6d70f18a57c6c982fdcb14958ecda8219b89236cbcfafe66ae51c6513e2c072e",
+      "gitBlob": "aa034adb1a2da4c11867d3eac6c031d65e19af20"
+    },
+    "textures/entity/villager2/biomes/biome_taiga.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_taiga.png",
+      "sha256": "162d1290359c29bb9e741820ed0fce0d047b59c50065b548e25cb733fb31fd9d",
+      "gitBlob": "0f46f7ad645d48cffca68a392cdca8d2c3fecff6"
+    },
+    "textures/entity/villager2/professions/armorer.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/armorer.tga",
+      "sha256": "b38f609c327888f5f03c8cdcf9f3b889ade3f87120b868843584480367725151",
+      "gitBlob": "68f70aff46ee6d9d336bb5e09c104ab3ff175717"
+    },
+    "textures/entity/villager2/professions/butcher.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/butcher.tga",
+      "sha256": "561884b51f32c72426b74e8ae7027d17ca334d3dafeb98ffdd793832cb2ee369",
+      "gitBlob": "f9f6362ca1fe19d7d995962874c5fac0ef83e0bb"
+    },
+    "textures/entity/villager2/professions/fisherman.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/fisherman.tga",
+      "sha256": "7d888e5ee30b26a0c7ed640f048474dfd024911d1f3a9ed7c25a5e93ce93f5dc",
+      "gitBlob": "5d83bccf84151e1ccb98e1eb9dbbf3ea18c4d240"
+    },
+    "textures/entity/villager2/professions/farmer.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/farmer.tga",
+      "sha256": "9ddc623a9265de5d7851c93fdad0dc7d2a21a81c66e4d2d4803762ba8a8b88a8",
+      "gitBlob": "1feab491734d54e92170f20a3fdff333f6b8452d"
+    },
+    "textures/entity/villager2/professions/cleric.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/cleric.tga",
+      "sha256": "d2ea8f6c2c2a81e0a85e9040a8941f9b944f23febfefc4832005b2ea6da59ecf",
+      "gitBlob": "7d9bcbc7976554d5b54b8effa1bb150de186d890"
+    },
+    "textures/entity/villager2/professions/cartographer.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/cartographer.tga",
+      "sha256": "7fe2f782001911772aee945b504912775fa523f6f927a32280ce8514830adda1",
+      "gitBlob": "d5616d39576efcc6610c8d6b9afd0164b6d2f7f3"
+    },
+    "textures/entity/villager2/professions/shepherd.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/shepherd.tga",
+      "sha256": "7a77ac22a38fb93d5550fc3d4a804dab748a85d11f897ab6c1479a62d7a043ec",
+      "gitBlob": "37e49d89cdacf4f8be2a6ada7076b8834c236783"
+    },
+    "textures/entity/villager2/professions/fletcher.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/fletcher.tga",
+      "sha256": "46066d5cbca35c747eab0a5473f002112acdb6e605a053fd0683b9fcd99e6d99",
+      "gitBlob": "3c4126900e180626d466256e48a039c479b9250d"
+    },
+    "textures/entity/villager2/professions/librarian.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/librarian.tga",
+      "sha256": "a580ee3de650376b9efa7a90f0dc063b62c1c4e12c480280f5a3c76763dd6ede",
+      "gitBlob": "00236ad72bbef36cb4f43a580e8db9a124c0b3b7"
+    },
+    "textures/entity/villager2/professions/leatherworker.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/leatherworker.tga",
+      "sha256": "86239d983b75335581f028da16cf9540cfe7048c049a55fade6a49eb8541e877",
+      "gitBlob": "8eec5f75922ae02d4d5ba3eeb5aafcb093014ccf"
+    },
+    "textures/entity/villager2/professions/stonemason.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/stonemason.tga",
+      "sha256": "4d47e85c1b9ba3d744f35ed213fe4126580f9ec98d5ba2f9f024d3d0200631f4",
+      "gitBlob": "b4098c6e0a799a300c0185b02399f8a2961952cf"
+    },
+    "textures/entity/villager2/professions/toolsmith.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/toolsmith.tga",
+      "sha256": "0839f065cda14e8b779e6b4f1926a60d81a3cdc9a659c743f7a35f5819611597",
+      "gitBlob": "edea114afca8c18782f920f30e37c1d8e1f0bbd5"
+    },
+    "textures/entity/villager2/professions/weaponsmith.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/weaponsmith.tga",
+      "sha256": "35ef55570e282f865a26eff083a4cde26aed521310f7d608491d836c88f5a0e4",
+      "gitBlob": "e07a064a30c47cd20c4a74348f0eb20dab79d85f"
+    },
+    "textures/entity/villager2/professions/nitwit.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/nitwit.tga",
+      "sha256": "8ea427cd3d387897ad0eb8546bc93ee052b17973d3cf308080afb15456070bb3",
+      "gitBlob": "442703c279d45b8537e697b88de53f63bfc8af0b"
+    },
+    "textures/entity/villager2/professions/unskilled.tga": {
+      "sourcePath": "resource_pack/textures/entity/villager2/professions/unskilled.tga",
+      "sha256": "505947fb7e93b36504c869232c2d3044e74c2f7d772c74a591dbd9129a6746c1",
+      "gitBlob": "d832dac16aab19f2f4824889009341f6fe362253"
+    },
+    "textures/entity/villager2/levels/level_iron.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/levels/level_iron.png",
+      "sha256": "0dafa832ef992a282f5cf120f0cb24538eef8aa61526afd1b3e5735f01a1044f",
+      "gitBlob": "79e907f1e3b0d46ffe6fb593fa5e2472d7688d1b"
+    },
+    "textures/entity/villager2/levels/level_gold.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/levels/level_gold.png",
+      "sha256": "360a5b53df121b6815e45360fe291b54acd881eae481193ee0c14970be2502a5",
+      "gitBlob": "7e5ca73799c1676a5a781d0b723000b7ca4b92c6"
+    },
+    "textures/entity/villager2/levels/level_stone.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/levels/level_stone.png",
+      "sha256": "3d74f25a112baa39a423b86aed0bf43fdd0451082fa9b8c20b94597d649c5076",
+      "gitBlob": "0daf8bb95800ff089912136b430ad79d671410dd"
+    },
+    "textures/entity/villager2/levels/level_diamond.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/levels/level_diamond.png",
+      "sha256": "96523341ab674ce4b910b02808a2d204bc97a46fcd22b8996f8028ae09794de1",
+      "gitBlob": "e451deacb42c127dee888ebb63591b43fbb5e084"
+    },
+    "textures/entity/villager2/villager_baby.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/villager_baby.png",
+      "sha256": "ba8c7c1947703006768aa75149e86b8b5ba68c568d1e42feedf9d46b87bcc4cf",
+      "gitBlob": "dd1f6de078322b08905ad28e3695697f1521a068"
+    },
+    "textures/entity/villager2/biomes/biome_desert_baby.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_desert_baby.png",
+      "sha256": "fa6b47b40ea2d97a1d949c187597821018af7b1e95ee7093401c85821b68512d",
+      "gitBlob": "ca1cf0ceb87ac5611951fa710ec8b5572509ac69"
+    },
+    "textures/entity/villager2/levels/level_emerald.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/levels/level_emerald.png",
+      "sha256": "1c5e2becc8ecacbc45df2f251a04b9ab9427bde508e2eb6bd3a75d964bdd030a",
+      "gitBlob": "a57eddf9518be03fca78ecd578767ea7ec51fd29"
+    },
+    "textures/entity/villager2/biomes/biome_savanna_baby.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_savanna_baby.png",
+      "sha256": "654cc6880596cabedfab776e941dc1439259b80fc3c687281fedd4fa8b2d2264",
+      "gitBlob": "707be713c56d9c617816db13ec98c80b3d8b3ef5"
+    },
+    "textures/entity/villager2/biomes/biome_snow_baby.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_snow_baby.png",
+      "sha256": "bd49b6aa2dd2f72b760a248374f8985c37d9aabd0d53cb72768e982a70b54777",
+      "gitBlob": "b3be7637fbd042a63c6750c96cf2108c616c0eb7"
+    },
+    "textures/entity/villager2/biomes/biome_plains_baby.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_plains_baby.png",
+      "sha256": "992bdecb5d65ab35ae4066f3a6719d4cad82a6aeb1a31ef93e0052dad397b60a",
+      "gitBlob": "0624f8a19e25ffe2ce554ff54bded6deed3c090c"
+    },
+    "textures/entity/villager2/biomes/biome_jungle_baby.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_jungle_baby.png",
+      "sha256": "1f21e2c513a9ef945685df1f1ff6c3adbfe4eace90ca6f0bf163c2fa39bba5da",
+      "gitBlob": "c5c51fb8c7699c90adead9a4990ee7a262df2afa"
+    },
+    "LICENSE.mojang.md": {
+      "sourcePath": "LICENSE.md",
+      "sha256": "ca18c0dede68ce24ea1cd6f9df0813579b6f9f979787983a50baec99345f975d",
+      "gitBlob": "ed3f1b782fb19fbc5d69f5b1343b056fc23c61fd"
+    },
+    "textures/entity/villager2/biomes/biome_swamp_baby.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_swamp_baby.png",
+      "sha256": "b915bfd0364804032909aa3ff6ae67db7151078878fcf79fb6dbe3a437d0b606",
+      "gitBlob": "805a0cf217a8cc9a8646b98b76f64fdffbc6c5b8"
+    },
+    "textures/entity/villager2/biomes/biome_taiga_baby.png": {
+      "sourcePath": "resource_pack/textures/entity/villager2/biomes/biome_taiga_baby.png",
+      "sha256": "4df4b9dff55fc7a0fe98309f9112f4886fef7176555e2a17e86bda26f4323360",
+      "gitBlob": "2f73073455a56b7796781e9eb5bd398cb529c84b"
+    }
+  },
+  "release": {
+    "tag": "v1.26.50.4",
+    "revision": "46ba6ea985fb5a92d79a9419198f10dda14c199d",
+    "channel": "stable",
+    "engine": "1.26.50",
+    "url": "https://github.com/Mojang/bedrock-samples/releases/download/v1.26.50.4/bedrock-samples-v1.26.50.4-min.zip",
+    "sha256": "2bb667786f4d5bedf97a61cec4ce9613c1e2986224c9deda5fbb108c2d96b07c",
+    "bytes": 14408778
+  },
+  "attribution": "(c) Mojang AB. All rights reserved. See LICENSE.mojang.md (Minecraft EULA).",
+  "verification": "JSON/geometry bytes match the SHA-256-verified release archive. Texture bytes match Git blob hashes in the saved official tree at the same immutable revision. The min archive omits binary textures."
+}

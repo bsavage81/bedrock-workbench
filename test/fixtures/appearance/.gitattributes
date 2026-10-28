@@ -1,0 +1,2 @@
+# Preserve exact upstream fixture bytes, including source whitespace.
+* -text -whitespace

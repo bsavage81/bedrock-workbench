@@ -37,10 +37,13 @@ function candidates(index,file,{propertyValues}={}) {
         return (files.length?files:[undefined]).map(textureFile=>({...t,file:textureFile}));
       });
       if(geometryFile===file||b.ownerFile===file||textures.some(t=>t.file===file)){
-        const properties=previewProperties.properties(index,b.owner),values=previewProperties.inputs(properties.fields,propertyValues?.get(b.ownerFile));
+        const requested=propertyValues?.get(b.ownerFile),base=previewProperties.properties(index,b.owner),initial=require('./preview-render-bindings.cjs').infer(index,b,previewProperties.inputs(base.fields,requested));
+        const desc=(index.documents.get(b.ownerFile)?.data?.['minecraft:client_entity']||index.documents.get(b.ownerFile)?.data?.['minecraft:attachable'])?.description;
+        const properties=previewProperties.appearanceInputs(base,initial,desc?.scripts?.pre_animation),values=previewProperties.inputs(properties.fields,requested);
         const inference=require('./preview-render-bindings.cjs').infer(index,b,values);
         const ownerLabel=index.documents.get(b.ownerFile)?.previewLabel;
-        models.push({...b,geometryFile,textures,inference,properties,values,warning:(inference?inference.message+(ownerLabel?'\nOwner source: '+ownerLabel:''):b.warning)+(properties.warning?'\n'+properties.warning:'')});
+        const previewOverrides=Object.fromEntries(properties.fields.filter(f=>Object.prototype.hasOwnProperty.call(requested||{},f.name)&&previewProperties.valid(f,requested[f.name])).map(f=>[f.name,requested[f.name]]));
+        models.push({...b,geometryFile,textures,inference,properties,values,previewOverrides,warning:(inference?inference.message+(ownerLabel?'\nOwner source: '+ownerLabel:''):b.warning)+(properties.warning?'\n'+properties.warning:'')});
       }
     }
   }return models;
@@ -78,16 +81,21 @@ function attach(vscode,context,getProject,output) {
       state.panel=panel;panels.add(state);panel.onDidDispose(()=>panels.delete(state));
       const nonce=require('node:crypto').randomBytes(16).toString('hex');
       const src=panel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri,'media','model-preview.js'));
-      panel.webview.html=`<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; img-src data:; style-src 'nonce-${nonce}';"><style nonce="${nonce}">body{margin:0;color:var(--vscode-foreground);background:var(--vscode-editor-background);font:13px var(--vscode-font-family)}header{padding:10px;max-height:50vh;overflow:auto;box-sizing:border-box}select,button,input{margin:4px;color:var(--vscode-input-foreground);background:var(--vscode-input-background);max-width:95%}canvas{display:block}#status{white-space:pre-wrap}</style></head><body><header><label>Model / owner <select id="models"></select></label><label>Texture <select id="textures"></select></label><button id="reset">Reset camera</button><div>Drag: rotate · Right drag: pan · Wheel: zoom</div><div id="status" role="status">Resolving project and vanilla resources…</div></header><script nonce="${nonce}" src="${src}"></script></body></html>`;
+      panel.webview.html=`<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; img-src data:; style-src 'nonce-${nonce}';"><style nonce="${nonce}">body{margin:0;color:var(--vscode-foreground);background:var(--vscode-editor-background);font:13px var(--vscode-font-family)}header{padding:10px;max-height:48vh;overflow:auto;box-sizing:border-box}nav{display:flex;gap:4px;flex-wrap:wrap}nav button[aria-pressed=true]{outline:1px solid var(--vscode-focusBorder)}[hidden]{display:none!important}label{display:inline-block;max-width:100%;min-width:0;overflow-wrap:anywhere}#inspectPanel label{display:block}select{box-sizing:border-box}button{overflow-wrap:anywhere}details{margin:6px 0}.layer{border-top:1px solid var(--vscode-panel-border);padding:6px 0;overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere}button,select,input{min-height:24px}h1{font-size:14px;margin:0 0 4px}#identity{overflow-wrap:anywhere;font-size:12px}#status{max-height:5em;overflow:auto}select,button,input{margin:4px;color:var(--vscode-input-foreground);background:var(--vscode-input-background);max-width:95%}canvas{display:block}#status{white-space:pre-wrap}</style></head><body><header><h1>Entity appearance</h1><div id="identity"></div><nav aria-label="Viewer mode"><button id="appearanceMode" aria-pressed="true">Appearance</button><button id="layersMode" aria-pressed="false">Layers</button><button id="inspectMode" aria-pressed="false">Inspect</button></nav><label id="ownerLabel">Entity <select id="owners"></select></label><section id="appearanceControls"></section><section id="layersPanel" hidden></section><section id="inspectPanel" hidden><label>Model / owner <select id="models"></select></label><label>Texture <select id="textures"></select></label></section><button id="reset">Reset camera</button><div>Drag: rotate · Right drag: pan · Wheel: zoom</div><div id="status" role="status">Resolving project and vanilla resources…</div></header><script nonce="${nonce}" src="${src}"></script></body></html>`;
       panel.webview.onDidReceiveMessage(async message=>{
         if(message?.type==='ready')await refresh(state);
+        if(message?.type==='viewMode'&&['appearance','layers','inspect'].includes(message.mode)&&vscode.workspace.isTrusted){state.viewMode=message.mode;if(message.mode==='appearance'){state.manualOverride=false;state.manualTexture=false;state.controllerChoices?.delete(state.models?.[state.selection?.model]?.ownerFile);}await refresh(state);}
+        if(message?.type==='openSource'&&typeof message.file==='string'&&vscode.workspace.isTrusted){
+          const plan=state.appearancePlan,files=new Set([plan?.entity?.source?.file,...(plan?.controllers||[]).flatMap(c=>c.sources.map(s=>s.file)),...(plan?.layers||[]).flatMap(l=>[l.sources?.owner?.file,l.sources?.geometry?.file,...(l.textures||[]).map(t=>t.file)])]);
+          if(files.has(message.file))await vscode.commands.executeCommand('vscode.open',vscode.Uri.file(message.file),vscode.ViewColumn.One);
+        }
         if(message?.type==='select'&&Number.isInteger(message.model)&&Number.isInteger(message.texture)) {state.manualTexture=message.manual!==false;if(state.manualTexture)state.manualOverride=true;state.selection=message;await send(state);}
         if(message?.type==='mode'&&typeof message.manual==='boolean'){state.manualOverride=message.manual;state.manualTexture=false;await refresh(state);}
         if(message?.type==='controllerChoice'&&typeof message.controller==='string'&&typeof message.choice==='string'&&vscode.workspace.isTrusted){const m=state.models?.[state.selection?.model];if(!m)return;state.controllerChoices||=new Map();const choices=state.controllerChoices.get(m.ownerFile)||Object.create(null);choices[message.controller]=message.choice;state.controllerChoices.set(m.ownerFile,choices);await send(state);}
         if(message?.type==='properties'&&vscode.workspace.isTrusted&&message.values&&typeof message.values==='object'&&!Array.isArray(message.values)){
-          const m=state.models?.[state.selection?.model];if(!m||!m.properties.fields.length&&!message.reset)return;
+          const m=state.models?.[state.selection?.model];if(!m)return;const fields=[...new Map(state.models.filter(other=>other.ownerFile===m.ownerFile).flatMap(other=>other.properties.fields).map(field=>[field.name,field])).values()];if(!fields.length&&!message.reset)return;
           if(message.reset)state.controllerChoices?.delete(m.ownerFile);
-          state.propertyValues||=new Map();const previous=message.reset?{}:state.propertyValues.get(m.ownerFile)||{};state.propertyValues.set(m.ownerFile,previewProperties.inputs(m.properties.fields,{...previous,...message.values}));state.followOwner=m.ownerFile;await refresh(state,true);
+          state.propertyValues||=new Map();const next=message.reset?{}:{...state.propertyValues.get(m.ownerFile)||{}};for(const field of fields){if(!Object.prototype.hasOwnProperty.call(message.values,field.name))continue;const value=message.values[field.name];if(value===null)delete next[field.name];else if(previewProperties.valid(field,value))next[field.name]=value;}state.propertyValues.set(m.ownerFile,next);state.followOwner=m.ownerFile;await refresh(state,true);
         }
       });
       return panel;
@@ -109,7 +117,7 @@ function attach(vscode,context,getProject,output) {
       const keepNeutral=state.manualTexture&&selected>=0&&state.selection?.texture===-1;
       state.selection={model,texture:state.manualTexture&&texture>=0?texture:keepNeutral?-1:defaultTexture(m,state.file)};
       const sourceLabel=file=>state.index.previewAssets?.get(file)?.label||path.relative(state.project.root,file);
-      await state.panel.webview.postMessage({type:'choices',manual:!!state.manualOverride,selection:state.selection,models:state.models.map(m=>({owner:m.owner,ownerKey:m.ownerFile||m.geometryFile,label:`${m.id} — ${m.owner} — ${sourceLabel(m.geometryFile)}`,defaultTexture:defaultTexture(m,state.file),textures:m.textures.map(t=>`${t.alias}: ${t.id}${m.inference?.aliases.includes(t.alias)?' (controller match)':''}${t.file?' — '+sourceLabel(t.file):' (missing)'}`)}))});
+      await state.panel.webview.postMessage({type:'choices',manual:!!state.manualOverride,viewMode:state.viewMode||(state.manualOverride?'inspect':'appearance'),selection:state.selection,models:state.models.map(m=>({owner:m.owner,ownerKey:m.ownerFile||m.geometryFile,label:`${m.id} — ${m.owner} — ${sourceLabel(m.geometryFile)}`,defaultTexture:defaultTexture(m,state.file),textures:m.textures.map(t=>`${t.alias}: ${t.id}${m.inference?.aliases.includes(t.alias)?' (controller match)':''}${t.file?' — '+sourceLabel(t.file):' (missing)'}`)}))});
       if(!state.models.length)await state.panel.webview.postMessage({type:'error',message:['No project geometry bindings found for this file. Unresolved vanilla geometry requires compatible Mojang samples or a selected vanilla pack.',state.geometryId?`Requested saved geometry: ${state.geometryId}. Save changed bindings or geometry before previewing.`:'',...state.index.previewWarnings].filter(Boolean).join('\n')});
       else if(state.selection.model>=0)await send(state);
     }catch(e){await state.panel.webview.postMessage({type:'error',message:e.message});}
@@ -138,35 +146,21 @@ function attach(vscode,context,getProject,output) {
       if(t?.file){try{const bytes=await read(t.file);texture=require('./preview-images.cjs').image(bytes,t.file).uri;const source=index.previewAssets?.get(t.file)?.label;if(source)warning+='\nTexture source: '+source;}catch(e){warning+='\nSelected texture unavailable: '+e.message;}}
       else warning+=t?' Selected texture is missing.':' Choose a texture; neutral geometry is shown until then.';
       if(state.sendVersion!==sendVersion||!vscode.workspace.isTrusted)return;
-      await state.panel.webview.postMessage({type:'model',geometry,geometryId:m.id,texture,textureAlias:t?.alias,textureId:t?.id,visibility:visibility.visibility,hiddenBones,properties:m.values,warning});
+      const rendered={id:'manual',layerId:'manual',geometry,geometryId:m.id,texture,textureAlias:t?.alias,textureId:t?.id,visibility:visibility.visibility,hiddenBones};
+      const appearancePlan={schemaVersion:1,entity:{identifier:m.owner,source:{file:m.ownerFile||m.geometryFile,label:path.relative(state.project.root,m.ownerFile||m.geometryFile)}},values:m.values,controls:m.properties.fields,dependencies:[],controllers:[],variants:[],layers:[{id:'manual',controller:'Manual asset inspection',status:'resolved',geometryId:m.id,textures:t?[t]:[],sources:{geometry:{file:m.geometryFile}},visibility:visibility.visibility,override:{origin:'manual geometry / texture inspection'}}],renderPasses:[rendered],warnings:warning.split('\n'),override:{origin:state.manualOverride?'manual geometry / texture inspection':'unbound asset preview'}};
+      state.appearancePlan=appearancePlan;
+      await state.panel.webview.postMessage({type:'model',...rendered,appearancePlan,properties:m.values,warning});
     }catch(e){if(state.sendVersion===sendVersion)await state.panel.webview.postMessage({type:'error',message:e.message});}
   }
   async function sendAutomatic(state,anchor,sendVersion){
-    const index=state.index,{plan,visibilityReferences}=require('./preview-plan.cjs');
-    const models=candidates(index,anchor.ownerFile,{propertyValues:state.propertyValues}),resolved=plan(models,{choices:state.controllerChoices?.get(anchor.ownerFile)}),passes=[],warnings=[...resolved.warnings],references=resolved.references;
-    for(const model of models)if(model.inference?.complete===false&&model.inference.active!==false)warnings.push(model.inference.message);
+    const index=state.index,models=candidates(index,anchor.ownerFile,{propertyValues:state.propertyValues});
     const read=file=>index.previewAssets?.has(file)?require('./preview-vanilla.cjs').read(index,file):safeRead(state.project,file);
-    const materialDefinitions=await require('./preview-materials.cjs').load(state.project);
-    for(const pass of resolved.passes){
-      const m=pass.model;let texture;
-      try{if(!pass.texture.file)throw Error('Texture asset is missing.');texture=require('./preview-images.cjs').image(await read(pass.texture.file),pass.texture.file);if(texture.transparent)continue;}catch(e){warnings.push(`${pass.controller}: ${e.message}`);if(resolved.passes.length>1)continue;}
-      await read(m.geometryFile);const geometry=geometries(index.documents.get(m.geometryFile)?.data).find(g=>g.description?.identifier===m.id);
-      const visibility=previewProperties.visible(geometry,pass.rules,m.values);if(visibility.warning)warnings.push(visibility.warning);
-      for(const name of visibilityReferences(geometry,pass.rules,m.values))references.add(name);
-      const materials=require('./preview-materials.cjs').resolve(geometry,pass.materials,pass.materialAliases,materialDefinitions);warnings.push(...materials.warnings);
-      const groups=new Map();for(const [bone,profile]of Object.entries(materials.bones)){const key=JSON.stringify(profile);if(!groups.has(key))groups.set(key,{profile,bones:[]});groups.get(key).bones.push(bone);}
-      for(const group of groups.values()){
-       let renderedTexture=texture?.uri;
-       if(pass.secondary||group.profile.colorMask){try{const composite=require('./preview-composite.cjs');renderedTexture=composite.compose(composite.decode(await read(pass.texture.file),pass.texture.file),pass.secondary?.file?composite.decode(await read(pass.secondary.file),pass.secondary.file):undefined,group.profile,m.values);}catch(e){warnings.push('Material composition: '+e.message);}}
-       const mask={...visibility.visibility};for(const bone of geometry.bones||[])if(!group.bones.includes(bone.name))mask[bone.name]=false;
-       passes.push({materials:materials.bones,geometry,geometryId:m.id,texture:renderedTexture,textureAlias:pass.texture.alias,textureId:pass.texture.id,visibility:mask,hiddenBones:Object.keys(mask).filter(n=>mask[n]===false),controller:pass.controller});
-      }
-    }
+    const appearancePlan=await require('./preview-plan.cjs').appearance(models,{index,read,materialDefinitions:await require('./preview-materials.cjs').load(state.project),choices:state.controllerChoices?.get(anchor.ownerFile)});
     if(state.sendVersion!==sendVersion||!vscode.workspace.isTrusted)return;
-    const fields=anchor.properties.fields.filter(f=>references.has(f.name));
-    await state.panel.webview.postMessage({type:'propertyControls',fields,values:anchor.values,variants:resolved.variants});
-    const warning=[`Controller-driven preview: ${anchor.owner}.`,...passes.map(p=>`${p.controller}: ${p.geometryId} · ${p.textureAlias}`),...new Set(warnings),...index.previewWarnings||[],'Only inputs used by reachable controller branches are shown. Static preview inputs; no live game state or general runtime scripts.',passes.length?'':'No controller pass is resolved. Choose appearance inputs or enable manual inspection.'].filter(Boolean).join('\n');
-    await state.panel.webview.postMessage({type:'model',...passes[0],geometry:passes[0]?.geometry||{bones:[]},passes,properties:anchor.values,warning});
+    state.appearancePlan=appearancePlan;
+    await state.panel.webview.postMessage({type:'propertyControls',fields:appearancePlan.controls,values:appearancePlan.values,variants:appearancePlan.variants});
+    const passes=appearancePlan.renderPasses,warning=[passes.length?'':'No render pass resolved. Supply preview inputs or inspect unresolved bindings.',...appearancePlan.warnings].filter(Boolean).join('\n');
+    await state.panel.webview.postMessage({type:'model',...passes[0],geometry:passes[0]?.geometry||{bones:[]},passes,appearancePlan,properties:appearancePlan.values,warning});
   }
   context.subscriptions.push(vscode.commands.registerCommand('bedrock.openModelPreview',uri=>open(uri)),vscode.commands.registerCommand('bedrock.openModelPreviewBeside',(uri,geometryId)=>open(uri,true,geometryId)));
   const watcher=vscode.workspace.createFileSystemWatcher('**/*');
