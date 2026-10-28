@@ -146,13 +146,21 @@ function attach(vscode,context,getProject,output) {
     const models=candidates(index,anchor.ownerFile,{propertyValues:state.propertyValues}),resolved=plan(models,{choices:state.controllerChoices?.get(anchor.ownerFile)}),passes=[],warnings=[...resolved.warnings],references=resolved.references;
     for(const model of models)if(model.inference?.complete===false&&model.inference.active!==false)warnings.push(model.inference.message);
     const read=file=>index.previewAssets?.has(file)?require('./preview-vanilla.cjs').read(index,file):safeRead(state.project,file);
+    const materialDefinitions=await require('./preview-materials.cjs').load(state.project);
     for(const pass of resolved.passes){
       const m=pass.model;let texture;
       try{if(!pass.texture.file)throw Error('Texture asset is missing.');texture=require('./preview-images.cjs').image(await read(pass.texture.file),pass.texture.file);if(texture.transparent)continue;}catch(e){warnings.push(`${pass.controller}: ${e.message}`);if(resolved.passes.length>1)continue;}
       await read(m.geometryFile);const geometry=geometries(index.documents.get(m.geometryFile)?.data).find(g=>g.description?.identifier===m.id);
       const visibility=previewProperties.visible(geometry,pass.rules,m.values);if(visibility.warning)warnings.push(visibility.warning);
       for(const name of visibilityReferences(geometry,pass.rules,m.values))references.add(name);
-      passes.push({geometry,geometryId:m.id,texture:texture?.uri,textureAlias:pass.texture.alias,textureId:pass.texture.id,visibility:visibility.visibility,hiddenBones:Object.keys(visibility.visibility).filter(n=>visibility.visibility[n]===false),controller:pass.controller});
+      const materials=require('./preview-materials.cjs').resolve(geometry,pass.materials,pass.materialAliases,materialDefinitions);warnings.push(...materials.warnings);
+      const groups=new Map();for(const [bone,profile]of Object.entries(materials.bones)){const key=JSON.stringify(profile);if(!groups.has(key))groups.set(key,{profile,bones:[]});groups.get(key).bones.push(bone);}
+      for(const group of groups.values()){
+       let renderedTexture=texture?.uri;
+       if(pass.secondary||group.profile.colorMask){try{const composite=require('./preview-composite.cjs');renderedTexture=composite.compose(composite.decode(await read(pass.texture.file),pass.texture.file),pass.secondary?.file?composite.decode(await read(pass.secondary.file),pass.secondary.file):undefined,group.profile,m.values);}catch(e){warnings.push('Material composition: '+e.message);}}
+       const mask={...visibility.visibility};for(const bone of geometry.bones||[])if(!group.bones.includes(bone.name))mask[bone.name]=false;
+       passes.push({materials:materials.bones,geometry,geometryId:m.id,texture:renderedTexture,textureAlias:pass.texture.alias,textureId:pass.texture.id,visibility:mask,hiddenBones:Object.keys(mask).filter(n=>mask[n]===false),controller:pass.controller});
+      }
     }
     if(state.sendVersion!==sendVersion||!vscode.workspace.isTrusted)return;
     const fields=anchor.properties.fields.filter(f=>references.has(f.name));

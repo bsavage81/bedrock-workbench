@@ -5,10 +5,11 @@ function plan(models,{choices={}}={}){
  for(const model of models){for(const name of model.inference?.references||[])references.add(name);if(model.inference?.active!==true)continue;
   for(const p of model.inference.passes||[]){
    if(p.complete===false){warnings.push(`${p.controller}: unsupported branches prevent a conclusive pass.`);continue;}
-   if(p.selections.length!==1){warnings.push(`${p.controller}: multi-texture material routing is unsupported.`);continue;}
+   if(p.selections.length>2){warnings.push(`${p.controller}: more than two texture samplers are unsupported.`);continue;}
+   if(p.selections.length===2&&p.selections[1].length!==1){warnings.push(`${p.controller}: second sampler is unresolved.`);continue;}
    if(!p.selections[0].length){warnings.push(`${p.controller}: texture alias is unresolved.`);continue;}
    for(const alias of p.selections[0]){const textures=model.textures.filter(t=>t.alias===alias);if(textures.length!==1){warnings.push(`${p.controller}: texture asset is ambiguous.`);continue;}
-    const options=groups.get(p.controller)||[];if(options.length<256)options.push({model,...p,texture:textures[0],key:JSON.stringify([model.alias,alias])});else warnings.push(`${p.controller}: candidate limit exceeded.`);groups.set(p.controller,options);
+    const options=groups.get(p.controller)||[];if(options.length<256)options.push({model,...p,texture:textures[0],secondary:p.selections.length===2?model.textures.find(t=>t.alias===p.selections[1][0]):undefined,key:JSON.stringify([model.alias,alias])});else warnings.push(`${p.controller}: candidate limit exceeded.`);groups.set(p.controller,options);
    }
   }
  }

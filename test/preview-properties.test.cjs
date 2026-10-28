@@ -1,4 +1,9 @@
 const test=require('node:test'),assert=require('node:assert/strict'),p=require('../src/preview-properties.cjs'),m=require('../src/molang.cjs'),{resolver,infer}=require('../src/preview-render-bindings.cjs'),{convert}=require('../src/preview-geometry.cjs');
+test('appearance components expose authored group values and feed matching query inputs',()=>{
+ const doc={side:'behavior',data:{'minecraft:entity':{description:{identifier:'test:fish'},components:{'minecraft:variant':{value:0},'minecraft:color':{value:2}},component_groups:{other:{'minecraft:variant':{value:1},'minecraft:color2':{value:14},'minecraft:skin_id':{value:3},'minecraft:mark_variant':{value:4}}}}}};
+ const info=p.properties({documents:new Map([['fish',doc]])},'test:fish');assert.deepEqual(info.fields.find(f=>f.name==='query.variant').values,[0,1]);assert.equal(info.fields.find(f=>f.name==='query.color2').default,undefined);
+ const values=p.inputs(info.fields,{'query.variant':1});assert.equal(p.literal(m.lex('q.variant'),values),1);assert.equal(p.literal(m.lex('q.color2'),values),undefined);assert.deepEqual(p.referenced('q.variant + q.color',values),['query.variant','query.color']);
+});
 function index(properties){const d={side:'behavior',file:'/BP/entity.json',data:{'minecraft:entity':{description:{identifier:'test:entity',properties}}}};return {documents:new Map([[d.file,d]])};}
 test('only uniquely owned client-synced valid schemas become controls; computed defaults remain unresolved',()=>{
  const i=index({skin:{type:'enum',values:['base','warm'],default:'base',client_sync:true},flag:{type:'bool',default:false,client_sync:true},count:{type:'int',range:[0,3],default:2,client_sync:true},weight:{type:'float',range:[-1,1],default:'.5',client_sync:true},private:{type:'bool',default:true},bad:{type:'enum',values:[],client_sync:true}});
