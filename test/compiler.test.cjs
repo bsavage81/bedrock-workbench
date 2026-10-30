@@ -85,11 +85,11 @@ test('stable mcaddon contains two packs and original colored icon; release canno
   const { root, config } = await fixture(t), build = await core.compile(root, 'stable');
   const file = await core.exportAddon(build), entries = unzipSync(await fs.readFile(file));
   assert.equal(path.basename(file), 'SavageCraft v2 1.2.3.mcaddon');
-  const bp = JSON.parse(Buffer.from(entries[`${core.packFolderName(config, 'stable', 'behavior')}/manifest.json`]).toString());
+  const bp = JSON.parse(Buffer.from(entries['SavageBP/manifest.json']).toString());
   assert.equal(bp.header.uuid, config.profiles.stable.identities.behavior.header);
   assert.equal(bp.header.name, 'SavageCraft v2 BP');
-  assert.ok(entries[`${core.packFolderName(config, 'stable', 'resource')}/manifest.json`]);
-  assert.deepEqual([...PNG.sync.read(Buffer.from(entries[`${core.packFolderName(config, 'stable', 'behavior')}/pack_icon.png`])).data], [200, 60, 20, 128]);
+  assert.ok(entries['SavageRP/manifest.json']);
+  assert.deepEqual([...PNG.sync.read(Buffer.from(entries['SavageBP/pack_icon.png'])).data], [200, 60, 20, 128]);
   await assert.rejects(core.exportAddon(build), { code: 'EEXIST' });
 });
 test('TypeScript, static and dynamic relative imports compile; strings remain untouched', async t => {
@@ -290,11 +290,12 @@ test('human-readable deployment migrates owned UUID folders and removes older ve
   assert.deepEqual((await core.readJson(path.join(updated[0], 'manifest.json'))).header.version, [1, 2, 4]);
   assert.equal((await core.readJson(path.join(updated[0], 'manifest.json'))).header.uuid, config.profiles.beta.identities.behavior.header);
 });
-test('pack folders are ten ASCII characters and independent of titles and versions', async t => {
+test('pack folders are recognizable, at most ten ASCII characters and independent of titles and versions', async t => {
   const { config } = await fixture(t), names = new Set();
   for (const profile of ['beta', 'stable']) for (const kind of ['behavior', 'resource']) {
     const name = core.packFolderName(config, profile, kind);
-    assert.match(name, /^[0-9a-f]{8}(BP|RP)$/);
+    assert.equal(name, `Savage${profile === 'beta' ? 'Beta' : ''}`);
+    assert.ok(name.length <= 10);
     names.add(name);
     const renamed = structuredClone(config);
     renamed.version = [99, 99, 99]; renamed.profiles[profile].title = 'New title';
@@ -302,7 +303,9 @@ test('pack folders are ten ASCII characters and independent of titles and versio
     renamed.profiles[profile].identities[kind].header = renamed.profiles[profile].identities[kind].header.toUpperCase();
     assert.equal(core.packFolderName(renamed, profile, kind), name);
   }
-  assert.equal(names.size, 4);
+  assert.equal(names.size, 2);
+  assert.equal(core.packFolderName({ ...config, name: 'CON: /? 😀' }, 'stable', 'behavior'), '_CON');
+  assert.equal(core.packFolderName({ ...config, name: '😀' }, 'beta', 'resource'), 'PackBeta');
 });
 test('legacy beta and stable folders migrate with all UUIDs preserved', async t => {
   const { root } = await fixture(t), destination = path.join(root, 'minecraft/com.mojang');
@@ -326,6 +329,20 @@ test('legacy beta and stable folders migrate with all UUIDs preserved', async t 
       assert.equal(manifest.header.name, core.buildName((await core.loadProject(root)).config, profile, index === 0 ? 'behavior' : 'resource'));
       assert.equal((await fs.readdir(path.dirname(next[index]))).length, 1);
     }
+  }
+});
+test('UUID-derived folder names migrate to readable names', async t => {
+  const { root, config } = await fixture(t), destination = path.join(root, 'minecraft/com.mojang');
+  await fs.mkdir(destination, { recursive: true });
+  for (const profile of ['beta', 'stable']) {
+    const targets = await core.deploy(await core.compile(root, profile), destination), legacy = [];
+    for (const [index, kind] of ['behavior', 'resource'].entries()) {
+      const hash = require('node:crypto').createHash('sha256').update(config.profiles[profile].identities[kind].header.toLowerCase()).digest('hex').slice(0, 8);
+      const folder = path.join(path.dirname(targets[index]), hash + (index === 0 ? 'BP' : 'RP'));
+      await fs.rename(targets[index], folder); legacy.push(folder);
+    }
+    assert.deepEqual(await core.deploy(await core.compile(root, profile), destination), targets);
+    for (const folder of legacy) assert.equal(await core.exists(folder), false);
   }
 });
 test('a locked obsolete root keeps only its marker, with cleanup retried next deployment', async t => {

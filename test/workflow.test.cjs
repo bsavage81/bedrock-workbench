@@ -176,7 +176,7 @@ test('stable export synchronizes manifests and rebuilds beta locally when auto-d
   await h.commands.get('bedrock.export')();
   assert.deepEqual(h.errors, []); await assertVersion(h.root, [1, 5, 0]);
   const archive = unzipSync(await fs.readFile(path.join(h.root, '.bedrock/exports/Workflow Pack 1.5.0.mcaddon')));
-  assert.deepEqual(JSON.parse(Buffer.from(archive[`${core.packFolderName(h.config, 'stable', 'behavior')}/manifest.json`]).toString()).header.version, [1, 5, 0]);
+  assert.deepEqual(JSON.parse(Buffer.from(archive['WorkflBP/manifest.json']).toString()).header.version, [1, 5, 0]);
   const state = await core.readJson(path.join(h.root, '.bedrock/state.json'));
   assert.deepEqual((await core.readJson(path.join(state.betaDirectory, 'behavior/manifest.json'))).header.version, [1, 5, 0]);
   assert.deepEqual(await fs.readdir(h.destination), []);

@@ -1,6 +1,6 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const { randomUUID, createHash } = require('node:crypto');
+const { randomUUID } = require('node:crypto');
 const { parse, printParseErrorCode, modify, applyEdits } = require('jsonc-parser');
 const { PNG } = require('pngjs');
 const { zipSync } = require('fflate');
@@ -149,8 +149,9 @@ function checkManifest(manifest, file) {
   if (!validateManifest(manifest)) throw new Error(`${file}: invalid format-2 manifest: ` + validateManifest.errors.map(e => `${e.instancePath} ${e.message}`).join('; '));
 }
 function packFolderName(config, profile, kind) {
-  const identity = config.profiles[profile].identities[kind].header.toLowerCase();
-  return createHash('sha256').update(identity).digest('hex').slice(0, 8) + (kind === 'behavior' ? 'BP' : 'RP');
+  const stem = config.name.replace(/[^a-z0-9]/gi, '').slice(0, 6) || 'Pack';
+  const name = `${stem}${profile === 'beta' ? 'Beta' : ''}`;
+  return /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(name) ? `_${name}` : name;
 }
 function buildName(config, profile, kind) {
   let title = config.profiles[profile].title.trim();
@@ -456,7 +457,7 @@ async function exportAddon(build) {
   await fs.mkdir(output, { recursive: true });
   const destination = path.join(output, `${buildName(build.config, 'stable')} ${build.config.version.join('.')}.mcaddon`);
   const archive = {};
-  for (const kind of kinds) for await (const file of files(path.join(build.directory, kind))) archive[`${packFolderName(build.config, 'stable', kind)}/${file.replaceAll(path.sep, '/')}`] = new Uint8Array(await fs.readFile(path.join(build.directory, kind, file)));
+  for (const kind of kinds) for await (const file of files(path.join(build.directory, kind))) archive[`${packFolderName(build.config, 'stable', kind)}${kind === 'behavior' ? 'BP' : 'RP'}/${file.replaceAll(path.sep, '/')}`] = new Uint8Array(await fs.readFile(path.join(build.directory, kind, file)));
   // Exclusive creation prevents accidentally replacing a released version.
   await fs.writeFile(destination, zipSync(archive, { level: 6 }), { flag: 'wx' });
   return destination;

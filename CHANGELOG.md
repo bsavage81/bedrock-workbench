@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.26.13 — October 30, 2026
+
+- Use recognizable project-based pack folder names within the 10-character limit, distinguishing beta and stable. Migrate older owned folders, including UUID-derived names, while preserving display names and UUIDs.
+
 ## 0.26.12 — October 30, 2026
 
 - Limit deployed and exported pack folder names to 10 ASCII characters derived from persistent pack UUIDs. Preserve full Minecraft display names, manifest versions, versioned export filenames and automatic migration of older owned folders.

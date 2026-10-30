@@ -1,5 +1,11 @@
 # Bedrock Workbench — project tracker
 
+## 0.26.13 — October 30, 2026
+
+Verification: syntax checks and full suite passed (330 tests: 328 passed, two skipped, zero failed), including archive path separation, recognizable short deployment names and migration from coded names.
+
+Replace coded deployment names with the first six ASCII letters/digits of the project name, plus Beta for beta packs. SavageCraft deploys as Savage / SavageBeta in each respective pack parent directory. Maximum length is 10 characters; empty stems fall back to Pack and Windows reserved names are prefixed with an underscore. Profile title/version changes preserve paths. Project name changes migrate owned folders; ownership checks still protect collisions. Export archives use the short name plus BP/RP (SavageBP/SavageRP) to avoid overlapping paths while keeping folder names recognizable and under 10 characters. Full display names and UUIDs are unchanged. Regression coverage includes migration from 0.26.12 UUID-derived names.
+
 ## 0.26.12 — October 30, 2026
 
 Limit generated deployment and exported pack root folder names to exactly 10 ASCII characters: eight SHA-256 hex characters of the persistent pack header UUID plus BP/RP. Names remain stable across title/version changes and UUID capitalization. Full manifest display names, UUIDs, manifest versions and versioned export filenames are preserved. Existing ownership checks protect colliding unowned folders; legacy owned names migrate through the existing transactional deployment.
