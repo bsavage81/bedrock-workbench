@@ -1,5 +1,11 @@
 # Bedrock Workbench — project tracker
 
+## 0.26.12 — October 30, 2026
+
+Limit generated deployment and exported pack root folder names to exactly 10 ASCII characters: eight SHA-256 hex characters of the persistent pack header UUID plus BP/RP. Names remain stable across title/version changes and UUID capitalization. Full manifest display names, UUIDs, manifest versions and versioned export filenames are preserved. Existing ownership checks protect colliding unowned folders; legacy owned names migrate through the existing transactional deployment.
+
+Syntax checks passed. Full suite: 329 tests, 327 passed, two skipped, zero failed. Tests cover short names, title/version independence, beta/stable legacy migration, header/module UUID preservation, archive paths, rollback and unowned-folder collisions.
+
 ## 0.26.11 — October 29, 2026
 
 Promote the SavageCraft installed-extension naming fix into the repository: beta/stable manifest titles, deployment folders and archive pack folders omit version numbers. Export filenames remain versioned; manifest versions and persistent profile UUIDs retain their existing behavior. Owned legacy folders migrate, while unowned collision and recovery protections remain in place.

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.26.12 — October 30, 2026
+
+- Limit deployed and exported pack folder names to 10 ASCII characters derived from persistent pack UUIDs. Preserve full Minecraft display names, manifest versions, versioned export filenames and automatic migration of older owned folders.
+
 ## 0.26.11 — October 29, 2026
 
 - Keep beta/stable pack titles and deployment folders constant across version changes, preserving profile UUIDs and migrating older owned folders. Keep version numbers in exported mcaddon filenames and manifest version fields.

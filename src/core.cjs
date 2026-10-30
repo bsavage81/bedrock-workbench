@@ -1,6 +1,6 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const { randomUUID } = require('node:crypto');
+const { randomUUID, createHash } = require('node:crypto');
 const { parse, printParseErrorCode, modify, applyEdits } = require('jsonc-parser');
 const { PNG } = require('pngjs');
 const { zipSync } = require('fflate');
@@ -147,6 +147,10 @@ async function* files(root, prefix = '', includeIgnored = false) {
 }
 function checkManifest(manifest, file) {
   if (!validateManifest(manifest)) throw new Error(`${file}: invalid format-2 manifest: ` + validateManifest.errors.map(e => `${e.instancePath} ${e.message}`).join('; '));
+}
+function packFolderName(config, profile, kind) {
+  const identity = config.profiles[profile].identities[kind].header.toLowerCase();
+  return createHash('sha256').update(identity).digest('hex').slice(0, 8) + (kind === 'behavior' ? 'BP' : 'RP');
 }
 function buildName(config, profile, kind) {
   let title = config.profiles[profile].title.trim();
@@ -326,7 +330,7 @@ async function deploy(build, destination) {
     // Minecraft can hold a directory handle that prevents renaming the root.
     for (const kind of kinds) {
       const parent = await noLinks(path.join(destination, `${build.profile === 'beta' ? 'development_' : ''}${kind}_packs`));
-      const target = await noLinks(path.join(parent, buildName(build.config, build.profile, kind)));
+      const target = await noLinks(path.join(parent, packFolderName(build.config, build.profile, kind)));
       await fs.mkdir(parent, { recursive: true });
       if (await exists(target)) {
         const marker = await readJson(path.join(target, '.bedrock-owner.json')).catch(() => null);
@@ -452,7 +456,7 @@ async function exportAddon(build) {
   await fs.mkdir(output, { recursive: true });
   const destination = path.join(output, `${buildName(build.config, 'stable')} ${build.config.version.join('.')}.mcaddon`);
   const archive = {};
-  for (const kind of kinds) for await (const file of files(path.join(build.directory, kind))) archive[`${buildName(build.config, 'stable', kind)}/${file.replaceAll(path.sep, '/')}`] = new Uint8Array(await fs.readFile(path.join(build.directory, kind, file)));
+  for (const kind of kinds) for await (const file of files(path.join(build.directory, kind))) archive[`${packFolderName(build.config, 'stable', kind)}/${file.replaceAll(path.sep, '/')}`] = new Uint8Array(await fs.readFile(path.join(build.directory, kind, file)));
   // Exclusive creation prevents accidentally replacing a released version.
   await fs.writeFile(destination, zipSync(archive, { level: 6 }), { flag: 'wx' });
   return destination;
@@ -474,4 +478,4 @@ function defaultDestinations(target, env = process.env) {
   const legacy = path.join(env.LOCALAPPDATA || '', 'Packages', target === 'preview' ? 'Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe' : 'Microsoft.MinecraftUWP_8wekyb3d8bbwe', 'LocalState/games/com.mojang');
   return [current, legacy];
 }
-module.exports = { loadProject, compile, deploy, exportAddon, initialize, defaultDestinations, readJson, writeJson, files, exists, local, inside, buildName, parseVersion, setProjectVersion, setProjectTargetVersion, commitTextChanges, copyPackIcon, migratePackIcons };
+module.exports = { loadProject, compile, deploy, exportAddon, initialize, defaultDestinations, readJson, writeJson, files, exists, local, inside, buildName, packFolderName, parseVersion, setProjectVersion, setProjectTargetVersion, commitTextChanges, copyPackIcon, migratePackIcons };
