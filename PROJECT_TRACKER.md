@@ -1,5 +1,11 @@
 # Bedrock Workbench — project tracker
 
+## 0.26.11 — October 29, 2026
+
+Promote the SavageCraft installed-extension naming fix into the repository: beta/stable manifest titles, deployment folders and archive pack folders omit version numbers. Export filenames remain versioned; manifest versions and persistent profile UUIDs retain their existing behavior. Owned legacy folders migrate, while unowned collision and recovery protections remain in place.
+
+Verified syntax checks, schema regeneration with no schema changes, and the full suite: 328 tests, 326 passed, two skipped, zero failed. Regression coverage includes beta/stable versioned-folder migration, all header/module UUIDs, repeated version updates, release archive naming, rollback and unowned folders.
+
 ## Entity Appearance System Phase 2 — October 28, 2026 (implementation delivered; rendering acceptance partial)
 
 Continues the same appearance milestone. All prior uncommitted work is preserved. Version remains 0.26.10; this development build is not installed.

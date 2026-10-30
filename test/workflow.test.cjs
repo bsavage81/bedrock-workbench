@@ -161,10 +161,10 @@ test('stable deploy prompts, installs regular packs and refreshes auto-deployed 
   assert.ok(h.prompts[0].validateInput('2.bad.0')); assert.equal(h.prompts[0].validateInput('2.3.4'), undefined);
   await assertVersion(h.root, [2, 3, 4]);
   for (const [parent, name, identity] of [
-    ['behavior_packs', 'Workflow Pack 2.3.4 BP', h.config.profiles.stable.identities.behavior.header],
-    ['resource_packs', 'Workflow Pack 2.3.4 RP', h.config.profiles.stable.identities.resource.header],
-    ['development_behavior_packs', 'Workflow Pack beta 2.3.4 BP', h.config.profiles.beta.identities.behavior.header],
-    ['development_resource_packs', 'Workflow Pack beta 2.3.4 RP', h.config.profiles.beta.identities.resource.header]
+    ['behavior_packs', 'Workflow Pack BP', h.config.profiles.stable.identities.behavior.header],
+    ['resource_packs', 'Workflow Pack RP', h.config.profiles.stable.identities.resource.header],
+    ['development_behavior_packs', 'Workflow Pack Beta BP', h.config.profiles.beta.identities.behavior.header],
+    ['development_resource_packs', 'Workflow Pack Beta RP', h.config.profiles.beta.identities.resource.header]
   ]) assert.equal((await core.readJson(path.join(h.destination, parent, name, 'manifest.json'))).header.uuid, identity);
   const state = await core.readJson(path.join(h.root, '.bedrock/state.json'));
   assert.deepEqual(state.lastRelease.version, [2, 3, 4]); assert.equal(state.lastRelease.mode, 'deployStable');
@@ -176,7 +176,7 @@ test('stable export synchronizes manifests and rebuilds beta locally when auto-d
   await h.commands.get('bedrock.export')();
   assert.deepEqual(h.errors, []); await assertVersion(h.root, [1, 5, 0]);
   const archive = unzipSync(await fs.readFile(path.join(h.root, '.bedrock/exports/Workflow Pack 1.5.0.mcaddon')));
-  assert.deepEqual(JSON.parse(Buffer.from(archive['Workflow Pack 1.5.0 BP/manifest.json']).toString()).header.version, [1, 5, 0]);
+  assert.deepEqual(JSON.parse(Buffer.from(archive['Workflow Pack BP/manifest.json']).toString()).header.version, [1, 5, 0]);
   const state = await core.readJson(path.join(h.root, '.bedrock/state.json'));
   assert.deepEqual((await core.readJson(path.join(state.betaDirectory, 'behavior/manifest.json'))).header.version, [1, 5, 0]);
   assert.deepEqual(await fs.readdir(h.destination), []);
@@ -194,7 +194,7 @@ test('manual beta deploy prompts for a version; automatic startup deployment nev
   const h = await harness(t, true); assert.equal(h.prompts.length, 0);
   h.inputs.push('1.1.0'); await h.commands.get('bedrock.deploy')();
   assert.equal(h.prompts.length, 1); assert.deepEqual(h.errors, []); await assertVersion(h.root, [1, 1, 0]);
-  assert.ok(await core.exists(path.join(h.destination, 'development_behavior_packs/Workflow Pack beta 1.1.0 BP/manifest.json')));
+  assert.ok(await core.exists(path.join(h.destination, 'development_behavior_packs/Workflow Pack Beta BP/manifest.json')));
 });
 test('unsaved manifest edits prevent version commands from overwriting editor content', async t => {
   const h = await harness(t); h.setQuickPick('patch');

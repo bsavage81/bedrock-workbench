@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.26.11 — October 29, 2026
+
+- Keep beta/stable pack titles and deployment folders constant across version changes, preserving profile UUIDs and migrating older owned folders. Keep version numbers in exported mcaddon filenames and manifest version fields.
+
 - Accept Learn-documented event strings and trigger objects for 20 fields across 13 entity components. Preserve local event suggestions and links for either form. Allow entity-reference warnings to be marked as intended.
 
 - Extend Molang potential bindings and source navigation, dirty-buffer references, runtime actor privacy boundaries, reviewed query overload/version guidance, particle/worldgen expression fields and contextual resource-subpack authoring previews. Keep undocumented runtime names and unverified compatibility boundaries permissive.

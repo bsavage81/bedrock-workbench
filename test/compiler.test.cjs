@@ -74,7 +74,7 @@ test('beta preserves version, rewrites all identities and dependencies, grayscal
   assert.equal(bp.header.uuid, config.profiles.beta.identities.behavior.header);
   assert.equal(bp.modules[0].uuid, config.profiles.beta.identities.behavior.modules[0]);
   assert.equal(bp.dependencies[0].uuid, config.profiles.beta.identities.resource.header);
-  assert.equal(bp.header.name, 'SavageCraft v2 beta 1.2.3 BP');
+  assert.equal(bp.header.name, 'SavageCraft v2 Beta BP');
   const image = PNG.sync.read(await fs.readFile(path.join(build.directory, 'behavior/pack_icon.png')));
   assert.equal(image.data[0], image.data[1]); assert.equal(image.data[1], image.data[2]); assert.equal(image.data[3], 128);
   const again = await core.compile(root);
@@ -85,11 +85,11 @@ test('stable mcaddon contains two packs and original colored icon; release canno
   const { root, config } = await fixture(t), build = await core.compile(root, 'stable');
   const file = await core.exportAddon(build), entries = unzipSync(await fs.readFile(file));
   assert.equal(path.basename(file), 'SavageCraft v2 1.2.3.mcaddon');
-  const bp = JSON.parse(Buffer.from(entries['SavageCraft v2 1.2.3 BP/manifest.json']).toString());
+  const bp = JSON.parse(Buffer.from(entries['SavageCraft v2 BP/manifest.json']).toString());
   assert.equal(bp.header.uuid, config.profiles.stable.identities.behavior.header);
-  assert.equal(bp.header.name, 'SavageCraft v2 1.2.3 BP');
-  assert.ok(entries['SavageCraft v2 1.2.3 RP/manifest.json']);
-  assert.deepEqual([...PNG.sync.read(Buffer.from(entries['SavageCraft v2 1.2.3 BP/pack_icon.png'])).data], [200, 60, 20, 128]);
+  assert.equal(bp.header.name, 'SavageCraft v2 BP');
+  assert.ok(entries['SavageCraft v2 RP/manifest.json']);
+  assert.deepEqual([...PNG.sync.read(Buffer.from(entries['SavageCraft v2 BP/pack_icon.png'])).data], [200, 60, 20, 128]);
   await assert.rejects(core.exportAddon(build), { code: 'EEXIST' });
 });
 test('TypeScript, static and dynamic relative imports compile; strings remain untouched', async t => {
@@ -273,8 +273,8 @@ test('human-readable deployment migrates owned UUID folders and removes older ve
   const { root, config } = await fixture(t), destination = path.join(root, 'minecraft/com.mojang');
   await fs.mkdir(destination, { recursive: true });
   const first = await core.compile(root), targets = await core.deploy(first, destination);
-  assert.equal(path.basename(targets[0]), 'SavageCraft v2 beta 1.2.3 BP');
-  assert.equal(path.basename(targets[1]), 'SavageCraft v2 beta 1.2.3 RP');
+  assert.equal(path.basename(targets[0]), 'SavageCraft v2 Beta BP');
+  assert.equal(path.basename(targets[1]), 'SavageCraft v2 Beta RP');
   const legacy = [];
   for (const [index, kind] of ['behavior', 'resource'].entries()) {
     const old = path.join(path.dirname(targets[index]), `bedrock-${config.profiles.beta.identities[kind].header}`);
@@ -285,14 +285,43 @@ test('human-readable deployment migrates owned UUID folders and removes older ve
   for (const folder of migrated) assert.ok(await core.exists(path.join(folder, 'manifest.json')));
   config.version = [1, 2, 4]; await configWrite(root, config);
   const updated = await core.deploy(await core.compile(root), destination);
-  assert.equal(path.basename(updated[0]), 'SavageCraft v2 beta 1.2.4 BP');
-  for (const old of migrated) assert.equal(await core.exists(old), false);
+  assert.equal(path.basename(updated[0]), 'SavageCraft v2 Beta BP');
+  assert.deepEqual(updated, migrated);
+  assert.deepEqual((await core.readJson(path.join(updated[0], 'manifest.json'))).header.version, [1, 2, 4]);
   assert.equal((await core.readJson(path.join(updated[0], 'manifest.json'))).header.uuid, config.profiles.beta.identities.behavior.header);
+});
+test('versioned beta and stable folders migrate with all UUIDs preserved', async t => {
+  const { root } = await fixture(t), destination = path.join(root, 'minecraft/com.mojang');
+  await fs.mkdir(destination, { recursive: true });
+  for (const profile of ['beta', 'stable']) {
+    const targets = await core.deploy(await core.compile(root, profile), destination);
+    const originals = await Promise.all(targets.map(folder => core.readJson(path.join(folder, 'manifest.json'))));
+    const legacy = [];
+    for (const [index, suffix] of ['BP', 'RP'].entries()) {
+      const folder = path.join(path.dirname(targets[index]), `SavageCraft v2${profile === 'beta' ? ' beta' : ''} 1.2.3 ${suffix}`);
+      await fs.rename(targets[index], folder); legacy.push(folder);
+    }
+    const next = await core.deploy(await core.compile(root, profile, { version: [2, 0, 0] }), destination);
+    assert.deepEqual(next, targets);
+    for (let index = 0; index < next.length; index++) {
+      assert.equal(await core.exists(legacy[index]), false);
+      const manifest = await core.readJson(path.join(next[index], 'manifest.json'));
+      assert.equal(manifest.header.uuid, originals[index].header.uuid);
+      assert.deepEqual(manifest.modules.map(module => module.uuid), originals[index].modules.map(module => module.uuid));
+      assert.deepEqual(manifest.header.version, [2, 0, 0]);
+      assert.equal(manifest.header.name, path.basename(next[index]));
+      assert.equal((await fs.readdir(path.dirname(next[index]))).length, 1);
+    }
+  }
 });
 test('a locked obsolete root keeps only its marker, with cleanup retried next deployment', async t => {
   const { root, config } = await fixture(t), destination = path.join(root, 'minecraft/com.mojang');
   await fs.mkdir(destination, { recursive: true });
   const targets = await core.deploy(await core.compile(root), destination);
+  for (let index = 0; index < targets.length; index++) {
+    const legacy = targets[index] + ' 1.2.3';
+    await fs.rename(targets[index], legacy); targets[index] = legacy;
+  }
   config.version = [1, 2, 4]; await configWrite(root, config);
   const build = await core.compile(root), rmdir = fs.rmdir;
   fs.rmdir = async (folder, ...args) => {
@@ -311,23 +340,31 @@ test('migration failure restores old pack manifests and avoids duplicate valid p
   const { root, config } = await fixture(t), destination = path.join(root, 'minecraft/com.mojang');
   await fs.mkdir(destination, { recursive: true });
   const old = await core.deploy(await core.compile(root), destination);
+  for (let index = 0; index < old.length; index++) {
+    const legacy = old[index] + ' 1.2.3';
+    await fs.rename(old[index], legacy); old[index] = legacy;
+  }
   config.version = [1, 2, 4]; await configWrite(root, config);
   const build = await core.compile(root), copyFile = fs.copyFile;
   fs.copyFile = async (from, to, ...args) => {
-    if (from.includes(path.sep + 'next' + path.sep) && to.endsWith(path.join('SavageCraft v2 beta 1.2.4 RP', 'manifest.json'))) throw new Error('Migration write failed');
+    if (from.includes(path.sep + 'next' + path.sep) && to.endsWith(path.join('SavageCraft v2 Beta RP', 'manifest.json'))) throw new Error('Migration write failed');
     return copyFile(from, to, ...args);
   };
   try { await assert.rejects(core.deploy(build, destination), /Migration write failed/); }
   finally { fs.copyFile = copyFile; }
   for (const folder of old) assert.ok(await core.exists(path.join(folder, 'manifest.json')));
-  for (const [index, suffix] of ['BP', 'RP'].entries()) assert.equal(await core.exists(path.join(path.dirname(old[index]), `SavageCraft v2 beta 1.2.4 ${suffix}`, 'manifest.json')), false);
+  for (const [index, suffix] of ['BP', 'RP'].entries()) assert.equal(await core.exists(path.join(path.dirname(old[index]), `SavageCraft v2 Beta ${suffix}`, 'manifest.json')), false);
 });
 test('a naming collision with an unowned folder does not remove the previous version', async t => {
   const { root, config } = await fixture(t), destination = path.join(root, 'minecraft/com.mojang');
   await fs.mkdir(destination, { recursive: true });
   const old = await core.deploy(await core.compile(root), destination);
+  for (let index = 0; index < old.length; index++) {
+    const legacy = old[index] + ' 1.2.3';
+    await fs.rename(old[index], legacy); old[index] = legacy;
+  }
   config.version = [1, 2, 4]; await configWrite(root, config);
-  const collision = path.join(path.dirname(old[0]), 'SavageCraft v2 beta 1.2.4 BP');
+  const collision = path.join(path.dirname(old[0]), 'SavageCraft v2 Beta BP');
   await fs.mkdir(collision); await fs.writeFile(path.join(collision, 'user.txt'), 'preserve');
   await assert.rejects(core.deploy(await core.compile(root), destination), /unowned/);
   assert.equal(await fs.readFile(path.join(collision, 'user.txt'), 'utf8'), 'preserve');
@@ -340,7 +377,7 @@ test('stable deployment writes normal pack folders with separate identities and 
   const stable = await core.deploy(await core.compile(root, 'stable'), destination);
   assert.equal(path.basename(path.dirname(stable[0])), 'behavior_packs');
   assert.equal(path.basename(path.dirname(stable[1])), 'resource_packs');
-  assert.equal(path.basename(stable[0]), 'SavageCraft v2 1.2.3 BP');
+  assert.equal(path.basename(stable[0]), 'SavageCraft v2 BP');
   const manifest = await core.readJson(path.join(stable[0], 'manifest.json'));
   assert.equal(manifest.header.uuid, config.profiles.stable.identities.behavior.header);
   assert.equal(manifest.dependencies[0].uuid, config.profiles.stable.identities.resource.header);
@@ -349,7 +386,8 @@ test('stable deployment writes normal pack folders with separate identities and 
   assert.equal(await core.exists(path.join(root, config.build.exports)), false);
   config.version = [1, 2, 4]; await configWrite(root, config);
   const next = await core.deploy(await core.compile(root, 'stable'), destination);
-  for (const folder of stable) assert.equal(await core.exists(folder), false);
+  assert.deepEqual(next, stable);
+  assert.deepEqual((await core.readJson(path.join(next[0], 'manifest.json'))).header.version, [1, 2, 4]);
   for (const folder of beta) assert.ok(await core.exists(path.join(folder, 'manifest.json')));
   assert.equal((await core.readJson(path.join(next[0], 'manifest.json'))).header.uuid, manifest.header.uuid);
 });

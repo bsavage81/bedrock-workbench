@@ -151,7 +151,7 @@ function checkManifest(manifest, file) {
 function buildName(config, profile, kind) {
   let title = config.profiles[profile].title.trim();
   if (profile === 'beta') title = title.replace(/\s*\bbeta$/i, '').trim() || config.name;
-  const label = `${title}${profile === 'beta' ? ' beta' : ''} ${config.version.join('.')}${kind ? kind === 'behavior' ? ' BP' : ' RP' : ''}`;
+  const label = `${title}${profile === 'beta' ? ' Beta' : ''}${kind ? kind === 'behavior' ? ' BP' : ' RP' : ''}`;
   const safe = label.replace(/[<>:"/\\|?*\u0000-\u001f]/g, '_').replace(/[. ]+$/, '');
   if (safe.length > 160) throw new Error('Build name is too long. Shorten the profile title in project settings.');
   return safe;
@@ -450,7 +450,7 @@ async function exportAddon(build) {
   if (build.profile !== 'stable') throw new Error('Stable profile required for export');
   const output = await local(build.root, build.config.build.exports);
   await fs.mkdir(output, { recursive: true });
-  const destination = path.join(output, `${buildName(build.config, 'stable')}.mcaddon`);
+  const destination = path.join(output, `${buildName(build.config, 'stable')} ${build.config.version.join('.')}.mcaddon`);
   const archive = {};
   for (const kind of kinds) for await (const file of files(path.join(build.directory, kind))) archive[`${buildName(build.config, 'stable', kind)}/${file.replaceAll(path.sep, '/')}`] = new Uint8Array(await fs.readFile(path.join(build.directory, kind, file)));
   // Exclusive creation prevents accidentally replacing a released version.
