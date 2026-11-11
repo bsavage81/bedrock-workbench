@@ -22,3 +22,17 @@ test('public publisher refuses arbitrary additional files and mislabeled Preview
   const preview=fixture(); preview.snapshot.channel='preview'; preview.entry.channel='preview'; const previewBytes=Buffer.from(JSON.stringify(preview.snapshot)); preview.entry.bytes=previewBytes.length;preview.entry.sha256=digest(previewBytes);preview.entry.reviewFingerprint=updates.reviewFingerprint(preview.snapshot,preview.entry);preview.verified={sha256:preview.entry.sha256,reviewFingerprint:preview.entry.reviewFingerprint};preview.reviewed={approvedFingerprints:[preview.entry.reviewFingerprint]};
   assert.throws(()=>validateCandidate(preview.entry,preview.snapshot,previewBytes,preview.verified,preview.reviewed),/No Preview source/);
 });
+const { automaticEligible } = require('../data-public/.github/scripts/publish.cjs');
+test('verified official changes publish automatically while authored changes and fallback conflicts stay held', () => {
+ const f=fixture(), generated=['src/component-descriptions.json','src/format-requirements.json','src/filter-catalog.json','src/molang-catalog.json','src/event-forms.json'];
+ const policy={formatVersion:1,authoredHashes:Object.fromEntries(data.FILES.filter(k=>!generated.includes(k)).map(k=>[k,digest(f.snapshot.files[k])]))};
+ const report={projectRegressionsPassed:true,vanillaDocuments:1,fixtureFailures:[],fallbackFailures:[],missingPages:[],coverage:Object.fromEntries(['block','item','entity'].map(k=>[k,{missing:[]}]))};
+ assert.equal(automaticEligible(f.snapshot,report,policy),true);
+ f.snapshot.files['src/component-descriptions.json'].officialUpdate=true;
+ assert.equal(automaticEligible(f.snapshot,report,policy),true);
+ const bytes=Buffer.from(JSON.stringify(f.snapshot)),entry={...f.entry,bytes:bytes.length,sha256:digest(bytes)};entry.reviewFingerprint=updates.reviewFingerprint(f.snapshot,entry);
+ assert.equal(validateCandidate(entry,f.snapshot,bytes,{sha256:entry.sha256,reviewFingerprint:entry.reviewFingerprint},{automatic:policy},report),entry.reviewFingerprint);
+ for(const changed of [{...report,projectRegressionsPassed:false},{...report,fallbackFailures:[{}]},{...report,previewReview:{inherited:[{}]}},{...report,missingPages:['missing']}]) assert.equal(automaticEligible(f.snapshot,changed,policy),false);
+ f.snapshot.files['schemas/item.schema.json'].title='Changed authored schema';
+ assert.equal(automaticEligible(f.snapshot,report,policy),false);
+});

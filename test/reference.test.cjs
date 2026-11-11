@@ -12,7 +12,7 @@ test('Preview reference preserves only sample-confirmed Stable documentation wit
   const stable = { tag: 'v1.26.50.4', components: { entity: { 'minecraft:trail': { description: 'Trail.', fields: { block: { type: 'String', description: 'Block.' } } }, 'minecraft:missing': { description: 'Missing.', fields: {} } } } };
   const preview = { tag: 'v1.26.60.30-preview', target: '1.26.60', components: { entity: {} } };
   const result = require('../tools/preview-reference-fallback.cjs').mergePreviewReference(preview, stable, { 'behavior_pack/entities/test.json': Buffer.from(JSON.stringify({ 'minecraft:entity': { component_groups: { sample: { 'minecraft:trail': { block: 'minecraft:snow' } } } } })) });
-  assert.equal(result.inherited[0].previewExamples, 1); assert.deepEqual(result.unresolved, ['minecraft:missing']);
+  assert.equal(result.inherited[0].previewExamples, 1); assert.deepEqual(result.unresolved, []); assert.deepEqual(result.absent, ['minecraft:missing']);
   const schema = componentSchema(preview, 'entity'), descriptions = JSON.stringify(schema);
   assert.match(descriptions, /v1\.26\.50\.4 \(Stable documentation; confirmed in Preview samples\)/);
   assert.ok(!preview.components.entity['minecraft:missing']);

@@ -4,14 +4,24 @@ const repository = 'bsavage81/bedrock-workbench-data';
 const files = ['src/documentation-links.json','src/component-descriptions.json','src/format-requirements.json','src/filter-catalog.json','src/molang-catalog.json','src/molang-guidance.json','src/event-forms.json',...['block','entity','item','client-entity','creative-catalog','loot-table','recipe','texture-atlas','sound-definitions'].map(n=>`schemas/${n}.schema.json`)];
 const digest = value => crypto.createHash('sha256').update(Buffer.isBuffer(value) ? value : Buffer.from(JSON.stringify(value ?? null))).digest('hex');
 function check(ok, message) { if (!ok) throw Error(message); }
-function validateCandidate(entry, snapshot, bytes, verified, reviewed) {
+function automaticEligible(snapshot, report, policy) {
+ const generated=['src/component-descriptions.json','src/format-requirements.json','src/filter-catalog.json','src/molang-catalog.json','src/event-forms.json'];
+ return policy?.formatVersion===1 && report?.projectRegressionsPassed===true && report.vanillaDocuments>0
+ && ['fixtureFailures','fallbackFailures','missingPages'].every(k=>Array.isArray(report[k]) && !report[k].length)
+ && ['block','item','entity'].every(k=>report.coverage?.[k]?.missing?.length===0)
+ && !report.previewReview?.inherited?.length && !report.previewReview?.unresolved?.length
+ && !Object.values(snapshot.reference?.components||{}).some(g=>Object.values(g).some(c=>c.sourceTag))
+ && files.filter(f=>!generated.includes(f)).every(f=>policy.authoredHashes?.[f]===digest(snapshot.files[f]))
+ && snapshot.sources?.every(s=>['https://github.com/Mojang/bedrock-samples','https://github.com/MicrosoftDocs/minecraft-creator','https://github.com/Mojang/minecraft-creator-tools'].includes(s.url)&&/^[a-f0-9]{40}$/.test(s.revision));
+}
+function validateCandidate(entry, snapshot, bytes, verified, reviewed, report) {
   check(entry.dataFormatVersion === 1 && ['stable','preview'].includes(entry.channel) && /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,95}$/.test(entry.id), 'Invalid candidate identity');
   check(entry.url === `https://github.com/${repository}/releases/download/data-${entry.id}/snapshot.json`, 'Untrusted artifact URL');
   check(bytes.length === entry.bytes && entry.bytes <= 24*1024*1024 && digest(bytes) === entry.sha256 && verified.sha256 === entry.sha256, 'Candidate checksum mismatch');
   check(snapshot.dataFormatVersion === 1 && snapshot.id === entry.id && snapshot.channel === entry.channel && JSON.stringify(snapshot.sources) === JSON.stringify(entry.sources), 'Candidate provenance mismatch');
   check(snapshot.files && Object.keys(snapshot.files).length === files.length && files.every(f => Object.hasOwn(snapshot.files, f)), 'Candidate contains unapproved files');
   const fingerprint = digest({ dataFormatVersion: entry.dataFormatVersion, channel: entry.channel, extension: entry.extension, minecraft: entry.minecraft, sources: entry.sources, files: Object.fromEntries(files.map(file => [file, digest(snapshot.files[file])])), reference: digest(snapshot.reference), notices: digest(snapshot.notices) });
-  check(fingerprint === verified.reviewFingerprint && fingerprint === entry.reviewFingerprint && reviewed.approvedFingerprints?.includes(fingerprint), 'Candidate has not been approved by the owner');
+  check(fingerprint === verified.reviewFingerprint && fingerprint === entry.reviewFingerprint && (reviewed.approvedFingerprints?.includes(fingerprint) || automaticEligible(snapshot, report, reviewed.automatic)), 'Candidate has not been approved by the owner');
   if (entry.channel === 'preview') check(entry.sources.some(s => s.url === 'https://github.com/Mojang/bedrock-samples' && s.channel === 'preview' && s.available === true), 'No Preview source');
   return fingerprint;
 }
@@ -36,7 +46,7 @@ async function publish(directory, sourceRevision) {
   check(manifest.dataFormatVersion === 1 && manifest.channel === entry.channel && manifest.snapshots?.length === 1 && JSON.stringify(manifest.snapshots[0]) === JSON.stringify(entry), 'Versioned manifest mismatch');
   const response = await fetch(`https://raw.githubusercontent.com/bsavage81/bedrock-workbench/${sourceRevision}/data-public/reviewed.json`, { signal:AbortSignal.timeout(30000) });
   check(response.ok, `Cannot read owner approval: HTTP ${response.status}`);
-  const reviewed = await response.json(); const fingerprint = validateCandidate(entry, snapshot, bytes, verified, reviewed);
+  const reviewed = await response.json(); const fingerprint = validateCandidate(entry, snapshot, bytes, verified, reviewed, JSON.parse(get('verification.json')));
   const endpoint = `repos/${repository}/contents/feeds/${entry.channel}.json`; let previous;
   try { previous = JSON.parse(gh(['api', endpoint])); }
   catch (error) { let problem; try { problem = JSON.parse(String(error.stdout)); } catch { throw Error('Cannot read feed'); } if (String(problem.status) !== '404') throw Error('Cannot read feed'); gh(['api', `repos/${repository}`]); }
@@ -58,4 +68,4 @@ async function publish(directory, sourceRevision) {
   console.log(`Published and anonymously verified ${entry.channel} data ${entry.id}.`);
 }
 if (require.main === module) publish(process.env.CANDIDATE_DIR, process.env.SOURCE_REVISION).catch(error => { console.error(error.message); process.exitCode=1; });
-module.exports = { validateCandidate, digest };
+module.exports = { validateCandidate, digest, automaticEligible };

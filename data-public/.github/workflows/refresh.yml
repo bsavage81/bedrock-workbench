@@ -26,88 +26,17 @@ concurrency:
   group: authoring-data-publication
   cancel-in-progress: false
 jobs:
-  verify:
+  channel:
     strategy:
       fail-fast: false
       max-parallel: 1
       matrix:
         channel: ${{ fromJSON((github.event_name == 'schedule' || inputs.channel == 'both') && '["stable","preview"]' || format('["{0}"]', inputs.channel)) }}
-    runs-on: windows-latest
-    outputs:
-      source_revision: ${{ steps.source.outputs.revision }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: bsavage81/bedrock-workbench
-          path: workbench
-          persist-credentials: false
-      - id: source
-        working-directory: workbench
-        shell: pwsh
-        run: |
-          $revision = git rev-parse HEAD
-          "revision=$revision" >> $env:GITHUB_OUTPUT
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: npm
-          cache-dependency-path: workbench/package-lock.json
-      - working-directory: workbench
-        run: npm ci
-      - working-directory: workbench
-        run: npm run check
-      - working-directory: workbench
-        run: npm test
-      - name: Fetch verified official sources
-        working-directory: workbench
-        run: node tools/fetch-authoring-inputs.cjs .test-temp/data-inputs
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          BEDROCK_DATA_CHANNEL: ${{ matrix.channel }}
-          BEDROCK_DATA_SOURCE_TAG: ${{ inputs.source_tag }}
-          BEDROCK_DATA_STABLE_TAG: ${{ inputs.stable_comparison_tag }}
-      - name: Generate and verify reviewed candidate
-        working-directory: workbench
-        run: node tools/build-authoring-data.cjs .test-temp/data-inputs .test-temp/data-output ${{ matrix.channel }} run-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.channel }}
-      - name: Report candidate review hashes when verification is held
-        if: failure()
-        working-directory: workbench
-        env:
-          DATA_CHANNEL: ${{ matrix.channel }}
-        run: |
-          $report = ".test-temp/data-output/$env:DATA_CHANNEL/verification.json"
-          if (Test-Path -LiteralPath $report) {
-            node -e "const r=require('./'+process.argv[1]);console.log(JSON.stringify({sources:r.sources,generatedFileHashes:r.generatedFileHashes,reviewHashes:r.reviewHashes,previewReview:r.previewReview,fixtureFailures:r.fixtureFailures.length,fallbackFailures:r.fallbackFailures.length,missingPages:r.missingPages.length,projectRegressionsPassed:r.projectRegressionsPassed,reviewFingerprint:r.reviewFingerprint},null,2))" $report
-          }
-      - uses: actions/upload-artifact@v4
-        with:
-          name: reviewed-candidate-${{ matrix.channel }}
-          path: workbench/.test-temp/data-output/${{ matrix.channel }}/
-  publish:
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        channel: ${{ fromJSON((github.event_name == 'schedule' || inputs.channel == 'both') && '["stable","preview"]' || format('["{0}"]', inputs.channel)) }}
-    needs: verify
-    if: github.event_name == 'schedule' || inputs.publish == true
-    runs-on: windows-latest
+    uses: ./.github/workflows/channel.yml
     permissions:
       contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - uses: actions/download-artifact@v4
-        with:
-          name: reviewed-candidate-${{ matrix.channel }}
-          path: candidate
-      - name: Publish immutable data after owner-fingerprint verification
-        run: node .github/scripts/publish.cjs
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CANDIDATE_DIR: candidate
-          SOURCE_REVISION: ${{ needs.verify.outputs.source_revision }}
+    with:
+      channel: ${{ matrix.channel }}
+      publish: ${{ github.event_name == 'schedule' || inputs.publish == true }}
+      source_tag: ${{ inputs.source_tag || '' }}
+      stable_comparison_tag: ${{ inputs.stable_comparison_tag || '' }}

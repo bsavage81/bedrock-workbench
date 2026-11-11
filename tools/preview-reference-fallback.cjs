@@ -11,12 +11,12 @@ function mergePreviewReference(preview, stable, vanillaFiles) {
       for (const name of Object.keys(components)) counts[name] = (counts[name] || 0) + 1;
     }
   }
-  const inherited = [], unresolved = [];
+  const inherited = [], unresolved = [], absent = [];
   for (const [name, component] of Object.entries(stable.components.entity)) {
     if (Object.hasOwn(preview.components.entity, name)) continue;
     if (counts[name]) { preview.components.entity[name] = { ...component, sourceTag: stable.tag }; inherited.push({ name, sourceTag: stable.tag, previewExamples: counts[name] }); }
-    else unresolved.push(name);
+    else absent.push(name);
   }
-  return { inherited, unresolved };
+  return { inherited, unresolved, absent };
 }
 module.exports = { mergePreviewReference };

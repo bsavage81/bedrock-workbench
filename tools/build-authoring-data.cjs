@@ -86,7 +86,7 @@ async function build(directory, output, channel, id) {
     }
   }
   const report = { channel, id, sources, coverage, missingPages, previewReview, fallbackFailures, vanillaDocuments: Object.keys(vanilla).length, fixtureFailures: fixtures, generatedFileHashes: Object.fromEntries(Object.entries(files).map(([file, content]) => [file, updates.sha256(Buffer.from(JSON.stringify(content)))])), reviewHashes: { reference: updates.sha256(Buffer.from(JSON.stringify(reference))), notices: Object.fromEntries(Object.entries(snapshot.notices).map(([name, value]) => [name, updates.sha256(Buffer.from(JSON.stringify(value)))])) } };
-  const destination = path.join(output, channel); await fs.mkdir(destination, { recursive: true });
+  const destination = path.join(output, channel); await fs.mkdir(destination, { recursive: true }); await fs.rm(path.join(destination, 'verified.json'), { force: true });
   await fs.writeFile(path.join(destination, 'snapshot.json'), bytes); await fs.writeFile(path.join(destination, 'entry.json'), JSON.stringify(entry, null, 2)); await fs.writeFile(path.join(destination, 'verification.json'), JSON.stringify(report, null, 2));
   await fs.writeFile(path.join(destination, 'manifest.json'), JSON.stringify({ dataFormatVersion: 1, channel, generatedAt, snapshots: [entry] }, null, 2));
   try {
@@ -95,11 +95,15 @@ async function build(directory, output, channel, id) {
   } catch (error) { await fs.writeFile(path.join(destination, 'regressions.log'), error.stdout || error.message); report.projectRegressionsPassed = false; }
   const review = JSON.parse(await fs.readFile(path.join(__dirname, '../data-public/reviewed.json')));
   const key = updates.reviewFingerprint(snapshot, entry);
-  report.reviewFingerprint = key; await fs.writeFile(path.join(destination, 'verification.json'), JSON.stringify(report, null, 2));
+  report.publication = 'blocked-by-validation'; report.reviewFingerprint = key; await fs.writeFile(path.join(destination, 'verification.json'), JSON.stringify(report, null, 2));
   entry.reviewFingerprint = key;
   await fs.writeFile(path.join(destination, 'entry.json'), JSON.stringify(entry, null, 2));
   await fs.writeFile(path.join(destination, 'manifest.json'), JSON.stringify({ dataFormatVersion: 1, channel, generatedAt, snapshots: [entry] }, null, 2));
-  if (fixtures.length || fallbackFailures.length || previewReview?.unresolved.length || missingPages.length || !report.projectRegressionsPassed || Object.values(coverage).some(v => v.missing.length) || !review.approvedFingerprints.includes(key)) throw Error(`Candidate held for review: ${key}. Inspect ${destination}/verification.json`);
+  if (fixtures.length || fallbackFailures.length || previewReview?.unresolved.length || missingPages.length || !report.projectRegressionsPassed || Object.values(coverage).some(v => v.missing.length)) throw Error(`Candidate held for review: ${key}. Inspect ${destination}/verification.json`);
+  const eligible = review.approvedFingerprints.includes(key) || require('../data-public/.github/scripts/publish.cjs').automaticEligible(snapshot, report, review.automatic);
+  report.publication = eligible ? 'ready' : 'held-for-review';
+  await fs.writeFile(path.join(destination, 'verification.json'), JSON.stringify(report, null, 2));
+  if (!eligible) { console.log('Candidate awaits review: inherited or authored data is outside automatic policy'); return entry; }
   await fs.writeFile(path.join(destination, 'verified.json'), JSON.stringify({ sha256: entry.sha256, reviewFingerprint: key }));
   return entry;
 }

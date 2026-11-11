@@ -1,0 +1,113 @@
+name: Verify and publish one authoring channel
+on:
+  workflow_call:
+    inputs:
+      channel:
+        type: string
+        required: true
+      publish:
+        type: boolean
+        default: false
+      source_tag:
+        type: string
+        default: ''
+      stable_comparison_tag:
+        type: string
+        default: ''
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: windows-latest
+    outputs:
+      ready: ${{ steps.ready.outputs.ready }}
+      source_revision: ${{ steps.source.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: bsavage81/bedrock-workbench
+          path: workbench
+          persist-credentials: false
+      - id: source
+        working-directory: workbench
+        shell: pwsh
+        run: |
+          $revision = git rev-parse HEAD
+          "revision=$revision" >> $env:GITHUB_OUTPUT
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: workbench/package-lock.json
+      - working-directory: workbench
+        run: npm ci
+      - working-directory: workbench
+        run: npm run check
+      - working-directory: workbench
+        run: npm test
+      - name: Fetch verified official sources
+        working-directory: workbench
+        run: node tools/fetch-authoring-inputs.cjs .test-temp/data-inputs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BEDROCK_DATA_CHANNEL: ${{ inputs.channel }}
+          BEDROCK_DATA_SOURCE_TAG: ${{ inputs.source_tag }}
+          BEDROCK_DATA_STABLE_TAG: ${{ inputs.stable_comparison_tag }}
+      - name: Generate and verify reviewed candidate
+        working-directory: workbench
+        run: node tools/build-authoring-data.cjs .test-temp/data-inputs .test-temp/data-output ${{ inputs.channel }} run-${{ github.run_id }}-${{ github.run_attempt }}-${{ inputs.channel }}
+      - name: Report candidate verification and publication status
+        if: always()
+        working-directory: workbench
+        env:
+          DATA_CHANNEL: ${{ inputs.channel }}
+        run: |
+          $report = ".test-temp/data-output/$env:DATA_CHANNEL/verification.json"
+          if (Test-Path -LiteralPath $report) {
+            node -e "const r=require('./'+process.argv[1]);console.log(JSON.stringify({sources:r.sources,generatedFileHashes:r.generatedFileHashes,reviewHashes:r.reviewHashes,previewReview:r.previewReview,fixtureFailures:r.fixtureFailures.length,fallbackFailures:r.fallbackFailures.length,missingPages:r.missingPages.length,projectRegressionsPassed:r.projectRegressionsPassed,reviewFingerprint:r.reviewFingerprint},null,2))" $report
+          }
+      - name: Write channel summary
+        if: always()
+        working-directory: workbench
+        shell: pwsh
+        run: |
+          $report = '.test-temp/data-output/${{ inputs.channel }}/verification.json'
+          if (Test-Path $report) {
+            $r = Get-Content $report -Raw | ConvertFrom-Json
+            "## ${{ inputs.channel }} authoring data" >> $env:GITHUB_STEP_SUMMARY
+            "Publication: $($r.publication). Fixture errors: $($r.fixtureFailures.Count). Inherited-definition errors: $($r.fallbackFailures.Count). See candidate artifact for full verification and regression logs." >> $env:GITHUB_STEP_SUMMARY
+          }
+      - id: ready
+        if: success()
+        working-directory: workbench
+        shell: pwsh
+        run: |
+          if (Test-Path '.test-temp/data-output/${{ inputs.channel }}/verified.json') { 'ready=true' >> $env:GITHUB_OUTPUT }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reviewed-candidate-${{ inputs.channel }}
+          path: workbench/.test-temp/data-output/${{ inputs.channel }}/
+  publish:
+    needs: verify
+    if: needs.verify.outputs.ready == 'true' && inputs.publish
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          name: reviewed-candidate-${{ inputs.channel }}
+          path: candidate
+      - name: Publish immutable verified official or owner-reviewed data
+        run: node .github/scripts/publish.cjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_DIR: candidate
+          SOURCE_REVISION: ${{ needs.verify.outputs.source_revision }}

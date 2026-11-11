@@ -18,5 +18,21 @@
       "date": "2026-10-27",
       "reason": "Verified repeated Learn downloads produce identical 378 extracted entries and channel audits despite volatile raw HTML hashes. Raw hashes retained in inputAudit; approval still binds all extracted data and source revisions."
     }
-  ]
+  ],
+  "automatic": {
+    "formatVersion": 1,
+    "authoredHashes": {
+      "src/documentation-links.json": "d4b3b77174a206de12b54ccff48f5473fdb87b2b4a615275751994fe790d24ae",
+      "src/molang-guidance.json": "6ee54788226661f3204baeb93f6f78e64a6281f4f79d1f97ef21d9b2b2e70261",
+      "schemas/block.schema.json": "69db6c13fb7078b69088dc3c40bca08476e851a9b3a62a4793755b38db3a74ac",
+      "schemas/entity.schema.json": "e961ac00ddd8091d51cd8a845933c752baf654b3b9ee7eec7b74281a77a4d074",
+      "schemas/item.schema.json": "2e6f5dbb67d5c7cfe99846987303e254b09e9ae13f584e31863bb4c3cea8ed55",
+      "schemas/client-entity.schema.json": "0743ebb6651cb28fc4253b961fe8d2e4603301e082abc984a82b1e734f65c9b3",
+      "schemas/creative-catalog.schema.json": "62d1e8e5a6b241d02d1fe19c84865532a4480b45d9c5273bb57d097dc197656c",
+      "schemas/loot-table.schema.json": "5a5206972eda8d8d25113bfac00951c5f99ad71c884d9d84db332b9fd6a30976",
+      "schemas/recipe.schema.json": "b4f4030d0138de694107ec095ab7d8441d76201cec4f86d7885552cb6ea8e44f",
+      "schemas/texture-atlas.schema.json": "21544cdf6b8ec0c715c2244228237b510118fc1db8ba642457c4fd939cd23c24",
+      "schemas/sound-definitions.schema.json": "d9436845b5b6ab5dfc75f1e00cc03572d941ee7d96997badbe0c226d145a5f21"
+    }
+  }
 }
