@@ -36,3 +36,21 @@ test('verified official changes publish automatically while authored changes and
  f.snapshot.files['schemas/item.schema.json'].title='Changed authored schema';
  assert.equal(automaticEligible(f.snapshot,report,policy),false);
 });
+
+test('official Preview replacements publish without fingerprints while Stable-only fallback content remains reviewed', () => {
+ const f=fixture(),snapshot=f.snapshot;snapshot.channel='preview';snapshot.sources.push({url:'https://github.com/Mojang/bedrock-samples',revision:'b'.repeat(40),tag:'v1.26.70.23-preview',channel:'preview',available:true});snapshot.sources[0].tag='v1.26.60.5';
+ const generated=['src/component-descriptions.json','src/format-requirements.json','src/filter-catalog.json','src/molang-catalog.json','src/event-forms.json'];
+ const fallback={description:'Stable attack',fields:{damage:{type:'Integer'}},sourceTag:'v1.26.60.5'};
+ snapshot.reference={components:{entity:{'minecraft:attack':fallback}}};
+ const policy={formatVersion:1,previewPrecedence:'official-replaces-stable',authoredHashes:Object.fromEntries(data.FILES.filter(k=>!generated.includes(k)).map(k=>[k,digest(snapshot.files[k])])),fallbackHashes:{'minecraft:attack':digest(require('../data-public/.github/scripts/publish.cjs').fallbackContent(fallback))}};
+ const report={projectRegressionsPassed:true,vanillaDocuments:5,fixtureFailures:[],fallbackFailures:[],missingPages:[],coverage:Object.fromEntries(['block','item','entity'].map(k=>[k,{missing:[]}])) ,previewReview:{inherited:[{name:'minecraft:attack',sourceTag:'v1.26.60.5',previewExamples:2}],unresolved:[]}};
+ assert.equal(automaticEligible(snapshot,report,policy),true);
+ fallback.fields.damage.type='String';assert.equal(automaticEligible(snapshot,report,policy),false);fallback.fields.damage.type='Integer';
+ assert.equal(automaticEligible(snapshot,{...report,fallbackFailures:[{}]},policy),false);
+ assert.equal(automaticEligible(snapshot,{...report,previewReview:{inherited:[],unresolved:[]}},policy),false);
+ // An official Preview definition replaces the entire fallback, including its fields.
+ snapshot.reference.components.entity['minecraft:attack']={description:'Official Preview replacement',fields:{new_preview_field:{type:'Boolean'}}};report.previewReview.inherited=[];
+ assert.equal(automaticEligible(snapshot,report,policy),true);
+ const bytes=Buffer.from(JSON.stringify(snapshot)),entry={...f.entry,channel:'preview',sources:snapshot.sources,bytes:bytes.length,sha256:digest(bytes)};entry.reviewFingerprint=updates.reviewFingerprint(snapshot,entry);entry.url=updates.artifactUrl(entry);
+ assert.equal(validateCandidate(entry,snapshot,bytes,{sha256:entry.sha256,reviewFingerprint:entry.reviewFingerprint},{approvedFingerprints:[],automatic:policy},report),entry.reviewFingerprint);
+});

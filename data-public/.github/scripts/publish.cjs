@@ -4,13 +4,24 @@ const repository = 'bsavage81/bedrock-workbench-data';
 const files = ['src/documentation-links.json','src/component-descriptions.json','src/format-requirements.json','src/filter-catalog.json','src/molang-catalog.json','src/molang-guidance.json','src/event-forms.json',...['block','entity','item','client-entity','creative-catalog','loot-table','recipe','texture-atlas','sound-definitions'].map(n=>`schemas/${n}.schema.json`)];
 const digest = value => crypto.createHash('sha256').update(Buffer.isBuffer(value) ? value : Buffer.from(JSON.stringify(value ?? null))).digest('hex');
 function check(ok, message) { if (!ok) throw Error(message); }
+function fallbackContent(component) { const { sourceTag, ...content } = component; return content; }
+function previewEligible(snapshot, report, policy) {
+ if(Object.entries(snapshot.reference?.components || {}).some(([kind,group])=>kind!=='entity' && Object.values(group).some(c=>c.sourceTag))) return false;
+ const inherited = Object.entries(snapshot.reference?.components?.entity || {}).filter(([,c])=>c.sourceTag);
+ if(snapshot.channel !== 'preview') return !inherited.length && !report.previewReview?.inherited?.length;
+ if(policy.previewPrecedence !== 'official-replaces-stable' || !snapshot.sources?.some(s=>s.url==='https://github.com/Mojang/bedrock-samples' && s.channel==='preview' && s.available===true)) return false;
+ const audit=report.previewReview?.inherited || [];
+ return audit.length===inherited.length && new Set(audit.map(v=>v.name)).size===audit.length && inherited.every(([name,c])=>
+   policy.fallbackHashes?.[name]===digest(fallbackContent(c))
+   && audit.some(v=>v.name===name && v.sourceTag===c.sourceTag && v.previewExamples>0)
+   && snapshot.sources.some(v=>v.url==='https://github.com/Mojang/bedrock-samples' && v.channel==='stable' && v.available===true && v.tag===c.sourceTag));
+}
 function automaticEligible(snapshot, report, policy) {
  const generated=['src/component-descriptions.json','src/format-requirements.json','src/filter-catalog.json','src/molang-catalog.json','src/event-forms.json'];
  return policy?.formatVersion===1 && report?.projectRegressionsPassed===true && report.vanillaDocuments>0
  && ['fixtureFailures','fallbackFailures','missingPages'].every(k=>Array.isArray(report[k]) && !report[k].length)
  && ['block','item','entity'].every(k=>report.coverage?.[k]?.missing?.length===0)
- && !report.previewReview?.inherited?.length && !report.previewReview?.unresolved?.length
- && !Object.values(snapshot.reference?.components||{}).some(g=>Object.values(g).some(c=>c.sourceTag))
+ && !report.previewReview?.unresolved?.length && previewEligible(snapshot, report, policy)
  && files.filter(f=>!generated.includes(f)).every(f=>policy.authoredHashes?.[f]===digest(snapshot.files[f]))
  && snapshot.sources?.every(s=>['https://github.com/Mojang/bedrock-samples','https://github.com/MicrosoftDocs/minecraft-creator','https://github.com/Mojang/minecraft-creator-tools'].includes(s.url)&&/^[a-f0-9]{40}$/.test(s.revision));
 }
@@ -68,4 +79,4 @@ async function publish(directory, sourceRevision) {
   console.log(`Published and anonymously verified ${entry.channel} data ${entry.id}.`);
 }
 if (require.main === module) publish(process.env.CANDIDATE_DIR, process.env.SOURCE_REVISION).catch(error => { console.error(error.message); process.exitCode=1; });
-module.exports = { validateCandidate, digest, automaticEligible };
+module.exports = { validateCandidate, digest, automaticEligible, fallbackContent };

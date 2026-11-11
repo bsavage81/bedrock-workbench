@@ -43,6 +43,11 @@
       "schemas/recipe.schema.json": "b4f4030d0138de694107ec095ab7d8441d76201cec4f86d7885552cb6ea8e44f",
       "schemas/texture-atlas.schema.json": "21544cdf6b8ec0c715c2244228237b510118fc1db8ba642457c4fd939cd23c24",
       "schemas/sound-definitions.schema.json": "d9436845b5b6ab5dfc75f1e00cc03572d941ee7d96997badbe0c226d145a5f21"
+    },
+    "previewPrecedence": "official-replaces-stable",
+    "fallbackHashes": {
+      "minecraft:attack": "0a09915dbd62d06d57c4467e8a1bd601293f56518aaf5b6c31431bdaa358a6da",
+      "minecraft:spell_effects": "5c427579935a2451d99ac42f343d1114d531206b7ffcdd02077b237d6f11f1d7"
     }
   }
 }

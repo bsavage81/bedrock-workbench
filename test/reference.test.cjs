@@ -164,3 +164,12 @@ test('Preview spell effects preserve documented string and array alternatives wi
  files['behavior_pack/entities/invalid.json']=Buffer.from(JSON.stringify({'minecraft:entity':{components:{'minecraft:spell_effects':{remove_effects:[123]}}}}));
  assert.equal(merge(preview(),stable,files,learn).corrections.length,0);
 });
+
+test('official Preview components replace Stable definitions in full without resurrecting removed fields', () => {
+ const stable={tag:'v1.26.60.5',components:{entity:{'minecraft:attack':{fields:{old_stable_field:{type:'String'},damage:{type:'Integer'}}}}}};
+ const preview={tag:'v1.26.70.23-preview',components:{entity:{'minecraft:attack':{fields:{damage:{type:'Boolean'},new_preview_field:{type:'String'}}}}}};
+ const original=structuredClone(preview.components.entity['minecraft:attack']);
+ const review=require('../tools/preview-reference-fallback.cjs').mergePreviewReference(preview,stable,{'behavior_pack/entities/example.json':Buffer.from(JSON.stringify({'minecraft:entity':{components:{'minecraft:attack':{damage:true}}}}))});
+ assert.deepEqual(preview.components.entity['minecraft:attack'],original);assert.deepEqual(review.inherited,[]);
+ assert.equal(preview.components.entity['minecraft:attack'].fields.old_stable_field,undefined);
+});
