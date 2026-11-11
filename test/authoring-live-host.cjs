@@ -4,11 +4,12 @@ const core=require('../src/core.cjs'),data=require('../src/authoring-data.cjs');
 async function until(check,message){const deadline=Date.now()+60000;while(Date.now()<deadline){const value=await check();if(value)return value;await new Promise(r=>setTimeout(r,250));}throw Error(message);}
 async function run(){
  const root=vscode.workspace.workspaceFolders[0].uri.fsPath,channel=process.env.BEDROCK_LIVE_CHANNEL==='preview'?'preview':'stable';
- const project=await core.loadProject(root);project.config.target=channel==='preview'?'preview':'release';project.config.targetVersion=channel==='preview'?'1.26.60':'1.26.50';await core.writeJson(path.join(root,'bedrock-project.json'),project.config);
+ const project=await core.loadProject(root);project.config.target=channel==='preview'?'preview':'release';project.config.targetVersion=process.env.BEDROCK_LIVE_TARGET || (channel==='preview'?'1.26.60':'1.26.50');assert.match(project.config.targetVersion,/^\d+\.\d+\.\d+$/);await core.writeJson(path.join(root,'bedrock-project.json'),project.config);
  const extension=vscode.extensions.getExtension('bsavage81.bedrock-workbench'),original=vscode.window.showQuickPick;vscode.window.showQuickPick=async()=>undefined;
  try{
   await extension.activate();await vscode.commands.executeCommand('bedrock.refresh');await vscode.commands.executeCommand('bedrock.refreshAuthoringData');
   const status=await until(async()=>{const s=await vscode.commands.executeCommand('bedrock.authoringData');return s?.channel===channel&&s.version!=='bundled'&&!s.error&&s;},'No compatible public data snapshot activated');
+  if(process.env.BEDROCK_LIVE_EXPECTED)assert.equal(status.version,process.env.BEDROCK_LIVE_EXPECTED);
   assert.equal(data.revision,status.version);assert.equal(data.reference.sourceChannel,channel);assert.ok(data.reference.tag);
   const response=await fetch(`https://raw.githubusercontent.com/bsavage81/bedrock-workbench-data/main/feeds/${channel}.json`);assert.ok(response.ok,`Anonymous ${channel} manifest HTTP ${response.status}`);
   const manifest=await response.json(),entry=manifest.snapshots.find(value=>value.id===status.version);assert.ok(entry,'Active snapshot absent from anonymous feed');

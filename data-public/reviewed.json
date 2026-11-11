@@ -2,7 +2,8 @@
   "formatVersion": 1,
   "approvedFingerprints": [
     "3b09d0c0f881cbb9ff71aa6fd1b84e000ba3fe81fe8b4ff95012405a10d7854a",
-    "ba1359c9b0937bcdae9b30ffc266f263fbfb6f620dcf5ed1d8c1dc846eda1d68"
+    "ba1359c9b0937bcdae9b30ffc266f263fbfb6f620dcf5ed1d8c1dc846eda1d68",
+    "42fa2dc592955ae9719d64bb1c46f7d64c46c190a5e7a0ebb3bec3111b2ebcb9"
   ],
   "reviews": [
     {
@@ -17,6 +18,15 @@
     {
       "date": "2026-10-27",
       "reason": "Verified repeated Learn downloads produce identical 378 extracted entries and channel audits despite volatile raw HTML hashes. Raw hashes retained in inputAudit; approval still binds all extracted data and source revisions."
+    },
+    {
+      "date": "2026-11-11",
+      "extension": "0.26.13",
+      "channels": [
+        "preview"
+      ],
+      "fingerprint": "42fa2dc592955ae9719d64bb1c46f7d64c46c190a5e7a0ebb3bec3111b2ebcb9",
+      "reason": "Reviewed sample-confirmed attack inheritance (64 occurrences) and spell_effects (6 occurrences) for v1.26.70.23-preview from v1.26.60.5 Stable metadata. Pinned Learn a9fd1c066560313eefb96715e8abf201890abd81 documents remove_effects as Array of strings; Preview vanilla contains both strings and arrays. Replaced inherited String-only type with an advisory alternative label, retained source tags and documented correction evidence. All 519 vanilla fixtures, inherited constraints and candidate-loaded regressions pass. No Stable schema or executable consumer changes."
     }
   ],
   "automatic": {

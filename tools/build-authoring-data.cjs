@@ -37,7 +37,7 @@ async function build(directory, output, channel, id) {
     const stable = buildIndex(await fs.readFile(path.join(directory, 'stable.zip')), input.channels.stable.tag);
     if (require('../src/releases.cjs').compareVersions(stable.engine, reference.engine) > 0 || stable.engine === reference.engine && parseInt(stable.tag.split('.').at(-1), 10) > parseInt(reference.tag.split('.').at(-1), 10)) throw Error('Stable comparison is newer than Preview; select a compatible historical Stable source');
     const examples = unzipSync(archive, { filter: e => /^behavior_pack\/entities\/.*\.json$/.test(e.name) });
-    previewReview = require('./preview-reference-fallback.cjs').mergePreviewReference(reference, stable, examples);
+    previewReview = require('./preview-reference-fallback.cjs').mergePreviewReference(reference, stable, examples, verified);
     reference.sourceFallbacks = previewReview.inherited;
   }
   files['src/filter-catalog.json'] = { source: reference.source, engine: reference.engine, tests: reference.filters, families: reference.vanilla?.entity_family || [] };

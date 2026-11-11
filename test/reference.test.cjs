@@ -148,3 +148,19 @@ test('pushable_by_entity keeps its description and minimum version after numeric
 test('standard AI goal priority is documented when omitted by Mojang field metadata',()=>{
  const {unzipSync}=require('fflate'),files=unzipSync(archive());files['metadata/doc_modules/entities.json']=strToU8(JSON.stringify({name:'Server Entity Documentation',nodes:[{name:'AI Goals',nodes:[{name:'minecraft:behavior.random_hover',description:['Randomly hovers.'],nodes:[{name:'interval',type:'Integer'}]}]}]}));const index=buildIndex(zipSync(files),'v1.26.50.4');assert.equal(index.components.entity['minecraft:behavior.random_hover'].fields.priority.type,'Integer');assert.match(index.components.entity['minecraft:behavior.random_hover'].fields.priority.description,/Lower numbers/);
 });
+
+test('Preview spell effects preserve documented string and array alternatives without mutating Stable constraints', () => {
+ const merge = require('../tools/preview-reference-fallback.cjs').mergePreviewReference;
+ const stable={tag:'v1.26.60.5',components:{entity:{'minecraft:spell_effects':{description:'Effects.',fields:{remove_effects:{type:'String',description:'Remove effects.'}}},'minecraft:attack':{fields:{effect_amplifier:{type:'Integer'}}}}}};
+ const preview=()=>({tag:'v1.26.70.23-preview',components:{entity:{}}});
+ const files={};for(const [i,value] of ['poison',['weakness']].entries())files[`behavior_pack/entities/${i}.json`]=Buffer.from(JSON.stringify({'minecraft:entity':{components:{'minecraft:spell_effects':{remove_effects:value},'minecraft:attack':{effect_amplifier:1}}}}));
+ const learn={revision:'a'.repeat(40),pages:{'entity|minecraft:spell_effects':{path:'creator/reference/spell_effects.md',text:'| remove_effects | [] | Array of strings | Effects |'}}};
+ const candidate=preview(),review=merge(candidate,stable,files,learn);
+ assert.equal(review.corrections.length,1);assert.equal(stable.components.entity['minecraft:spell_effects'].fields.remove_effects.type,'String');
+ const validate=new(require('ajv'))({strict:false}).compile(componentSchema(candidate,'entity'));
+ for(const raw of Object.values(files))assert.equal(validate(JSON.parse(raw)),true,JSON.stringify(validate.errors));
+ assert.equal(validate({'minecraft:entity':{components:{'minecraft:attack':{effect_amplifier:'wrong'}}}}),false);
+ assert.equal(merge(preview(),stable,files).corrections.length,0);
+ files['behavior_pack/entities/invalid.json']=Buffer.from(JSON.stringify({'minecraft:entity':{components:{'minecraft:spell_effects':{remove_effects:[123]}}}}));
+ assert.equal(merge(preview(),stable,files,learn).corrections.length,0);
+});
